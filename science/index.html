@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>המעבדה של פיקאצ'ו</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { margin: 0; height: 100%; overflow: hidden; font-family: "Arial Rounded MT Bold", "Varela Round", Arial, sans-serif; background: #fff8dc; touch-action: none; }
+  button { font-family: inherit; font-weight: bold; cursor: pointer; border: none; }
+  .top { position: fixed; top: 0; left: 0; right: 0; height: 74px; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; z-index: 20; }
+  .round { width: 58px; height: 58px; border-radius: 50%; font-size: 28px; background: #fff; border: 4px solid #3b4cca; box-shadow: 0 4px 0 #23308a; }
+  .round:active { transform: translateY(3px); box-shadow: 0 1px 0 #23308a; }
+  .stars { background: #fff; border: 4px solid #ffcb05; box-shadow: 0 4px 0 #c79a00; border-radius: 30px; padding: 6px 16px; font-size: 28px; color: #3b4cca; font-weight: bold; }
+  .grp { display: flex; gap: 8px; }
+  .screen { position: fixed; inset: 0; display: none; }
+  .screen.on { display: block; }
+  /* menu */
+  #menu { background: radial-gradient(circle at 50% 30%, #fff59d, #ffcb05 60%, #f5a300); }
+  #menu .inner { position: absolute; inset: 74px 0 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 10px; }
+  h1 { margin: 0; font-size: clamp(32px, 7vw, 64px); color: #3b4cca; text-shadow: 3px 3px 0 #fff; text-align: center; }
+  #menuPika { width: min(200px, 34vh); height: min(200px, 34vh); }
+  .tiles { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .tile { width: clamp(120px, 28vw, 200px); height: clamp(120px, 28vw, 200px); border-radius: 30px; border: 6px solid #fff; font-size: clamp(56px, 12vw, 90px); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 0 rgba(0,0,0,.25); line-height: 1.1; }
+  .tile span { font-size: clamp(18px, 4vw, 28px); text-shadow: 0 2px 2px rgba(0,0,0,.4); }
+  .tile:active { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .tile { position: relative; } .tile.done::after { content: "⭐"; position: absolute; font-size: 40px; top: -18px; right: -14px; }
+  .t1 { background: #29b6f6; } .t2 { background: #66bb6a; } .t3 { background: #ef5350; }
+  /* bubble */
+  #guide { position: fixed; bottom: 8px; right: 8px; z-index: 15; display: flex; align-items: flex-end; gap: 6px; pointer-events: none; max-width: calc(100% - 16px); }
+  #guidePika { width: 110px; height: 110px; flex: none; }
+  #bubble { background: #fff; border: 4px solid #3b4cca; border-radius: 24px; padding: 10px 16px; font-size: clamp(20px, 4.5vw, 30px); color: #222; max-width: 560px; box-shadow: 0 4px 0 rgba(0,0,0,.2); margin-bottom: 40px; opacity: 0; transform: scale(.6); transition: .25s; pointer-events: auto; }
+  #bubble.show { opacity: 1; transform: scale(1); }
+  #menu.on ~ #guide { display: none; }
+  .big { font-size: clamp(26px, 6vw, 40px); padding: 12px 28px; border-radius: 40px; color: #fff; border: 5px solid #fff; box-shadow: 0 6px 0 rgba(0,0,0,.25); }
+  .big:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .green { background: #43a047; } .blue { background: #1e88e5; } .red { background: #e53935; } .yellow { background: #ffb300; }
+  /* sink / float */
+  #sink { background: linear-gradient(#bbdefb, #e3f2fd); }
+  #tray { position: absolute; top: 78px; left: 0; right: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 8px; }
+  .obj { font-size: clamp(42px, 8vw, 60px); width: clamp(62px, 11vw, 84px); height: clamp(62px, 11vw, 84px); border-radius: 20px; background: #fff; border: 4px solid #90caf9; box-shadow: 0 4px 0 #64b5f6; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .obj.used { opacity: .25; pointer-events: none; }
+  #tank { position: absolute; left: 4%; right: 4%; bottom: 6px; top: 42%; border: 6px solid #fff; border-top: none; border-radius: 0 0 30px 30px; background: linear-gradient(rgba(41,182,246,.55), rgba(2,119,189,.75)); overflow: visible; }
+  #tank::before { content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 20px; background: radial-gradient(ellipse at 50% 0, rgba(255,255,255,.7), transparent 70%); }
+  .inwater { position: absolute; font-size: clamp(44px, 8vw, 64px); transform: translate(-50%, -50%); line-height: 1; }
+  #predict { position: absolute; left: 50%; top: 52%; transform: translate(-50%, 0); display: none; gap: 16px; z-index: 5; }
+  #predict.on { display: flex; }
+  #predict .big { min-width: 130px; white-space: nowrap; padding: 12px 20px; }
+  #held { position: absolute; left: 50%; top: calc(42% - 46px); font-size: 80px; transform: translate(-50%, -50%); display: none; z-index: 4; animation: wob 1s infinite alternate; }
+  @keyframes wob { from { transform: translate(-50%, -50%) rotate(-8deg); } to { transform: translate(-50%, -50%) rotate(8deg); } }
+  .bubbleUp { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 2px solid rgba(255,255,255,.8); animation: up 1.2s linear forwards; }
+  @keyframes up { to { transform: translateY(-120px); opacity: 0; } }
+  /* ramp */
+  #ramp { background: linear-gradient(#c8e6c9, #f1f8e9); }
+  #rampCv { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #rampCtl { position: absolute; top: 80px; left: 0; right: 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 0 70px; }
+  .angle { width: 86px; height: 70px; border-radius: 18px; background: #fff; border: 4px solid #81c784; box-shadow: 0 4px 0 #4caf50; padding: 4px; }
+  .angle.sel { border-color: #ff9800; box-shadow: 0 4px 0 #e65100; background: #fff3e0; }
+  .angle svg { width: 100%; height: 100%; }
+  /* magnet */
+  #mag { background: linear-gradient(#ffe0b2, #fff3e0); }
+  #magnet { position: absolute; font-size: 90px; transform: translate(-50%, -50%) rotate(180deg); z-index: 6; pointer-events: none; filter: drop-shadow(0 6px 4px rgba(0,0,0,.25)); line-height: 1; }
+  .thing { position: absolute; font-size: clamp(44px, 8vw, 60px); transform: translate(-50%, -50%); line-height: 1; pointer-events: none; }
+  .thing.shake { animation: shake .4s; }
+  @keyframes shake { 25% { margin-left: -8px; } 75% { margin-left: 8px; } }
+  #magHint { position: absolute; top: 90px; width: 100%; text-align: center; font-size: 36px; pointer-events: none; }
+  #again { white-space: nowrap; position: fixed; top: 45%; left: 50%; transform: translateX(-50%); z-index: 18; display: none; }
+  #again.on { display: block; }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="grp"><div class="stars">⭐ <span id="starCount">0</span></div></div>
+  <div class="grp">
+    <button class="round" id="sayBtn" aria-label="שוב">🗣️</button>
+    <button class="round" id="muteBtn" aria-label="קול">🔊</button>
+    <button class="round" id="homeBtn" aria-label="בית">🏠</button>
+  </div>
+</div>
+
+<div class="screen on" id="menu">
+  <div class="inner">
+    <h1>המעבדה של פיקאצ'ו 🔬</h1>
+    <canvas id="menuPika" width="200" height="200"></canvas>
+    <div class="tiles">
+      <button class="tile t1" data-go="sink">💧<span>צף או שוקע?</span></button>
+      <button class="tile t2" data-go="ramp">⚽<span>מגלשה</span></button>
+      <button class="tile t3" data-go="mag">🧲<span>מגנט</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="sink">
+  <div id="tray"></div>
+  <div id="tank"></div>
+  <div id="held"></div>
+  <div id="predict">
+    <button class="big green" id="pFloat">⬆️ צף</button>
+    <button class="big blue" id="pSink">⬇️ שוקע</button>
+  </div>
+</div>
+
+<div class="screen" id="ramp">
+  <canvas id="rampCv"></canvas>
+  <div id="rampCtl">
+    <button class="angle" data-a="12"><svg viewBox="0 0 80 50"><polygon points="76,46 4,46 76,32" fill="#ff9800"/></svg></button>
+    <button class="angle sel" data-a="25"><svg viewBox="0 0 80 50"><polygon points="76,46 4,46 76,20" fill="#ff9800"/></svg></button>
+    <button class="angle" data-a="40"><svg viewBox="0 0 80 50"><polygon points="76,46 4,46 76,4" fill="#ff9800"/></svg></button>
+    <button class="big red" id="goBtn">▶ יאללה!</button>
+  </div>
+</div>
+
+<div class="screen" id="mag">
+  <div id="magHint">👆🧲</div>
+  <div id="magnet">🧲</div>
+</div>
+
+<button class="big yellow" id="again">🔄 עוד פעם!</button>
+<div id="guide"><div id="bubble"></div><canvas id="guidePika" width="110" height="110"></canvas></div>
+<canvas id="confetti"></canvas>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  // ---------- sound ----------
+  let actx = null, muted = false;
+  function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
+  function tone(f, d, type = 'sine', v = 0.2, delay = 0, to = null) {
+    if (muted) return; const a = ac(); if (!a) return; const t = a.currentTime + delay;
+    const o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + d + 0.05);
+  }
+  const sfx = {
+    tap() { tone(700, 0.08, 'triangle', 0.2); },
+    yes() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.16, 'triangle', 0.22, i * 0.09)); },
+    oops() { tone(500, 0.2, 'sine', 0.2); tone(420, 0.3, 'sine', 0.2, 0.15); },
+    splash() { tone(300, 0.25, 'sine', 0.2, 0, 900); },
+    sinkS() { tone(500, 0.6, 'sine', 0.15, 0, 120); },
+    roll() { tone(200, 0.3, 'triangle', 0.1, 0, 400); },
+    click() { tone(1400, 0.06, 'square', 0.12); tone(1800, 0.06, 'square', 0.08, 0.04); },
+    boing() { tone(300, 0.25, 'sine', 0.2, 0, 600); },
+    party() { [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, 0.2, 'triangle', 0.22, i * 0.11)); }
+  };
+
+  // ---------- speech ----------
+  let heVoice = null, lastSay = '';
+  function findVoice() { if (!('speechSynthesis' in window)) return; const vs = speechSynthesis.getVoices(); heVoice = vs.find(v => /^(he|iw)/i.test(v.lang)) || null; }
+  if ('speechSynthesis' in window) { findVoice(); speechSynthesis.onvoiceschanged = findVoice; }
+  let bubbleT = null;
+  function say(text, speak = text) {
+    lastSay = text;
+    const b = $('bubble'); b.textContent = text; b.classList.add('show'); guideHappy = 2.5;
+    clearTimeout(bubbleT); bubbleT = setTimeout(() => b.classList.remove('show'), 7000);
+    if (!muted && heVoice && speak) {
+      try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(speak.replace(/[^\u0590-\u05FF\s,.!?'"-]/g, '')); u.voice = heVoice; u.lang = heVoice.lang; u.rate = 0.9; u.pitch = 1.2; speechSynthesis.speak(u); } catch (e) {}
+    }
+  }
+  $('sayBtn').onclick = () => { if (lastSay) say(lastSay); };
+  $('muteBtn').onclick = () => { muted = !muted; $('muteBtn').textContent = muted ? '🔇' : '🔊'; if (muted && window.speechSynthesis) speechSynthesis.cancel(); };
+
+  // ---------- stars ----------
+  let stars = 0; const addStar = (n = 1) => { stars += n; $('starCount').textContent = stars; };
+
+  // ---------- drawing ----------
+  function drawMouse(c, x, y, s, opts = {}) {
+    const { dizzy = 0, happy = 0, t = 0, facing = 1 } = opts;
+    c.save(); c.translate(x, y); c.scale(facing * s / 100, s / 100);
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    const Y = '#ffd83a', O = '#5a3b00';
+    // tail (lightning bolt)
+    c.save(); c.translate(-38, 15); c.rotate(-0.25 + Math.sin(t * 6) * 0.08);
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(-18, -22); c.lineTo(-8, -26); c.lineTo(-30, -52); c.lineTo(-10, -56); c.lineTo(-38, -92); c.lineTo(-2, -60); c.lineTo(-14, -56); c.lineTo(4, -30); c.lineTo(-6, -26); c.lineTo(10, -4); c.closePath();
+    c.fillStyle = Y; c.fill(); c.lineWidth = 3; c.strokeStyle = O; c.stroke();
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(-10, -14); c.lineTo(4, -10); c.closePath(); c.fillStyle = '#8b5a00'; c.fill();
+    c.restore();
+    // feet
+    c.fillStyle = Y; c.strokeStyle = O; c.lineWidth = 3;
+    [[-20, 42], [20, 42]].forEach(([fx, fy]) => { c.beginPath(); c.ellipse(fx, fy, 14, 8, 0, 0, Math.PI * 2); c.fill(); c.stroke(); });
+    // body
+    c.beginPath(); c.ellipse(0, 15, 38, 32, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    // back stripes hint
+    // ears
+    const ear = (dir) => {
+      c.save(); c.translate(dir * 20, -40); c.rotate(dir * (0.45 + Math.sin(t * 4) * 0.04));
+      c.beginPath(); c.moveTo(-10, 0); c.quadraticCurveTo(-8, -40, 0, -62); c.quadraticCurveTo(8, -40, 10, 0); c.closePath();
+      c.fillStyle = Y; c.fill(); c.stroke();
+      c.save(); c.clip(); c.fillStyle = '#222'; c.fillRect(-15, -70, 30, 26); c.restore();
+      c.beginPath(); c.moveTo(-10, 0); c.quadraticCurveTo(-8, -40, 0, -62); c.quadraticCurveTo(8, -40, 10, 0); c.stroke();
+      c.restore();
+    };
+    ear(-1); ear(1);
+    // head
+    c.beginPath(); c.ellipse(0, -25, 40, 34, 0, 0, Math.PI * 2); c.fillStyle = Y; c.fill(); c.stroke();
+    // arms
+    c.beginPath(); c.ellipse(-24, 12, 9, 6, 0.6, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.beginPath(); c.ellipse(24, 12, 9, 6, -0.6, 0, Math.PI * 2); c.fill(); c.stroke();
+    // cheeks
+    c.fillStyle = '#ff3b3b';
+    c.beginPath(); c.arc(-27, -14, 9, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(27, -14, 9, 0, Math.PI * 2); c.fill();
+    // eyes
+    if (dizzy > 0) {
+      c.strokeStyle = '#222'; c.lineWidth = 3;
+      [-15, 15].forEach(ex => { c.beginPath(); for (let a = 0; a < 12; a += 0.3) { const r = a * 0.7; const px = ex + Math.cos(a + t * 8) * r, py = -30 + Math.sin(a + t * 8) * r; a === 0 ? c.moveTo(px, py) : c.lineTo(px, py); } c.stroke(); });
+    } else if (happy > 0) {
+      c.strokeStyle = '#222'; c.lineWidth = 4;
+      [-15, 15].forEach(ex => { c.beginPath(); c.arc(ex, -28, 7, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); });
+    } else {
+      c.fillStyle = '#222';
+      [-15, 15].forEach(ex => { c.beginPath(); c.arc(ex, -30, 7, 0, Math.PI * 2); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(ex - 2, -33, 2.6, 0, Math.PI * 2); c.fill(); c.fillStyle = '#222'; });
+    }
+    // nose
+    c.fillStyle = '#222'; c.beginPath(); c.ellipse(0, -21, 2.5, 1.8, 0, 0, Math.PI * 2); c.fill();
+    // mouth
+    c.strokeStyle = '#222'; c.lineWidth = 2.5;
+    if (happy > 0 || dizzy === 0) {
+      c.beginPath(); c.moveTo(-8, -15); c.quadraticCurveTo(-4, -10, 0, -15); c.quadraticCurveTo(4, -10, 8, -15); c.stroke();
+      if (happy > 0) { c.fillStyle = '#c0392b'; c.beginPath(); c.moveTo(-6, -14); c.quadraticCurveTo(0, -2, 6, -14); c.closePath(); c.fill(); }
+    } else { c.beginPath(); c.arc(0, -11, 4, 0, Math.PI * 2); c.stroke(); }
+    c.restore();
+    if (dizzy > 0) { // circling stars
+      for (let i = 0; i < 3; i++) { const a = t * 5 + i * 2.1; drawStar(c, x + Math.cos(a) * s * 0.45, y - s * 0.75 + Math.sin(a) * s * 0.12, s * 0.09, '#fff176'); }
+    }
+  }
+
+  function drawStar(c, x, y, r, col) {
+    c.save(); c.translate(x, y); c.beginPath();
+    for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.45 : r; const a = -Math.PI / 2 + i * Math.PI / 5; c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    c.closePath(); c.fillStyle = col; c.fill(); c.lineWidth = 2; c.strokeStyle = '#e6a700'; c.stroke(); c.restore();
+  }
+
+
+  let guideHappy = 0, T = 0;
+  const mp = $('menuPika').getContext('2d'), gp = $('guidePika').getContext('2d');
+  function pikaLoop(ts) {
+    T = ts / 1000;
+    if ($('menu').classList.contains('on')) { mp.clearRect(0, 0, 200, 200); drawMouse(mp, 108, 128 + Math.sin(T * 3) * 5, 115, { happy: 1, t: T }); }
+    gp.clearRect(0, 0, 110, 110); guideHappy -= 1 / 60;
+    drawMouse(gp, 58, 72 + (guideHappy > 0 ? -Math.abs(Math.sin(T * 8)) * 6 : 0), 62, { happy: guideHappy > 0 ? 1 : 0, t: T, facing: -1 });
+    drawConfetti();
+    requestAnimationFrame(pikaLoop);
+  }
+
+  // ---------- confetti ----------
+  const cc = $('confetti'), cx = cc.getContext('2d'); let conf = [];
+  function sizeConf() { cc.width = innerWidth; cc.height = innerHeight; }
+  sizeConf(); addEventListener('resize', sizeConf);
+  function party(text, speak) {
+    sfx.party(); say(text, speak);
+    const cols = ['#ff5252', '#ffeb3b', '#69f0ae', '#40c4ff', '#e040fb', '#ff9800'];
+    for (let i = 0; i < 120; i++) conf.push({ x: Math.random() * innerWidth, y: -20 - Math.random() * 200, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, c: cols[i % 6], r: Math.random() * 6, life: 4 });
+  }
+  function drawConfetti() {
+    cx.clearRect(0, 0, cc.width, cc.height);
+    conf = conf.filter(p => (p.life -= 1 / 60) > 0 && p.y < cc.height + 20);
+    conf.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += 0.1; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-6, -3, 12, 6); cx.restore(); });
+  }
+
+  // ---------- navigation ----------
+  let current = 'menu';
+  function go(name) {
+    sfx.tap(); document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === name)); current = name;
+    $('again').classList.remove('on'); $('bubble').classList.remove('show');
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    if (name === 'sink') Sink.start(); if (name === 'ramp') Ramp.start(); if (name === 'mag') Mag.start();
+  }
+  document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { ac(); go(b.dataset.go); });
+  $('homeBtn').onclick = () => go('menu');
+  $('again').onclick = () => go(current);
+  const markDone = id => document.querySelector(`[data-go="${id}"]`).classList.add('done');
+
+  // ================= SINK OR FLOAT =================
+  const Sink = (() => {
+    const OBJS = [
+      { e: '🦆', f: true,  why: 'הברווז צף! הוא קל ויש בו אוויר בפנים.' },
+      { e: '🪨', f: false, why: 'האבן שוקעת! היא כבדה וצפופה.' },
+      { e: '🍎', f: true,  why: 'התפוח צף! יש בתוכו הרבה אוויר.' },
+      { e: '🔑', f: false, why: 'המפתח שוקע! מתכת שוקעת כי היא כבדה.' },
+      { e: '🍃', f: true,  why: 'העלה צף! הוא דק וקל מאוד.' },
+      { e: '🪙', f: false, why: 'המטבע שוקע! מתכת שוקעת כי היא כבדה.' },
+      { e: '⚽', f: true,  why: 'הכדור צף! הוא מלא באוויר.' },
+      { e: '🔩', f: false, why: 'הבורג שוקע! הוא עשוי ממתכת כבדה.' }
+    ];
+    let left = 0, cur = null, busy = false, right = 0;
+    function start() {
+      const tray = $('tray'), tank = $('tank'); tray.innerHTML = ''; tank.innerHTML = ''; left = OBJS.length; right = 0; cur = null; busy = false;
+      $('held').style.display = 'none'; $('predict').classList.remove('on');
+      OBJS.slice().sort(() => Math.random() - .5).forEach(o => {
+        const b = document.createElement('button'); b.className = 'obj'; b.textContent = o.e;
+        b.onclick = () => { if (busy || cur) return; sfx.tap(); cur = { o, b }; b.classList.add('used'); const h = $('held'); h.textContent = o.e; h.style.display = 'block'; $('predict').classList.add('on'); say('מה יקרה? צף או שוקע?'); };
+        tray.appendChild(b);
+      });
+      say('בחר משהו וננחש: צף או שוקע?');
+    }
+    function guess(fl) {
+      if (!cur || busy) return; busy = true; sfx.tap();
+      $('predict').classList.remove('on'); $('held').style.display = 'none';
+      const { o } = cur, tank = $('tank'); const el = document.createElement('div'); el.className = 'inwater'; el.textContent = o.e;
+      const x = 10 + Math.random() * 80; el.style.left = x + '%'; tank.appendChild(el);
+      const th = tank.clientHeight; let y = -th * 0.35, vy = 0, t0 = performance.now(), splashed = false;
+      const floor = th - 40, surface = 14;
+      const step = now => {
+        const dt = 1 / 60;
+        if (y < surface) { vy += 1400 * dt; }
+        else { if (!splashed) { splashed = true; sfx.splash(); bubbles(tank, x, 0); if (!o.f) setTimeout(sfx.sinkS, 150); }
+          if (o.f) { vy += (surface - y) * 20 * dt; vy *= 0.9; } else { vy = Math.min(vy * 0.92 + 30, 120); if (Math.random() < .1) bubbles(tank, x, y, 1); } }
+        y += vy * dt; if (!o.f && y > floor) y = floor;
+        el.style.top = y + 'px';
+        if (now - t0 < 1800) requestAnimationFrame(step); else finish(el, x, y);
+      };
+      requestAnimationFrame(step);
+      function finish() {
+        if (o.f) el.style.animation = 'wob 1.4s infinite alternate';
+        const ok = fl === o.f;
+        if (ok) { sfx.yes(); addStar(); right++; say('נכון! ⭐ ' + o.why, 'נכון! ' + o.why); } else { sfx.oops(); say('לא נורא! ' + o.why); }
+        left--; cur = null; busy = false;
+        if (left === 0) setTimeout(() => { markDone('sink'); party('כל הכבוד! ' + right + ' ⭐ — דברים קלים צפים, דברים כבדים שוקעים!', 'כל הכבוד! דברים קלים צפים, ודברים כבדים שוקעים!'); $('again').classList.add('on'); }, 2600);
+      }
+    }
+    function bubbles(tank, x, y, n = 6) { for (let i = 0; i < n; i++) { const b = document.createElement('div'); b.className = 'bubbleUp'; b.style.left = `calc(${x}% + ${(Math.random() - .5) * 40}px)`; b.style.top = (y + Math.random() * 20) + 'px'; tank.appendChild(b); setTimeout(() => b.remove(), 1300); } }
+    $('pFloat').onclick = () => guess(true); $('pSink').onclick = () => guess(false);
+    return { start };
+  })();
+
+  // ================= RAMP =================
+  const Ramp = (() => {
+    const cv = $('rampCv'), c = cv.getContext('2d'); let W, H, ang = 25, ball = null, flags = [], tried = {}, running = false, raf = null;
+    const COL = { 12: '#42a5f5', 25: '#66bb6a', 40: '#ef5350' };
+    function size() { W = cv.clientWidth; H = cv.clientHeight; cv.width = W * 2; cv.height = H * 2; c.setTransform(2, 0, 0, 2, 0, 0); }
+    const geo = () => { const floorY = H - Math.max(150, H * 0.25), L = Math.min(W * 0.34, (H - 260) / Math.sin(40 * Math.PI / 180)), a = ang * Math.PI / 180; const topX = W - 30, botX = topX - L * Math.cos(a); return { floorY, L, a, topX, topY: floorY - L * Math.sin(a), botX }; };
+    function reset() { const g = geo(); ball = { s: 0, v: 0, x: g.topX - 20, y: g.topY, rot: 0, phase: 'wait' }; }
+    function start() { size(); flags = []; tried = {}; reset(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); say('בחר גובה למגלשה ולחץ יאללה!'); }
+    document.querySelectorAll('.angle').forEach(b => b.onclick = () => { if (ball && ball.phase === 'roll') return; sfx.tap(); document.querySelectorAll('.angle').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); ang = +b.dataset.a; reset(); });
+    $('goBtn').onclick = () => { if (!ball || ball.phase === 'roll') return; if (ball.phase === 'done') reset(); ac(); sfx.roll(); ball.phase = 'roll'; $('bubble').classList.remove('show'); };
+    const R = 16, G = 900, MU = 0.42;
+    function loop() {
+      if (!$('ramp').classList.contains('on')) return;
+      if (cv.clientWidth !== W || cv.clientHeight !== H) { size(); if (ball.phase !== 'roll') reset(); }
+      const g = geo(), dt = 1 / 60;
+      if (ball.phase === 'roll') {
+        if (ball.onRamp !== false) {
+          ball.v += G * Math.sin(g.a) * dt; ball.s += ball.v * dt;
+          if (ball.s >= g.L - 20) { ball.onRamp = false; ball.x = g.botX; ball.y = g.floorY; }
+          else { ball.x = g.topX - 20 * Math.cos(g.a) - ball.s * Math.cos(g.a); ball.y = g.topY + (20 + ball.s) * Math.sin(g.a); }
+        } else {
+          ball.v -= G * MU * dt; if (ball.x - ball.v * dt < R + 4) { ball.v = 0; }
+          ball.x -= Math.max(0, ball.v) * dt; ball.y = g.floorY;
+          if (ball.v <= 0) { ball.phase = 'done'; ball.onRamp = true; stopped(g); }
+        }
+        ball.rot -= ball.v * dt / R;
+      }
+      draw(g);
+      raf = requestAnimationFrame(loop);
+    }
+    function stopped(g) {
+      flags.push({ x: ball.x, a: ang }); sfx.yes(); addStar();
+      const first = !tried[ang]; tried[ang] = true;
+      const txt = { 12: 'מגלשה נמוכה: הכדור איטי ועוצר קרוב.', 25: 'מגלשה באמצע: הכדור מגיע די רחוק!', 40: 'מגלשה גבוהה: הכדור הכי מהיר ומגיע הכי רחוק!' }[ang];
+      if (Object.keys(tried).length === 3 && first) { markDone('ramp'); setTimeout(() => { party('כל הכבוד! ככל שהמגלשה גבוהה יותר, הכדור מהיר יותר ומגיע רחוק יותר!'); $('again').classList.add('on'); }, 300); }
+      else say(txt + (Object.keys(tried).length < 3 ? ' 👆 נסה גובה אחר!' : ''), txt + (Object.keys(tried).length < 3 ? ' נסה גובה אחר!' : ''));
+    }
+    function draw(g) {
+      c.clearRect(0, 0, W, H);
+      // floor with distance marks
+      c.fillStyle = '#8d6e63'; c.fillRect(0, g.floorY + R, W, H - g.floorY);
+      c.fillStyle = '#a5d6a7'; c.fillRect(0, g.floorY + R, W, 10);
+      for (let x = g.botX - 60, i = 1; x > 0; x -= 60, i++) { c.fillStyle = '#fff'; c.fillRect(x - 2, g.floorY + R + 10, 4, 14); }
+      // ramp
+      c.beginPath(); c.moveTo(g.topX, g.floorY + R); c.lineTo(g.botX - 10, g.floorY + R); c.lineTo(g.topX, g.topY + R); c.closePath();
+      c.fillStyle = '#ff9800'; c.fill(); c.lineWidth = 4; c.strokeStyle = '#e65100'; c.stroke();
+      // flags
+      flags.forEach(f => { c.strokeStyle = '#555'; c.lineWidth = 3; c.beginPath(); c.moveTo(f.x, g.floorY + R); c.lineTo(f.x, g.floorY - 50); c.stroke(); c.fillStyle = COL[f.a]; c.beginPath(); c.moveTo(f.x, g.floorY - 50); c.lineTo(f.x - 30, g.floorY - 40); c.lineTo(f.x, g.floorY - 30); c.fill(); });
+      // ball (pokeball)
+      c.save(); c.translate(ball.x, ball.y); c.rotate(ball.rot); c.lineWidth = 3; c.strokeStyle = '#222';
+      c.beginPath(); c.arc(0, 0, R, Math.PI, 0); c.fillStyle = '#ee1515'; c.fill(); c.beginPath(); c.arc(0, 0, R, 0, Math.PI); c.fillStyle = '#fff'; c.fill();
+      c.beginPath(); c.arc(0, 0, R, 0, 7); c.stroke(); c.beginPath(); c.moveTo(-R, 0); c.lineTo(R, 0); c.stroke(); c.beginPath(); c.arc(0, 0, 5, 0, 7); c.fillStyle = '#fff'; c.fill(); c.stroke(); c.restore();
+    }
+    return { start };
+  })();
+
+  // ================= MAGNET =================
+  const Mag = (() => {
+    const ITEMS = [
+      { e: '📎', m: true, n: 'האטב' }, { e: '🔑', m: true, n: 'המפתח' }, { e: '🔩', m: true, n: 'הבורג' }, { e: '🥄', m: true, n: 'הכפית' },
+      { e: '🧸', m: false, n: 'הדובי' }, { e: '🍌', m: false, n: 'הבננה' }, { e: '✏️', m: false, n: 'העיפרון' }, { e: '🧦', m: false, n: 'הגרב' }, { e: '🎈', m: false, n: 'הבלון' }
+    ];
+    let things = [], mx = 0, my = 0, raf = null, stuck = 0, done = false, lastNo = 0;
+    const st = $('mag'), mg = $('magnet');
+    function start() {
+      st.querySelectorAll('.thing').forEach(t => t.remove()); things = []; stuck = 0; done = false;
+      const W = st.clientWidth, H = st.clientHeight; mx = W / 2; my = 150;
+      const pts = [];
+      ITEMS.slice().sort(() => Math.random() - .5).forEach(it => {
+        let x, y, k = 0; do { x = 50 + Math.random() * (W - 100); y = H * 0.42 + Math.random() * (H * 0.58 - 160); k++; } while (k < 200 && pts.some(p => Math.hypot(p.x - x, p.y - y) < 80));
+        pts.push({ x, y }); const el = document.createElement('div'); el.className = 'thing'; el.textContent = it.e; st.appendChild(el);
+        things.push({ ...it, x, y, el, stuck: false, ox: 0, oy: 0, said: 0 });
+      });
+      $('magHint').style.display = 'block';
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+      say('הזז את המגנט! מה נדבק אליו?');
+    }
+    const move = e => { if (!st.classList.contains('on')) return; const r = st.getBoundingClientRect(); mx = e.clientX - r.left; my = Math.max(90, e.clientY - r.top - 40); $('magHint').style.display = 'none'; };
+    st.addEventListener('pointerdown', e => { ac(); move(e); });
+    st.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.buttons || e.pressure > 0) move(e); });
+    function loop(now) {
+      if (!st.classList.contains('on')) return;
+      mg.style.left = mx + 'px'; mg.style.top = my + 'px';
+      const tx = mx, ty = my + 40; // magnet tip
+      things.forEach(t => {
+        const d = Math.hypot(t.x - tx, t.y - ty);
+        if (t.stuck) { t.x = tx + t.ox; t.y = ty + t.oy; }
+        else if (t.m && d < 170) {
+          const k = Math.min(0.35, 18 / Math.max(d, 1)); t.x += (tx - t.x) * k; t.y += (ty - t.y) * k;
+          if (d < 45) { t.stuck = true; stuck++; const n = stuck; t.ox = (n % 2 ? -1 : 1) * Math.ceil(n / 2) * 18; t.oy = 18 + (n % 3) * 10; sfx.click(); addStar(); say(t.n + ' נדבק! ⭐ הוא עשוי ממתכת.', t.n + ' נדבק! הוא עשוי ממתכת.');
+            if (stuck === ITEMS.filter(i => i.m).length && !done) { done = true; markDone('mag'); setTimeout(() => { party('כל הכבוד! המגנט מושך רק דברים ממתכת! 🧲'); $('again').classList.add('on'); }, 900); } }
+        } else if (!t.m && d < 75 && now - t.said > 3000 && now - lastNo > 1500) {
+          t.said = now; lastNo = now; sfx.boing(); t.el.classList.remove('shake'); void t.el.offsetWidth; t.el.classList.add('shake');
+          say(t.n + ' לא נדבק, הוא לא ממתכת.');
+        }
+        t.el.style.left = t.x + 'px'; t.el.style.top = t.y + 'px';
+      });
+      raf = requestAnimationFrame(loop);
+    }
+    return { start };
+  })();
+
+  requestAnimationFrame(pikaLoop);
+  window.__sci = { go, get stars() { return stars; }, get voice() { return heVoice && heVoice.name; } };
+})();
+</script>
+</body>
+</html>

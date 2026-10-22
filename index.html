@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>המשחקים של עומר 🎮</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; min-height: 100vh; font-family: "Arial Rounded MT Bold", "Varela Round", Arial, sans-serif; background: radial-gradient(circle at 50% 0, #fff59d, #ffcb05 45%, #ff9800); display: flex; flex-direction: column; align-items: center; padding: 24px 12px 40px; }
+  h1 { font-size: clamp(36px, 9vw, 72px); color: #3b4cca; text-shadow: 3px 3px 0 #fff, 6px 6px 0 rgba(0,0,0,.15); margin: 10px 0 24px; text-align: center; }
+  .games { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 90vw), 1fr)); gap: 22px; width: 100%; max-width: 900px; }
+  a.game { text-decoration: none; border-radius: 34px; border: 7px solid #fff; padding: 22px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; box-shadow: 0 10px 0 rgba(0,0,0,.25); transition: transform .15s; }
+  a.game:hover { transform: translateY(-4px) rotate(-1deg); }
+  a.game:active { transform: translateY(6px); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+  .icon { font-size: 90px; line-height: 1; animation: bob 1.4s infinite alternate ease-in-out; }
+  .name { font-size: 34px; font-weight: bold; text-shadow: 0 3px 3px rgba(0,0,0,.35); text-align: center; }
+  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+  .c1 { background: linear-gradient(135deg, #ff5252, #ff9100); }
+  .c2 { background: linear-gradient(135deg, #29b6f6, #3949ab); }
+  .c3 { background: linear-gradient(135deg, #66bb6a, #00897b); }
+  .c4 { background: linear-gradient(135deg, #ab47bc, #ec407a); }
+</style>
+</head>
+<body>
+  <h1>🎮 המשחקים של עומר 🎮</h1>
+  <div class="games">
+    <!-- GAMES: add a new <a class="game"> block for each new game (newest first is fine) -->
+    <a class="game c1" href="pikachu/"><div class="icon">⚡</div><div class="name">פיקאצ'ו תופס כדורים</div></a>
+    <a class="game c2" href="science/"><div class="icon">🔬</div><div class="name">המעבדה של פיקאצ'ו</div></a>
+  </div>
+</body>
+</html>
