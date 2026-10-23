@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>אתגר החשיבה של פיקאצ'ו</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { margin: 0; min-height: 100%; font-family: "Arial Rounded MT Bold", "Varela Round", Arial, sans-serif; background: radial-gradient(circle at 50% 0, #fff59d, #ffca28 40%, #7e57c2 100%); color: #222; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 8px 8px 24px; min-height: 100vh; overflow-x: hidden; touch-action: manipulation; }
+  .screen { width: 100%; max-width: 940px; display: none; flex-direction: column; align-items: center; }
+  .screen.on { display: flex; }
+  .top { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .top > .pill, .side .pill { min-width: 0; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }
+  @media (max-width: 400px) { .top .pill { font-size: 19px; padding: 5px 9px; } }
+  .side { display: flex; min-width: 0; gap: 6px; align-items: center; }
+  .round { width: 56px; height: 56px; border-radius: 50%; font-size: 27px; background: #fff; border: 4px solid #3b4cca; box-shadow: 0 5px 0 #23308a; cursor: pointer; padding: 0; flex: none; }
+  .round:active { transform: translateY(4px); box-shadow: 0 1px 0 #23308a; }
+  .pill { background: rgba(255,255,255,.93); border: 4px solid #ffcb05; border-radius: 30px; padding: 5px 12px; font-size: 22px; font-weight: bold; color: #3b4cca; box-shadow: 0 4px 0 #c79a00; text-align: center; white-space: nowrap; }
+  .panel { background: #fff; border: 8px solid #ffcb05; border-radius: 36px; padding: 16px 18px; text-align: center; width: 100%; max-width: 620px; box-shadow: 0 12px 0 rgba(0,0,0,.25); margin-top: 8px; }
+  h1 { margin: 2px 0 4px; font-size: clamp(28px, 7.5vw, 46px); color: #3b4cca; }
+  .sub { font-size: 22px; color: #555; margin: 2px 0 6px; }
+  #hero { width: 150px; height: 150px; }
+  .big { display: block; width: 100%; max-width: 420px; margin: 12px auto 0; font-family: inherit; font-weight: bold; font-size: 32px; color: #fff; border: 6px solid #fff; border-radius: 40px; padding: 12px 20px; cursor: pointer; }
+  .big:active { transform: translateY(6px); }
+  .b-green { background: linear-gradient(135deg, #43a047, #00c853); box-shadow: 0 8px 0 #1b5e20; }
+  .b-blue { background: linear-gradient(135deg, #3b4cca, #5c6bc0); box-shadow: 0 8px 0 #1a237e; }
+  .b-orange { background: linear-gradient(135deg, #fb8c00, #ffa726); box-shadow: 0 8px 0 #e65100; }
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-top: 12px; }
+  @media (min-width: 720px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+  .tile { font-family: inherit; background: #fff; border: 6px solid #fff; border-radius: 28px; padding: 10px 6px; cursor: pointer; box-shadow: 0 7px 0 rgba(0,0,0,.25); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tile:active { transform: translateY(5px); }
+  .tile .em { font-size: 46px; line-height: 1.1; }
+  .tile .nm { font-size: 22px; font-weight: bold; color: #3b4cca; }
+  .tile .lv { font-size: 15px; color: #666; }
+  .t0 { background: #e3f2fd; } .t1 { background: #f3e5f5; } .t2 { background: #fff3e0; } .t3 { background: #e8f5e9; } .t4 { background: #fffde7; } .t5 { background: #fce4ec; } .t6 { background: linear-gradient(135deg, #fff59d, #ffcc80); }
+  .qcard { background: #fff; border-radius: 28px; border: 6px solid #ffcb05; width: 100%; padding: 8px 8px 10px; margin-top: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 8px 0 rgba(0,0,0,.2); }
+  .qhead { width: 100%; display: flex; align-items: center; gap: 8px; justify-content: center; }
+  .prompt { font-size: 24px; font-weight: bold; color: #3b4cca; text-align: center; line-height: 1.25; }
+  .stem { width: 100%; display: flex; justify-content: center; align-items: center; margin: 6px 0 2px; flex-wrap: wrap; gap: 6px; direction: rtl; }
+  .opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; margin-top: 8px; }
+  @media (min-width: 720px) { .opts { grid-template-columns: repeat(4, 1fr); } }
+  .opts.three { grid-template-columns: repeat(3, 1fr); }
+  .opt { position: relative; font-family: inherit; background: #fff; border: 5px solid #c5cae9; border-radius: 22px; min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 0 #9fa8da; padding: 8px 4px 4px; color: #222; }
+  .opt:active { transform: translateY(4px); box-shadow: 0 1px 0 #9fa8da; }
+  .opt .lab { position: absolute; top: 2px; right: 10px; font-size: 15px; color: #9fa8da; font-weight: bold; }
+  .opt.right { border-color: #43a047; background: #e8f5e9; box-shadow: 0 5px 0 #2e7d32; }
+  .opt.wrong { border-color: #e53935; background: #ffebee; box-shadow: 0 5px 0 #b71c1c; }
+  .opt.faded { opacity: .25; pointer-events: none; }
+  .opt.picked { border-color: #3b4cca; background: #e8eaf6; }
+  .opt svg.fig { width: 92px; height: 92px; }
+  .num { font-size: 40px; font-weight: bold; color: #3b4cca; direction: ltr; }
+  .emo { font-size: 50px; line-height: 1.1; }
+  .nm { font-size: 15px; color: #666; }
+  .cell { background: #fafafa; border: 3px solid #d1c4e9; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .cell svg { width: 100%; height: 100%; }
+  .cell.q { background: #fff8e1; border: 3px dashed #ff9800; font-size: 40px; color: #ff9800; font-weight: bold; }
+  .mgrid { display: grid; gap: 6px; direction: rtl; }
+  .seq { display: flex; gap: 4px; direction: rtl; flex-wrap: wrap; justify-content: center; align-items: center; row-gap: 6px; }
+  .seq .cell { width: min(15vw, 86px); height: min(15vw, 86px); }
+  .seq .ncell { min-width: 42px; height: 52px; padding: 0 5px; border-radius: 26px; background: #fff59d; border: 4px solid #fbc02d; font-size: 23px; font-weight: bold; display: flex; align-items: center; justify-content: center; color: #3b4cca; direction: ltr; }
+  .seq .ncell.q { background: #fff8e1; border-style: dashed; border-color: #ff9800; color: #ff9800; }
+  .arrow { font-size: 22px; color: #7e57c2; font-weight: bold; }
+  .ana { display: flex; align-items: center; gap: 6px; direction: rtl; justify-content: center; flex-wrap: wrap; }
+  .ana .pair { display: flex; align-items: center; gap: 4px; background: #f3e5f5; border-radius: 18px; padding: 4px 8px; }
+  .ana .box { width: 84px; height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 3px solid #d1c4e9; border-radius: 14px; }
+  .ana .box.q { border: 3px dashed #ff9800; color: #ff9800; font-size: 40px; font-weight: bold; background: #fff8e1; }
+  .ana .box .emo { font-size: 44px; } .ana .box svg { width: 76px; height: 76px; }
+  .pairopt { display: flex; align-items: center; gap: 2px; direction: rtl; } .pairopt .emo { font-size: 38px; }
+  .story { font-size: 22px; line-height: 1.4; text-align: center; color: #333; max-width: 600px; }
+  .story b { color: #3b4cca; font-size: 26px; }
+  .pics { font-size: 30px; letter-spacing: 2px; text-align: center; line-height: 1.3; max-width: 100%; word-break: break-all; }
+  .bar { display: flex; gap: 10px; justify-content: center; width: 100%; margin-top: 10px; flex-wrap: wrap; }
+  .chip { font-family: inherit; font-size: 22px; font-weight: bold; padding: 8px 18px; border-radius: 26px; border: 4px solid #3b4cca; background: #fff; color: #3b4cca; cursor: pointer; box-shadow: 0 4px 0 #23308a; }
+  .chip:active { transform: translateY(3px); box-shadow: 0 1px 0 #23308a; }
+  .chip.go { background: #43a047; color: #fff; border-color: #fff; box-shadow: 0 5px 0 #1b5e20; font-size: 28px; padding: 8px 30px; }
+  .fb { width: 100%; margin-top: 10px; border-radius: 22px; padding: 10px 12px; font-size: 21px; line-height: 1.4; text-align: center; display: none; }
+  .fb.on { display: block; }
+  .fb.good { background: #e8f5e9; border: 4px solid #66bb6a; }
+  .fb.bad { background: #fff3e0; border: 4px solid #ffa726; }
+  .fb .ttl { font-size: 28px; font-weight: bold; }
+  .timer { width: calc(100% - 36px); flex: none; margin: 18px 0 2px; height: 22px; background: rgba(255,255,255,.85); border: 3px solid #3b4cca; border-radius: 14px; position: relative; overflow: visible; margin: 0 6px; }
+  .timer .fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #ffe082, #ffca28); border-radius: 11px; width: 0; }
+  .timer .runner { position: absolute; top: -12px; font-size: 26px; transform: translateX(-50%); }
+  .timer.over .fill { background: #b2dfdb; }
+  .chap { font-size: 18px; color: #7e57c2; font-weight: bold; }
+  table.res { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 18px; }
+  table.res th, table.res td { border-bottom: 2px solid #eee; padding: 6px 4px; text-align: center; }
+  table.res td:first-child, table.res th:first-child { text-align: right; }
+  .overlay { position: fixed; inset: 0; background: rgba(20,30,90,.55); display: flex; align-items: flex-start; justify-content: center; z-index: 10; overflow-y: auto; padding: 10px; }
+  .overlay.hide { display: none; }
+  .note { font-size: 16px; color: #555; background: #fffde7; border-radius: 14px; padding: 8px 10px; text-align: right; line-height: 1.45; margin-top: 10px; }
+  .lvsel { display: inline-flex; align-items: center; gap: 4px; }
+  .lvsel button { font-family: inherit; width: 34px; height: 34px; border-radius: 50%; border: 3px solid #3b4cca; background: #fff; font-size: 18px; font-weight: bold; cursor: pointer; padding: 0; }
+  .lvsel b { min-width: 22px; display: inline-block; }
+  @media (max-width: 440px) { table.res { font-size: 14px; } table.res th, table.res td { padding: 5px 2px; } #parentOv .panel { padding: 12px 8px; border-width: 6px; } .lvsel button { width: 28px; height: 28px; font-size: 16px; } }
+  .lvdots { letter-spacing: 1px; }
+  .toast { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(.6); background: #fff; border: 6px solid #ffcb05; border-radius: 30px; padding: 14px 26px; font-size: 32px; font-weight: bold; color: #3b4cca; z-index: 12; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; text-align: center; }
+  .toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 11; }
+  #pika { width: 70px; height: 70px; flex: none; }
+  @media (max-height: 720px) { #hero { width: 110px; height: 110px; } .big { font-size: 27px; padding: 9px 16px; } }
+</style>
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffca28">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="חשיבה">
+<script src="pwa.js" defer></script>
+<!-- /PWA -->
+</head>
+<body>
+  <!-- start -->
+  <div class="screen on" id="sStart">
+    <div class="top"><button class="round" id="homeBtn" aria-label="תפריט">🏠</button><div class="pill" id="starsPill">⭐ 0</div></div>
+    <div class="panel">
+      <canvas id="hero" width="360" height="360"></canvas>
+      <h1 id="title">אתגר החשיבה של פיקאצ'ו</h1>
+      <div class="sub">🧩 🔢 🔄 🧠</div>
+      <button class="big b-green" id="practiceBtn">🏋️ אימון</button>
+      <button class="big b-orange" id="testBtn">⏱️ מבחן תרגול</button>
+      <div data-pwa-slot></div>
+    </div>
+  </div>
+  <!-- sections -->
+  <div class="screen" id="sSections">
+    <div class="top"><button class="round" id="backStart" aria-label="חזרה">↩️</button><div class="pill">🏋️ אימון</div><button class="round" id="sayPick" aria-label="הקראה">🔊</button></div>
+    <div class="tiles" id="tiles"></div>
+  </div>
+  <!-- play -->
+  <div class="screen" id="sPlay">
+    <div class="top">
+      <button class="round" id="quitBtn" aria-label="יציאה">↩️</button>
+      <div class="pill" id="secPill">🧩</div>
+      <div class="side"><div class="pill" id="scorePill">⭐ 0</div><button class="round" id="repeatBtn" aria-label="שוב">🔊</button></div>
+    </div>
+    <div class="timer" id="timer" style="display:none"><div class="fill" id="tfill"></div><div class="runner" id="trun">⚡</div></div>
+    <div class="qcard" id="qcard">
+      <div class="chap" id="chap"></div>
+      <div class="qhead"><canvas id="pika" width="140" height="140"></canvas><div class="prompt" id="prompt"></div></div>
+      <div class="stem" id="stem"></div>
+      <div class="opts" id="opts"></div>
+      <div class="fb" id="fb"></div>
+      <div class="bar" id="bar">
+        <button class="chip" id="hintBtn">💡 רמז</button>
+        <button class="chip go" id="nextBtn" style="display:none">▶ הבא</button>
+      </div>
+    </div>
+  </div>
+  <!-- test summary -->
+  <div class="screen" id="sSum">
+    <div class="panel">
+      <h1>🎉 כל הכבוד!</h1>
+      <div class="sub" id="sumLine"></div>
+      <table class="res" id="sumTable"></table>
+      <button class="big b-green" id="againBtn">▶ עוד מבחן</button>
+      <button class="big b-blue" id="sumHome">🏠 התחלה</button>
+    </div>
+  </div>
+  <!-- parents -->
+  <div class="overlay hide" id="parentOv"><div class="panel" style="max-width:720px">
+    <h1 style="font-size:30px">👨‍👩‍👦 פינת ההורים</h1>
+    <table class="res" id="parentTable"></table>
+    <div class="bar"><button class="chip" id="voiceTog">🔊 הקראה אוטומטית: פועלת</button><button class="chip" id="resetBtn">🗑️ איפוס התקדמות</button></div>
+    <div class="note" id="lastTests"></div>
+    <div class="note">
+      <b>חשוב לדעת:</b> זהו תרגול חשיבה בסגנונות דומים לפרקים המתוארים בפומבי במבחני האיתור למחוננים (שלב ב׳: יחסים בין מילים, בעיות מילוליות, מספר חסר בצורה, סדרות וטבלאות של צורות, ועוד), ולא המבחן הרשמי. כל השאלות נוצרות במחשב ואינן לקוחות ממבחנים אמיתיים. ציון כאן אינו מנבא תוצאה במבחן.
+      משרד החינוך מדגיש שאין צורך בהכנה מוקדמת ושחשוב לא ליצור לחץ, אז כדאי לשחק בכיף, בקצב של הילד.
+      <br>שלב א׳ (בכיתה ב׳, בבית הספר) בודק בעיקר הבנת הנקרא וחשבון. שלב ב׳ מורכב מפרקים של כ־10 שאלות בחירה עם זמן לכל פרק.
+      <br>הרמות: 1 (קל) עד 8 (קשה מאוד). 3 תשובות נכונות ברצף מעלות רמה, 2 טעויות ברצף מורידות רמה. אפשר לקבוע כאן רמת התחלה לכל נושא.
+    </div>
+    <button class="big b-blue" id="closeParent">✖ סגירה</button>
+  </div></div>
+  <div class="toast" id="toast"></div>
+  <canvas id="confetti"></canvas>
+<script>
+(() => {
+  'use strict';
+  const el = id => document.getElementById(id);
+  function drawMouse(c, x, y, s, opts = {}) {
+    const { dizzy = 0, happy = 0, t = 0, facing = 1 } = opts;
+    c.save(); c.translate(x, y); c.scale(facing * s / 100, s / 100);
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    const Y = '#ffd83a', O = '#5a3b00';
+    // tail (lightning bolt)
+    c.save(); c.translate(-38, 15); c.rotate(-0.25 + Math.sin(t * 6) * 0.08);
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(-18, -22); c.lineTo(-8, -26); c.lineTo(-30, -52); c.lineTo(-10, -56); c.lineTo(-38, -92); c.lineTo(-2, -60); c.lineTo(-14, -56); c.lineTo(4, -30); c.lineTo(-6, -26); c.lineTo(10, -4); c.closePath();
+    c.fillStyle = Y; c.fill(); c.lineWidth = 3; c.strokeStyle = O; c.stroke();
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(-10, -14); c.lineTo(4, -10); c.closePath(); c.fillStyle = '#8b5a00'; c.fill();
+    c.restore();
+    // feet
+    c.fillStyle = Y; c.strokeStyle = O; c.lineWidth = 3;
+    [[-20, 42], [20, 42]].forEach(([fx, fy]) => { c.beginPath(); c.ellipse(fx, fy, 14, 8, 0, 0, Math.PI * 2); c.fill(); c.stroke(); });
+    // body
+    c.beginPath(); c.ellipse(0, 15, 38, 32, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    // back stripes hint
+    // ears
+    const ear = (dir) => {
+      c.save(); c.translate(dir * 20, -40); c.rotate(dir * (0.45 + Math.sin(t * 4) * 0.04));
+      c.beginPath(); c.moveTo(-10, 0); c.quadraticCurveTo(-8, -40, 0, -62); c.quadraticCurveTo(8, -40, 10, 0); c.closePath();
+      c.fillStyle = Y; c.fill(); c.stroke();
+      c.save(); c.clip(); c.fillStyle = '#222'; c.fillRect(-15, -70, 30, 26); c.restore();
+      c.beginPath(); c.moveTo(-10, 0); c.quadraticCurveTo(-8, -40, 0, -62); c.quadraticCurveTo(8, -40, 10, 0); c.stroke();
+      c.restore();
+    };
+    ear(-1); ear(1);
+    // head
+    c.beginPath(); c.ellipse(0, -25, 40, 34, 0, 0, Math.PI * 2); c.fillStyle = Y; c.fill(); c.stroke();
+    // arms
+    c.beginPath(); c.ellipse(-24, 12, 9, 6, 0.6, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.beginPath(); c.ellipse(24, 12, 9, 6, -0.6, 0, Math.PI * 2); c.fill(); c.stroke();
+    // cheeks
+    c.fillStyle = '#ff3b3b';
+    c.beginPath(); c.arc(-27, -14, 9, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(27, -14, 9, 0, Math.PI * 2); c.fill();
+    // eyes
+    if (dizzy > 0) {
+      c.strokeStyle = '#222'; c.lineWidth = 3;
+      [-15, 15].forEach(ex => { c.beginPath(); for (let a = 0; a < 12; a += 0.3) { const r = a * 0.7; const px = ex + Math.cos(a + t * 8) * r, py = -30 + Math.sin(a + t * 8) * r; a === 0 ? c.moveTo(px, py) : c.lineTo(px, py); } c.stroke(); });
+    } else if (happy > 0) {
+      c.strokeStyle = '#222'; c.lineWidth = 4;
+      [-15, 15].forEach(ex => { c.beginPath(); c.arc(ex, -28, 7, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); });
+    } else {
+      c.fillStyle = '#222';
+      [-15, 15].forEach(ex => { c.beginPath(); c.arc(ex, -30, 7, 0, Math.PI * 2); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(ex - 2, -33, 2.6, 0, Math.PI * 2); c.fill(); c.fillStyle = '#222'; });
+    }
+    // nose
+    c.fillStyle = '#222'; c.beginPath(); c.ellipse(0, -21, 2.5, 1.8, 0, 0, Math.PI * 2); c.fill();
+    // mouth
+    c.strokeStyle = '#222'; c.lineWidth = 2.5;
+    if (happy > 0 || dizzy === 0) {
+      c.beginPath(); c.moveTo(-8, -15); c.quadraticCurveTo(-4, -10, 0, -15); c.quadraticCurveTo(4, -10, 8, -15); c.stroke();
+      if (happy > 0) { c.fillStyle = '#c0392b'; c.beginPath(); c.moveTo(-6, -14); c.quadraticCurveTo(0, -2, 6, -14); c.closePath(); c.fill(); }
+    } else { c.beginPath(); c.arc(0, -11, 4, 0, Math.PI * 2); c.stroke(); }
+    c.restore();
+    if (dizzy > 0) { // circling stars
+      for (let i = 0; i < 3; i++) { const a = t * 5 + i * 2.1; drawStar(c, x + Math.cos(a) * s * 0.45, y - s * 0.75 + Math.sin(a) * s * 0.12, s * 0.09, '#fff176'); }
+    }
+  }
+
+  function drawStar(c, x, y, r, col) {
+    c.save(); c.translate(x, y); c.beginPath();
+    for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.45 : r; const a = -Math.PI / 2 + i * Math.PI / 5; c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    c.closePath(); c.fillStyle = col; c.fill(); c.lineWidth = 2; c.strokeStyle = '#e6a700'; c.stroke(); c.restore();
+  }
+  // ================= helpers =================
+  const rnd = n => Math.floor(Math.random() * n);
+  const rr = (a, b) => a + rnd(b - a + 1); // inclusive
+  const pick = a => a[rnd(a.length)];
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const sample = (a, n) => shuffle(a.slice()).slice(0, n);
+  const mod = (a, m) => ((a % m) + m) % m;
+  const fmt = n => String(n); // digits only, no separators (easier to read aloud)
+  let UID = 0;
+
+  // ================= figures (original vector shapes) =================
+  const COLORS = { r: ['#e53935', 'אדום'], b: ['#1e88e5', 'כחול'], g: ['#43a047', 'ירוק'], y: ['#fbc02d', 'צהוב'], p: ['#8e24aa', 'סגול'] };
+  const COLK = Object.keys(COLORS);
+  const SYM = ['circle', 'square', 'triangle', 'star', 'diamond', 'hex', 'heart', 'cross'];
+  const ASYM = ['arrow', 'pac', 'bolt'];
+  const SHN = { circle: 'עיגול', square: 'ריבוע', triangle: 'משולש', star: 'כוכב', diamond: 'מעוין', hex: 'משושה', heart: 'לב', cross: 'פלוס', arrow: 'חץ', pac: 'עיגול נגוס', bolt: 'ברק' };
+  const starPts = (() => { const p = []; for (let i = 0; i < 10; i++) { const r = i % 2 ? 0.42 : 1, a = -Math.PI / 2 + i * Math.PI / 5; p.push((Math.cos(a) * r).toFixed(3) + ',' + (Math.sin(a) * r + 0.08).toFixed(3)); } return p.join(' '); })();
+  const hexPts = (() => { const p = []; for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; p.push((Math.cos(a) * 0.95).toFixed(3) + ',' + (Math.sin(a) * 0.95).toFixed(3)); } return p.join(' '); })();
+  function shapeEl(s, attrs) {
+    switch (s) {
+      case 'circle': return `<circle r="0.92" ${attrs}/>`;
+      case 'square': return `<rect x="-0.8" y="-0.8" width="1.6" height="1.6" rx="0.1" ${attrs}/>`;
+      case 'triangle': return `<polygon points="0,-0.95 0.98,0.8 -0.98,0.8" ${attrs}/>`;
+      case 'star': return `<polygon points="${starPts}" ${attrs}/>`;
+      case 'diamond': return `<polygon points="0,-1 0.72,0 0,1 -0.72,0" ${attrs}/>`;
+      case 'hex': return `<polygon points="${hexPts}" ${attrs}/>`;
+      case 'heart': return `<path d="M0,0.92 C-1.15,0.05 -0.95,-1.05 0,-0.42 C0.95,-1.05 1.15,0.05 0,0.92Z" ${attrs}/>`;
+      case 'cross': return `<polygon points="-0.3,-0.95 0.3,-0.95 0.3,-0.3 0.95,-0.3 0.95,0.3 0.3,0.3 0.3,0.95 -0.3,0.95 -0.3,0.3 -0.95,0.3 -0.95,-0.3 -0.3,-0.3" ${attrs}/>`;
+      case 'arrow': return `<polygon points="0,-1 0.82,-0.12 0.3,-0.12 0.3,1 -0.3,1 -0.3,-0.12 -0.82,-0.12" ${attrs}/>`;
+      case 'pac': return `<path d="M0.05,0 L0.8,-0.52 A0.95,0.95 0 1,0 0.8,0.52 Z" ${attrs}/>`;
+      case 'bolt': return `<polygon points="0.15,-1 -0.6,0.12 -0.08,0.12 -0.3,1 0.62,-0.25 0.1,-0.25 0.42,-1" ${attrs}/>`;
+    }
+  }
+  const POS = { 1: [[50, 50]], 2: [[27, 50], [73, 50]], 3: [[50, 27], [27, 72], [73, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[24, 24], [76, 24], [50, 50], [24, 76], [76, 76]], 6: [[22, 30], [50, 30], [78, 30], [22, 70], [50, 70], [78, 70]] };
+  const BASER = { 1: 40, 2: 21, 3: 19, 4: 19, 5: 15, 6: 13 };
+  const SIZES = [0.5, 0.75, 1];
+  function figInner(f) {
+    const [col] = COLORS[f.color]; const id = 'st' + (++UID); let defs = '';
+    let fill;
+    if (f.fill === 0) fill = `fill="${col}" stroke="#333"`;
+    else if (f.fill === 1) fill = `fill="#fff" stroke="${col}"`;
+    else { defs = `<defs><pattern id="${id}" width="0.36" height="0.36" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="0.36" height="0.36" fill="#fff"/><rect width="0.17" height="0.36" fill="${col}"/></pattern></defs>`; fill = `fill="url(#${id})" stroke="${col}"`; }
+    const sw = f.fill === 0 ? 2.5 : 4;
+    const attrs = `${fill} stroke-width="${sw}" vector-effect="non-scaling-stroke" stroke-linejoin="round"`;
+    const r = BASER[f.count] * SIZES[f.size];
+    return defs + POS[f.count].map(([x, y]) => `<g transform="translate(${x},${y}) rotate(${f.rot * 45}) scale(${r})">${shapeEl(f.shape, attrs)}</g>`).join('');
+  }
+  const figSvg = f => `<svg class="fig" viewBox="0 0 100 100">${figInner(f)}</svg>`;
+  const FA = ['shape', 'color', 'fill', 'count', 'size', 'rot'];
+  const fkey = f => FA.map(a => f[a]).join('|');
+  const AN2 = { shape: 'הצורה', color: 'הצבע', fill: 'המילוי', count: 'מספר הצורות', size: 'הגודל', rot: 'הכיוון' };
+  const AHint = { shape: 'לצורה', color: 'לצבע', fill: 'למילוי (מלא, ריק או פסים)', count: 'למספר הצורות', size: 'לגודל', rot: 'לכיוון שאליו הצורה מצביעה' };
+  function mutate(f, a, pool) {
+    const g = { ...f };
+    for (let t = 0; t < 20; t++) {
+      if (a === 'shape') g.shape = pick(pool && pool.length > 1 ? pool : (ASYM.includes(f.shape) ? ASYM : SYM));
+      else if (a === 'color') g.color = pick(COLK);
+      else if (a === 'fill') g.fill = rnd(3);
+      else if (a === 'count') g.count = Math.max(1, Math.min(6, f.count + pick([-1, 1, 2])));
+      else if (a === 'size') g.size = rnd(3);
+      else if (a === 'rot') g.rot = mod(f.rot + pick([1, 2, 3, 4, 6, 7]), 8);
+      if (g[a] !== f[a]) return g;
+    }
+    return g;
+  }
+  const valsOf = (a, n, rotOn) => {
+    if (a === 'shape') return sample(rotOn ? ASYM : SYM, n);
+    if (a === 'color') return sample(COLK, n);
+    if (a === 'fill') return sample([0, 1, 2], n);
+    if (a === 'size') return sample([0, 1, 2], n);
+    if (a === 'count') return sample([1, 2, 3, 4, 5], n);
+    if (a === 'rot') return sample([0, 1, 2, 3, 4, 5, 6, 7], n);
+  };
+
+  // ================= generic, rule-agnostic checkers =================
+  // a 3x3 grid attribute is "consistent" if it follows ANY common rule family
+  function attrOK3(V, a) {
+    const num = a === 'count' || a === 'size' || a === 'rot';
+    const df = (x, y) => a === 'rot' ? mod(y - x, 8) : y - x;
+    const rows = [0, 1, 2].map(r => V[r]), cols = [0, 1, 2].map(c => [V[0][c], V[1][c], V[2][c]]);
+    const allEq = l => l[0] === l[1] && l[1] === l[2];
+    const dist = l => new Set(l).size === 3;
+    const sameSet = ls => ls.every(l => dist(l) && l.slice().sort().join() === ls[0].slice().sort().join());
+    if (rows.every(allEq) || cols.every(allEq) || sameSet(rows) || sameSet(cols)) return true;
+    if (num) {
+      const prog = ls => { const d = df(ls[0][0], ls[0][1]); return ls.every(l => df(l[0], l[1]) === d && df(l[1], l[2]) === d); };
+      if (prog(rows) || prog(cols)) return true;
+    }
+    return false;
+  }
+  function attrOK2(V, a) {
+    if (V[0][0] === V[1][0] && V[0][1] === V[1][1]) return true;
+    if (V[0][0] === V[0][1] && V[1][0] === V[1][1]) return true;
+    if (a === 'count' || a === 'size') return V[1][1] - V[1][0] === V[0][1] - V[0][0];
+    if (a === 'rot') return mod(V[1][1] - V[1][0], 8) === mod(V[0][1] - V[0][0], 8);
+    return false;
+  }
+  function gridOK(grid, cand) {
+    const n = grid.length; const G = grid.map(r => r.slice()); G[n - 1][n - 1] = cand;
+    return FA.every(a => { const V = G.map(r => r.map(f => f[a])); return n === 3 ? attrOK3(V, a) : attrOK2(V, a); });
+  }
+  // sequence attribute: predictions of every rule family that fits the shown terms
+  function seqPreds(s, a) {
+    const n = s.length, P = new Set(), num = a === 'count' || a === 'size' || a === 'rot';
+    if (s.every(x => x === s[0])) P.add(s[0]);
+    for (const p of [2, 3]) if (n >= p + 2 && s.every((x, i) => i < p || x === s[i - p])) P.add(s[n - p]);
+    if (num) {
+      const df = (x, y) => a === 'rot' ? mod(y - x, 8) : y - x;
+      const d = df(s[0], s[1]);
+      if (s.every((x, i) => i === 0 || df(s[i - 1], x) === d)) { const v = a === 'rot' ? mod(s[n - 1] + d, 8) : s[n - 1] + d; P.add(v); }
+    }
+    return P;
+  }
+  // number sequences: predictions of all fitting families
+  function numPreds(t) {
+    const n = t.length, P = new Set(), d = t.map((x, i) => i ? x - t[i - 1] : null).slice(1);
+    if (d.every(x => x === d[0])) P.add(t[n - 1] + d[0]);
+    if (t.every(x => x !== 0)) { const r = t[1] / t[0]; if (r !== 1 && t.every((x, i) => i === 0 || Math.abs(x / t[i - 1] - r) < 1e-9)) { const v = t[n - 1] * r; if (Number.isInteger(v)) P.add(v); } }
+    if (d.length >= 4 && d[0] !== d[1] && d.every((x, i) => i < 2 || x === d[i - 2])) P.add(t[n - 1] + d[d.length - 2]);
+    const dd = d.map((x, i) => i ? x - d[i - 1] : null).slice(1);
+    if (dd.length >= 2 && dd.every(x => x === dd[0]) && dd[0] !== 0) P.add(t[n - 1] + d[d.length - 1] + dd[0]);
+    if (n >= 4 && t.every((x, i) => i < 2 || x === t[i - 1] + t[i - 2])) P.add(t[n - 1] + t[n - 2]);
+    if (n >= 5) { const e = t.map((x, i) => i >= 2 ? x - t[i - 2] : null); const ok = [2, 3].every(k => e.every((x, i) => i < 2 || i % 2 !== k % 2 || x === e[k])); if (ok) P.add(t[n - 2] + e[(n) % 2 === 0 ? 2 : 3]); }
+    return P;
+  }
+
+  function numOpts(ans, extra, spread) {
+    const set = new Set([ans]); const out = [ans];
+    const cand = shuffle((extra || []).filter(x => Number.isInteger(x) && x >= 0));
+    const sp = spread || [1, 2, 10];
+    for (const c of cand) { if (out.length >= 4) break; if (!set.has(c)) { set.add(c); out.push(c); } }
+    let guard = 0;
+    while (out.length < 4 && guard++ < 200) { const c = ans + pick([-1, 1]) * pick(sp) * rr(1, 2); if (c >= 0 && !set.has(c)) { set.add(c); out.push(c); } }
+    return out;
+  }
+  const numHtml = v => `<div class="num">${fmt(v)}</div>`;
+
+  // ================= 1. matrices =================
+  const ruleTxt = (a, rule, d) => {
+    if (rule === 'latin') return `${AN2[a]}: בכל שורה יש שלושה שונים, כל אחד פעם אחת.`;
+    if (rule === 'row') return `${AN2[a]} זהה לאורך כל שורה.`;
+    if (rule === 'col') return `${AN2[a]} זהה בכל טור, מלמעלה למטה.`;
+    if (rule === 'prog') {
+      if (a === 'count') return `מספר הצורות ${d > 0 ? 'גדל' : 'קטן'} ב־${Math.abs(d)} בכל צעד, מימין לשמאל.`;
+      if (a === 'size') return `הצורות ${d > 0 ? 'גדלות' : 'קטנות'} בכל צעד, מימין לשמאל.`;
+      if (a === 'rot') return `הצורה מסתובבת ${Math.abs(d) === 2 ? 'רבע סיבוב' : Math.abs(d) === 4 ? 'חצי סיבוב' : 'קצת'} בכל צעד, מימין לשמאל.`;
+    }
+    if (rule === 'both') return `${AN2[a]} משתנה גם לרוחב וגם לאורך באותה כמות.`;
+    return '';
+  };
+  function genMatrix(L) {
+    const n = L <= 2 ? 2 : 3;
+    const nAttr = [0, 1, 2, 1, 2, 2, 3, 3, 4][L];
+    let varied;
+    if (L === 1) varied = [pick(['shape', 'color'])];
+    else if (L === 2) varied = sample(['shape', 'color', 'fill', 'count'], 2);
+    else if (L === 3) varied = [pick(['shape', 'count', 'color'])];
+    else if (L === 4) varied = sample(['shape', 'color', 'count', 'fill'], 2);
+    else if (L === 5) varied = [pick(['rot', 'size', 'count']), pick(['shape', 'color', 'fill'])];
+    else varied = [pick(['rot', 'size', 'count']), ...sample(['shape', 'color', 'fill', 'count'].filter(x => x), nAttr - 1)];
+    varied = [...new Set(varied)];
+    const rotOn = varied.includes('rot');
+    const base = { shape: pick(rotOn ? ASYM : SYM), color: pick(COLK), fill: pick([0, 0, 1, 2]), count: 1, size: 2, rot: rotOn ? 0 : 0 };
+    if (!varied.includes('count') && L >= 4 && Math.random() < 0.4) base.count = rr(2, 3);
+    const fn = {}; const expl = [];
+    for (const a of varied) {
+      if (n === 2) {
+        const dep = pick(['row', 'col']);
+        if ((a === 'count') && Math.random() < 0.5) { const s = rr(1, 2), x = rr(1, 2), y = rr(1, 2); fn[a] = (r, c) => s + x * r + y * c; expl.push(ruleTxt(a, 'both')); continue; }
+        const v = valsOf(a, 2, rotOn); fn[a] = dep === 'row' ? (r) => v[r] : (r, c) => v[c];
+        expl.push(dep === 'row' ? `${AN2[a]} זהה בכל שורה.` : `${AN2[a]} זהה בכל טור.`); continue;
+      }
+      const numeric = a === 'count' || a === 'size' || a === 'rot';
+      const rule = numeric ? pick(a === 'size' ? ['prog', 'latin'] : ['prog', 'prog', 'latin']) : pick(['latin', 'latin', 'row', 'col']);
+      if (rule === 'prog') {
+        if (a === 'count') { const d = pick([1, 1, 2, -1]); const e = pick([0, d]); const lo = 1 - Math.min(0, 2 * d + 2 * e), hi = 6 - Math.max(0, 2 * d + 2 * e); if (lo > hi) return null; const s = rr(lo, hi); fn[a] = (r, c) => s + d * c + e * r; expl.push(ruleTxt(a, 'prog', d)); }
+        else if (a === 'size') { const up = Math.random() < 0.5; fn[a] = (r, c) => up ? c : 2 - c; expl.push(ruleTxt(a, 'prog', up ? 1 : -1)); }
+        else { const d = pick([1, 2, -1, -2, 2]); const e = pick([0, d, rr(1, 7)]); const s = rnd(8); fn[a] = (r, c) => mod(s + d * c + e * r, 8); expl.push(ruleTxt(a, 'prog', d)); }
+      } else {
+        const v = valsOf(a, 3, rotOn); const sh = pick([1, 2]);
+        if (rule === 'latin') fn[a] = (r, c) => v[(c + sh * r) % 3];
+        else if (rule === 'row') fn[a] = (r) => v[r];
+        else fn[a] = (r, c) => v[c];
+        expl.push(ruleTxt(a, rule));
+      }
+    }
+    const grid = [];
+    for (let r = 0; r < n; r++) { grid.push([]); for (let c = 0; c < n; c++) { const f = { ...base }; for (const a of varied) f[a] = fn[a](r, c); grid[r].push(f); } }
+    if (grid.flat().some(f => f.count < 1 || f.count > 6)) return null;
+    const ans = grid[n - 1][n - 1];
+    if (!gridOK(grid, ans)) return null;
+    // distractors
+    const near = L >= 7;
+    const pool = [...new Set(grid.flat().map(f => f.shape))];
+    const opts = [ans]; const keys = new Set([fkey(ans)]);
+    let guard = 0;
+    while (opts.length < 4 && guard++ < 80) {
+      let d;
+      const k = rnd(10);
+      if (!near && k < 2) d = { ...grid[rnd(n)][rnd(n - 1)] }; // copy of another cell
+      else { const a = near || Math.random() < 0.7 ? pick(varied) : pick(FA.filter(x => x !== 'rot' || rotOn)); d = mutate(ans, a, pool); if (!near && L <= 3 && Math.random() < 0.4) d = mutate(d, pick(['shape', 'color']), pool); }
+      if (!keys.has(fkey(d)) && !gridOK(grid, d)) { keys.add(fkey(d)); opts.push(d); }
+    }
+    if (opts.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]);
+    const O = order.map(i => opts[i]);
+    const cells = grid.flat().map((f, i) => i === n * n - 1 ? `<div class="cell q">?</div>` : `<div class="cell">${figSvg(f)}</div>`).join('');
+    const sz = n === 2 ? 'min(30vw,118px)' : 'min(24vw,96px)';
+    return {
+      kind: 'matrix', prompt: 'איזו צורה חסרה בטבלה?',
+      say: 'איזו צורה חסרה בטבלה? בדוק מה משתנה בכל שורה ובכל טור.',
+      stem: `<div class="mgrid" style="grid-template-columns:repeat(${n},${sz});grid-auto-rows:${sz}">${cells}</div>`,
+      opts: O.map(f => ({ html: figSvg(f), key: fkey(f) })), ans: order.indexOf(0),
+      check: i => gridOK(grid, O[i]),
+      hint: `שים לב ${AHint[varied[0]]}. מה משתנה כשהולכים בשורה מימין לשמאל?`,
+      explain: expl.join(' ')
+    };
+  }
+
+  // ================= 2. sequences (shapes & numbers) =================
+  function genShapeSeq(L) {
+    const n = 5;
+    const plan = [[], [['shape', 'cyc2']], [[pick(['shape', 'color']), 'cyc3']], [[pick(['rot', 'count']), 'ar']], [['count', 'ar'], [pick(['color', 'shape']), pick(['cyc2', 'cyc3'])]], [['rot', 'ar'], ['size', 'cyc3']], [['rot', 'ar'], ['color', 'cyc3'], ['fill', 'cyc2']], [['count', 'ar'], ['color', 'cyc2'], ['fill', 'cyc3']], [['rot', 'ar'], ['color', 'cyc3'], ['fill', 'cyc2'], ['size', 'cyc3']]][L];
+    if (L === 1 && Math.random() < 0.5) plan[0] = ['color', 'cyc2'];
+    const rotOn = plan.some(p => p[0] === 'rot');
+    const base = { shape: pick(rotOn ? ASYM : SYM), color: pick(COLK), fill: pick([0, 0, 1]), count: 1, size: 2, rot: 0 };
+    const seqs = {}; const expl = [];
+    for (const [a, r] of plan) {
+      if (r === 'cyc2' || r === 'cyc3') { const p = r === 'cyc2' ? 2 : 3; const v = valsOf(a, p, rotOn); seqs[a] = i => v[i % p]; expl.push(`${AN2[a]} חוזר כל ${p === 2 ? 'שתי' : 'שלוש'} צורות.`); }
+      else if (a === 'count') { const d = pick([1, 1, -1]); const s = d > 0 ? 1 : 6; seqs[a] = i => s + d * i; expl.push(`מספר הצורות ${d > 0 ? 'גדל' : 'קטן'} באחת בכל פעם.`); }
+      else { const d = pick(L <= 3 ? [2, -2] : [1, -1, 3]); const s = rnd(8); seqs[a] = i => mod(s + d * i, 8); expl.push(`הצורה מסתובבת ${Math.abs(d) === 2 ? 'רבע סיבוב' : Math.abs(d) === 1 ? 'שמינית סיבוב' : 'שלוש שמיניות סיבוב'} בכל צעד.`); }
+    }
+    const items = []; for (let i = 0; i <= n; i++) { const f = { ...base }; for (const [a] of plan) f[a] = seqs[a](i); items.push(f); }
+    if (items.some(f => f.count < 1 || f.count > 6)) return null;
+    const shown = items.slice(0, n), ans = items[n];
+    const preds = {}; for (const a of FA) { preds[a] = seqPreds(shown.map(f => f[a]), a); if (preds[a].size !== 1) return null; }
+    const fits = f => FA.every(a => preds[a].has(f[a]));
+    if (!fits(ans)) return null;
+    const varied = plan.map(p => p[0]);
+    const opts = [ans], keys = new Set([fkey(ans)]); let g = 0;
+    while (opts.length < 4 && g++ < 80) { const a = L >= 6 || Math.random() < 0.75 ? pick(varied) : pick(['shape', 'color', 'fill']); let d = Math.random() < 0.25 ? { ...shown[rnd(n)] } : mutate(ans, a); if (!keys.has(fkey(d)) && !fits(d)) { keys.add(fkey(d)); opts.push(d); } }
+    if (opts.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => opts[i]);
+    return {
+      kind: 'shapeseq', prompt: 'מה הצורה הבאה?', say: 'מה הצורה הבאה בשורה? מתחילים מימין.',
+      stem: `<div class="seq">${shown.map(f => `<div class="cell">${figSvg(f)}</div>`).join('')}<div class="cell q">?</div></div>`,
+      opts: O.map(f => ({ html: figSvg(f), key: fkey(f) })), ans: order.indexOf(0),
+      check: i => fits(O[i]), hint: `שים לב ${AHint[varied[0]]}.`, explain: expl.join(' ')
+    };
+  }
+  function genNumSeq(L) {
+    let t = [], why = '', n = 5;
+    const ar = (s, d, k) => Array.from({ length: k }, (_, i) => s + d * i);
+    const kind = pick({ 1: ['ar'], 2: ['ar'], 3: ['ar', 'ar', 'geo'], 4: ['ar', 'geo'], 5: ['alt', 'geo', 'ar'], 6: ['inc', 'alt', 'geo'], 7: ['fib', 'inter', 'geo', 'inc'], 8: ['inc2', 'fib', 'inter', 'bigar'] }[L]);
+    if (kind === 'ar') {
+      const d = pick({ 1: [1, 2], 2: [2, 3, 5, 10], 3: [4, 5, 10, 20, 25, -2, -5], 4: [25, 50, 100, 11, -10, -25] }[Math.min(L, 4)]);
+      const s = d > 0 ? rr(0, L >= 3 ? 50 : 10) * (Math.abs(d) >= 25 ? Math.abs(d) / 25 : 1) : rr(Math.abs(d) * 6, Math.abs(d) * 6 + (L >= 3 ? 60 : 10));
+      t = ar(Math.round(s), d, n + 1); why = d > 0 ? `בכל פעם מוסיפים ${d}.` : `בכל פעם מורידים ${-d}.`;
+    } else if (kind === 'bigar') { const d = pick([125, 250, 150, 99, 101, -75]); const s = rr(10, 40) * 100; t = ar(s, d, n + 1); why = d > 0 ? `בכל פעם מוסיפים ${d}.` : `בכל פעם מורידים ${-d}.`; }
+    else if (kind === 'geo') {
+      const r = pick(L >= 7 ? [3, 10, 2] : L >= 5 ? [2, 3] : [2]); const down = L >= 5 && Math.random() < 0.3;
+      let s = r === 10 ? rr(1, 3) : r === 3 ? rr(1, 2) : rr(1, L >= 5 ? 5 : 3); n = r === 10 ? 4 : 5;
+      t = Array.from({ length: n + 1 }, (_, i) => s * r ** i); if (down) t.reverse(); n = t.length - 1;
+      why = down ? `בכל פעם מחלקים ב־${r}.` : `בכל פעם כופלים ב־${r}${r === 2 ? ', כלומר מכפילים' : ''}.`;
+    } else if (kind === 'alt') { const a = rr(2, 9), b = pick([rr(1, 10), -rr(1, a - 1)]); if (a === b) return null; n = 6; t = [rr(1, 20)]; for (let i = 1; i <= n; i++) t.push(t[i - 1] + (i % 2 ? a : b)); why = `לסירוגין: ${b > 0 ? `מוסיפים ${a}, ואז מוסיפים ${b}` : `מוסיפים ${a}, ואז מורידים ${-b}`}.`; }
+    else if (kind === 'inc' || kind === 'inc2') { const s = rr(1, kind === 'inc2' ? 50 : 10), d0 = rr(1, 3), dd = kind === 'inc2' ? pick([2, 3, 5]) : 1; t = [s]; for (let i = 1; i <= n; i++) t.push(t[i - 1] + d0 + dd * (i - 1)); why = `כל פעם מוסיפים ${dd === 1 ? 'אחד יותר' : dd + ' יותר'} מהפעם הקודמת: +${d0}, +${d0 + dd}, +${d0 + 2 * dd}...`; }
+    else if (kind === 'fib') { n = 6; t = [rr(1, 3), rr(1, 4)]; for (let i = 2; i <= n; i++) t.push(t[i - 1] + t[i - 2]); why = 'כל מספר הוא החיבור של שני המספרים שלפניו.'; }
+    else if (kind === 'inter') { n = 6; const a = rr(1, 9), da = pick([1, 2, 5, 10]), b = rr(20, 60), db = -pick([1, 2, 3, 5]); t = []; for (let i = 0; i <= n; i++) t.push(i % 2 === 0 ? a + da * (i / 2) : b + db * ((i - 1) / 2)); why = `יש כאן שתי סדרות שמשתלבות: במקומות 1, 3, 5 מוסיפים ${da}, ובמקומות 2, 4, 6 מורידים ${-db}.`; }
+    if (t.some(x => x < 0 || !Number.isInteger(x))) return null;
+    const shown = t.slice(0, n), ans = t[n];
+    const P = numPreds(shown); if (P.size !== 1 || !P.has(ans)) return null;
+    const last = shown[n - 1], ld = last - shown[n - 2];
+    const vals = numOpts(ans, [last + ld, ans + 1, ans - 1, ans + 10, ans - 10, ans + ld, last + 2 * ld, ans * 2, ans + 100].filter(x => !P.has(x)), [1, 2, 10]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'numseq', prompt: 'מה המספר הבא?', say: shown.join(', ') + '. מה המספר הבא?',
+      stem: `<div class="seq">${shown.map(v => `<div class="ncell">${fmt(v)}</div>`).join('')}<div class="ncell q">?</div></div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => P.has(O[i]), hint: 'בדוק כמה מוסיפים או מורידים בין כל שני מספרים.', explain: why + ` לכן התשובה ${ans}.`
+    };
+  }
+  const genSeq = L => (Math.random() < 0.5 ? genShapeSeq(L) : genNumSeq(L));
+  // ================= 3. analogies =================
+  const NM = {};
+  const nm = e => NM[e] || '';
+  const REL = {
+    eats: { why: 'מה שהחיה אוהבת לאכול', p: [['🐰', 'ארנב', '🥕', 'גזר'], ['🐵', 'קוף', '🍌', 'בננה'], ['🐭', 'עכבר', '🧀', 'גבינה'], ['🐶', 'כלב', '🦴', 'עצם'], ['🐼', 'פנדה', '🎋', 'במבוק'], ['🐦', 'ציפור', '🐛', 'תולעת']] },
+    grows: { why: 'מה שהוא נהיה כשהוא גדל', p: [['🐣', 'אפרוח', '🐔', 'תרנגולת'], ['🐛', 'זחל', '🦋', 'פרפר'], ['👶', 'תינוק', '🧑', 'מבוגר'], ['🌱', 'נבט', '🌳', 'עץ']] },
+    place: { why: 'איפה הוא נמצא או נוסע', p: [['🐟', 'דג', '🌊', 'ים'], ['🐪', 'גמל', '🏜️', 'מדבר'], ['🐧', 'פינגווין', '🧊', 'קרח'], ['🐦', 'ציפור', '🪺', 'קן'], ['✈️', 'מטוס', '☁️', 'שמיים'], ['🚗', 'מכונית', '🛣️', 'כביש'], ['🚂', 'רכבת', '🛤️', 'מסילה'], ['🚀', 'חללית', '🪐', 'חלל']] },
+    uses: { why: 'במה הוא משתמש בעבודה', p: [['👨‍🍳', 'טבח', '🍳', 'מחבת'], ['👨‍🚒', 'כבאי', '🚒', 'כבאית'], ['👩‍⚕️', 'רופאה', '🩺', 'מכשיר שמיעה של רופא'], ['👩‍🎨', 'ציירת', '🎨', 'צבעים'], ['👨‍🌾', 'חקלאי', '🚜', 'טרקטור'], ['👮', 'שוטר', '🚓', 'ניידת'], ['👨‍🔧', 'מכונאי', '🔧', 'מפתח ברגים'], ['🧑‍🚀', 'אסטרונאוט', '🚀', 'חללית']] },
+    from: { why: 'מאיפה זה מגיע', p: [['🥛', 'חלב', '🐄', 'פרה'], ['🍯', 'דבש', '🐝', 'דבורה'], ['🧶', 'צמר', '🐑', 'כבשה'], ['🥚', 'ביצה', '🐔', 'תרנגולת'], ['🍞', 'לחם', '🌾', 'חיטה'], ['🍎', 'תפוח', '🌳', 'עץ']] },
+    weather: { why: 'מה צריך במזג האוויר הזה', p: [['☀️', 'שמש', '🕶️', 'משקפי שמש'], ['🌧️', 'גשם', '☂️', 'מטרייה'], ['❄️', 'שלג', '🧤', 'כפפות'], ['🌬️', 'רוח', '🪁', 'עפיפון']] },
+    part: { why: 'חלק ממנו', p: [['🌳', 'עץ', '🍃', 'עלה'], ['🚗', 'מכונית', '🛞', 'גלגל'], ['🏠', 'בית', '🚪', 'דלת'], ['🐦', 'ציפור', '🪶', 'נוצה']] }
+  };
+  // items that would make a distractor arguable for this relation (e.g. a dog could also eat bread)
+  const EX = { eats: '🍎 🍯 🥛 🍞 🥚 🍭 🌾 🍃 🌸 🐟 🐔 🐛 🦋 🐝 🧀 🍌 🥕 🦴 🎋 🌱 🐑 🐄 🐣 🌳', place: '🌳 🏠 🌱 🌾 🌸 🌈', uses: '🐄 🐑 🐔 🌾 🌱 🐝 🛣️ 🛤️ 🚗 🚂 ✈️ 🚀 ☂️ 🕶️ 🧤 🍳', part: '🍎 🌱 🛣️ 🪺', grows: '🥚', from: '', weather: '' };
+  Object.values(REL).forEach(r => { r.p = r.p.map(([a, an, b, bn]) => { NM[a] = NM[a] || an; NM[b] = NM[b] || bn; return [a, b]; }); });
+  const inRel = (k, x, y) => REL[k].p.some(([a, b]) => a === x && b === y);
+  const relsOf = (x, y) => Object.keys(REL).filter(k => inRel(k, x, y));
+  const ALLI = [...new Set(Object.values(REL).flatMap(r => r.p.flat()))];
+  const emoBox = e => `<div class="box"><div class="emo">${e}</div></div>`;
+  const emoOpt = e => `<div class="emo">${e}</div><div class="nm">${nm(e)}</div>`;
+  function genSemAna(L) {
+    const keys = L <= 2 ? ['eats', 'grows', 'place', 'from'] : Object.keys(REL);
+    const rk = pick(keys); const [[A, B], [C, D]] = sample(REL[rk].p, 2);
+    const Rs = relsOf(A, B);
+    const sameRelItems = new Set(REL[rk].p.flat());
+    const tempt = ALLI.filter(x => x !== C && x !== D && Object.keys(REL).some(k => k !== rk && (inRel(k, C, x) || inRel(k, x, C))));
+    const ex = new Set(EX[rk].split(' '));
+    const others = ALLI.filter(x => !sameRelItems.has(x) && !ex.has(x));
+    const pool = [...new Set([...(L >= 3 ? shuffle(tempt.filter(x => !ex.has(x))).slice(0, 2) : []), ...shuffle(others)])].filter(x => x !== C && x !== D && x !== A && x !== B);
+    const vals = [D, ...pool.slice(0, 3)]; if (vals.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    const R = REL[rk];
+    return {
+      kind: 'semana', prompt: 'מה מתאים במקום סימן השאלה?',
+      say: `${nm(A)} ו${nm(B)}. ${nm(C)} ו... מה? ${O.map(nm).join(', ')}.`,
+      stem: `<div class="ana"><div class="pair">${emoBox(A)}<span class="arrow">⬅</span>${emoBox(B)}</div><div class="pair">${emoBox(C)}<span class="arrow">⬅</span><div class="box q">?</div></div></div>`,
+      opts: O.map(e => ({ html: emoOpt(e), key: e, say: nm(e) })), ans: order.indexOf(0),
+      check: i => Rs.some(k => inRel(k, C, O[i])),
+      hint: `מה הקשר בין ${nm(A)} ל${nm(B)}?`,
+      explain: `${nm(B)} זה ${R.why} של ${nm(A)}. אותו דבר: ${nm(D)} זה ${R.why} של ${nm(C)}.`
+    };
+  }
+  function genPairAna(L) {
+    const rk = pick(Object.keys(REL)); const [[A, B], [C, D]] = sample(REL[rk].p, 2);
+    const Rs = relsOf(A, B);
+    const pairs = [[C, D]];
+    if (!Rs.some(k => inRel(k, D, C))) pairs.push([D, C]); // same pair, wrong order
+    const otherPairs = shuffle(Object.keys(REL).filter(k => k !== rk).flatMap(k => REL[k].p)).filter(([x, y]) => x !== A && y !== B);
+    const tempt = otherPairs.filter(([x, y]) => x === C || y === D || x === D || y === C);
+    for (const p of [...tempt, ...otherPairs]) { if (pairs.length >= 4) break; if (!pairs.some(q => q[0] === p[0] && q[1] === p[1])) pairs.push(p); }
+    if (pairs.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => pairs[i]);
+    return {
+      kind: 'pairana', prompt: 'איזה זוג מתאים באותה דרך?',
+      say: `${nm(A)} ו${nm(B)}. איזה זוג מתאים באותה דרך? ${O.map(([x, y]) => nm(x) + ' ו' + nm(y)).join('. ')}.`,
+      stem: `<div class="ana"><div class="pair">${emoBox(A)}<span class="arrow">⬅</span>${emoBox(B)}</div></div>`,
+      opts: O.map(([x, y]) => ({ html: `<div class="pairopt"><span class="emo">${x}</span><span class="arrow">⬅</span><span class="emo">${y}</span></div><div class="nm">${nm(x)} ← ${nm(y)}</div>`, key: x + '>' + y })), ans: order.indexOf(0),
+      check: i => Rs.some(k => inRel(k, O[i][0], O[i][1])),
+      hint: 'שים לב גם לסדר: מה בא ראשון בזוג?',
+      explain: `${nm(B)} זה ${REL[rk].why} של ${nm(A)}, וגם ${nm(D)} זה ${REL[rk].why} של ${nm(C)}. הסדר חשוב!`
+    };
+  }
+  function figPreds(A, B, C) { // all transformations that turn A into B, applied to C (generic)
+    const per = FA.map(a => {
+      const x = A[a], y = B[a], c = C[a];
+      if (x === y) return [c];
+      if (a === 'shape' || a === 'color' || a === 'fill') return [y];
+      if (a === 'rot') return [mod(c + y - x, 8)];
+      const out = [c + y - x]; if (a === 'count' && y === 2 * x) out.push(2 * c); if (a === 'count' && x === 2 * y && c % 2 === 0) out.push(c / 2);
+      return out;
+    });
+    let keys = [''];
+    per.forEach((vals, i) => { keys = keys.flatMap(k => [...new Set(vals)].map(v => k + (i ? '|' : '') + v)); });
+    return new Set(keys);
+  }
+  function genFigAna(L) {
+    const nT = L <= 4 ? 1 : L <= 6 ? 2 : 3;
+    const ch = sample(['color', 'fill', 'count', 'size', 'rot', 'shape'], nT);
+    const rotOn = ch.includes('rot');
+    const A = { shape: pick(rotOn ? ASYM : SYM), color: pick(COLK), fill: pick([0, 1, 2]), count: rr(1, 3), size: rr(1, 2), rot: rotOn ? rnd(8) : 0 };
+    const B = { ...A };
+    for (const a of ch) {
+      if (a === 'count') B.count = A.count + pick([1, 2, -1]);
+      else if (a === 'size') B.size = A.size === 2 ? pick([0, 1]) : A.size + 1;
+      else if (a === 'rot') B.rot = mod(A.rot + pick(L >= 7 ? [1, 2, 3, 6] : [2, 4, 6]), 8);
+      else B[a] = mutate(A, a)[a];
+    }
+    if (B.count < 1 || B.count > 6) return null;
+    // C: a different-looking figure
+    const C = { ...A };
+    const free = ['shape', 'color', 'fill'].filter(a => !ch.includes(a));
+    for (const a of sample(free, Math.min(free.length, L >= 5 ? 2 : 1))) C[a] = mutate(A, a)[a];
+    for (const a of ch) {
+      if (a === 'count') C.count = rr(1, 4);
+      else if (a === 'size') C.size = A.size;
+      else if (a === 'rot') C.rot = rnd(8);
+      else if (L >= 5 && Math.random() < 0.5) { C[a] = mutate(A, a)[a]; if (C[a] === B[a]) C[a] = A[a]; }
+    }
+    if (rotOn && !ASYM.includes(C.shape)) C.shape = pick(ASYM);
+    const P = figPreds(A, B, C); if (P.size !== 1) return null;
+    const D = { ...C }; for (const a of ch) { if (a === 'count') D.count = C.count + B.count - A.count; else if (a === 'size') D.size = C.size + B.size - A.size; else if (a === 'rot') D.rot = mod(C.rot + B.rot - A.rot, 8); else D[a] = B[a]; }
+    if (D.count < 1 || D.count > 6 || D.size < 0 || D.size > 2 || C.count < 1) return null;
+    if (!P.has(fkey(D)) || fkey(C) === fkey(A)) return null;
+    const opts = [D], keys = new Set([fkey(D)]); let g = 0;
+    const cands = () => { const k = rnd(10); if (k < 2) return { ...C }; if (k < 3) return { ...B }; return mutate(D, Math.random() < 0.75 ? pick(ch) : pick(['shape', 'color', 'fill'])); };
+    while (opts.length < 4 && g++ < 60) { const d = cands(); if (d.count >= 1 && d.count <= 6 && !keys.has(fkey(d)) && !P.has(fkey(d))) { keys.add(fkey(d)); opts.push(d); } }
+    if (opts.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => opts[i]);
+    const tx = { color: 'הצבע משתנה', fill: 'המילוי משתנה', count: 'מספר הצורות משתנה', size: 'הגודל משתנה', rot: 'הצורה מסתובבת', shape: 'הצורה מתחלפת' };
+    return {
+      kind: 'figana', prompt: 'מה מתאים במקום סימן השאלה?', say: 'הצורה הראשונה משתנה לשנייה. מה יקרה לצורה השלישית אם נשנה אותה באותה דרך?',
+      stem: `<div class="ana"><div class="pair"><div class="box">${figSvg(A)}</div><span class="arrow">⬅</span><div class="box">${figSvg(B)}</div></div><div class="pair"><div class="box">${figSvg(C)}</div><span class="arrow">⬅</span><div class="box q">?</div></div></div>`,
+      opts: O.map(f => ({ html: figSvg(f), key: fkey(f) })), ans: order.indexOf(0),
+      check: i => P.has(fkey(O[i])), hint: `מה השתנה בין הצורה הראשונה לשנייה? שים לב ${AHint[ch[0]]}.`,
+      explain: ch.map(a => tx[a]).join(', ') + '. עושים בדיוק את אותו שינוי לצורה השלישית.'
+    };
+  }
+  function genAnalogy(L) {
+    const k = pick({ 1: ['sem'], 2: ['sem', 'sem', 'fig'], 3: ['sem', 'fig'], 4: ['sem', 'fig', 'fig'], 5: ['fig', 'sem', 'pair'], 6: ['pair', 'fig'], 7: ['pair', 'fig'], 8: ['pair', 'fig', 'fig'] }[L]);
+    return k === 'sem' ? genSemAna(L) : k === 'pair' ? genPairAna(L) : genFigAna(L);
+  }
+
+  // ================= 4. spatial =================
+  const PCOL = { a: '#ffd83a', b: '#e53935', c: '#1e88e5' };
+  const pnorm = cs => { const mx = Math.min(...cs.map(c => c[0])), my = Math.min(...cs.map(c => c[1])); return cs.map(([x, y, k]) => [x - mx, y - my, k]); };
+  const pkey = cs => pnorm(cs).map(c => c.join(',')).sort().join(';');
+  const prot = cs => pnorm(cs.map(([x, y, k]) => [-y, x, k]));
+  const pflipX = cs => pnorm(cs.map(([x, y, k]) => [-x, y, k]));
+  const pflipY = cs => pnorm(cs.map(([x, y, k]) => [x, -y, k]));
+  const prots = cs => { const o = [cs]; for (let i = 0; i < 3; i++) o.push(prot(o[o.length - 1])); return o; };
+  function polyRandom(n, bound) {
+    const cs = [[0, 0]]; let g = 0;
+    while (cs.length < n && g++ < 200) { const [x, y] = pick(cs); const [dx, dy] = pick([[1, 0], [-1, 0], [0, 1], [0, -1]]); const nx = x + dx, ny = y + dy; if (Math.abs(nx) >= bound || Math.abs(ny) >= bound) continue; if (!cs.some(c => c[0] === nx && c[1] === ny)) cs.push([nx, ny]); }
+    const p = pnorm(cs.map(c => [c[0], c[1], 'a']));
+    const W = Math.max(...p.map(c => c[0])) + 1, H = Math.max(...p.map(c => c[1])) + 1;
+    return W > bound || H > bound ? null : p;
+  }
+  function polySvg(cs, mirror) {
+    const W = Math.max(...cs.map(c => c[0])) + 1, H = Math.max(...cs.map(c => c[1])) + 1, S = Math.max(W, H, 3);
+    const u = 84 / S, ox = 50 - W * u / 2, oy = 50 - H * u / 2;
+    return `<svg class="fig" viewBox="0 0 100 100">${cs.map(([x, y, k]) => `<rect x="${ox + x * u}" y="${oy + y * u}" width="${u}" height="${u}" fill="${PCOL[k]}" stroke="#5a3b00" stroke-width="2.5" rx="2"/>`).join('')}${mirror ? '' : ''}</svg>`;
+  }
+  function genRotate(L) {
+    const n = L <= 2 ? 4 : L <= 5 ? 5 : 6; let cs = polyRandom(n, L <= 2 ? 3 : 4); if (!cs) return null;
+    if (L >= 4) { const i = rnd(cs.length); cs[i] = [cs[i][0], cs[i][1], 'b']; }
+    if (L >= 7) { const i = rnd(cs.length); if (cs[i][2] === 'a') cs[i] = [cs[i][0], cs[i][1], 'c']; }
+    const R = prots(cs).map(pkey), RS = new Set(R);
+    if (pkey(pflipX(cs)) && R.includes(pkey(pflipX(cs)))) return null; // must be chiral
+    const k = rr(1, 3); const ans = prots(cs)[k]; if (pkey(ans) === pkey(cs)) return null;
+    const opts = [ans], keys = new Set([pkey(ans)]);
+    const mir = prots(pflipX(cs));
+    for (const m of shuffle(mir)) { if (opts.length >= 4) break; const kk = pkey(m); if (!keys.has(kk) && !RS.has(kk)) { keys.add(kk); opts.push(m); } }
+    let g = 0; while (opts.length < 4 && g++ < 50) { const o = polyRandom(n, 4); if (!o) continue; if (L >= 4) o[0] = [o[0][0], o[0][1], 'b']; const kk = pkey(o); if (!keys.has(kk) && !RS.has(kk)) { keys.add(kk); opts.push(o); } }
+    if (opts.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => opts[i]);
+    return {
+      kind: 'rotate', prompt: 'איזו היא אותה צורה, רק מסובבת?', say: 'איזו מהתשובות היא בדיוק אותה צורה, רק מסובבת? בלי להפוך אותה!',
+      stem: `<div class="cell" style="width:min(36vw,150px);height:min(36vw,150px)">${polySvg(cs)}</div>`,
+      opts: O.map(c => ({ html: polySvg(c), key: pkey(c) })), ans: order.indexOf(0),
+      check: i => RS.has(pkey(O[i])), hint: 'דמיין שאתה מסובב את הדף. צורה הפוכה כמו במראה לא נחשבת.',
+      explain: `הצורה הנכונה היא אותה צורה אחרי ${k === 2 ? 'חצי סיבוב' : 'רבע סיבוב'}. בשאר התשובות הצורה הפוכה כמו במראה או שונה.`
+    };
+  }
+  function genMirror(L) {
+    const n = L <= 3 ? 4 : 5; const cs = polyRandom(n, 4); if (!cs) return null;
+    if (L >= 5) { const i = rnd(cs.length); cs[i] = [cs[i][0], cs[i][1], 'b']; }
+    const ans = pflipX(cs); const K = pkey(ans);
+    if (K === pkey(cs)) return null;
+    const vals = [ans]; const keys = new Set([K]);
+    for (const o of shuffle([cs, pflipY(cs), prot(prot(cs)), prot(cs), prot(ans)])) { if (vals.length >= 4) break; const k = pkey(o); if (!keys.has(k)) { keys.add(k); vals.push(o); } }
+    if (vals.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'mirror', prompt: 'איך הצורה נראית במראה?', say: 'יש מראה ליד הצורה. איך הצורה תיראה במראה?',
+      stem: `<div style="display:flex;align-items:center;gap:8px;direction:rtl"><div class="cell" style="width:min(34vw,140px);height:min(34vw,140px)">${polySvg(cs)}</div><div style="width:10px;height:min(34vw,140px);background:linear-gradient(90deg,#b3e5fc,#e1f5fe,#81d4fa);border:2px solid #0288d1;border-radius:4px"></div><div class="cell q" style="width:min(34vw,140px);height:min(34vw,140px)">🪞</div></div>`,
+      opts: O.map(c => ({ html: polySvg(c), key: pkey(c) })), ans: order.indexOf(0),
+      check: i => pkey(O[i]) === pkey(pflipX(cs)), hint: 'במראה, מה שבצד ימין עובר לצד שמאל, ומה שלמעלה נשאר למעלה.',
+      explain: 'במראה הצורה מתהפכת מצד לצד: ימין הופך לשמאל, אבל למעלה נשאר למעלה.'
+    };
+  }
+  function holesSvg(holes, w, h, opts = {}) {
+    const u = 80 / 4, ox = 10 + (4 - w) * u / 2, oy = 10 + (4 - h) * u / 2;
+    let s = `<svg class="fig" viewBox="0 0 100 100"><rect x="${ox}" y="${oy}" width="${w * u}" height="${h * u}" fill="#e3f2fd" stroke="#1565c0" stroke-width="2.5"/>`;
+    if (opts.vline) s += `<line x1="50" y1="${oy - 4}" x2="50" y2="${oy + h * u + 4}" stroke="#e53935" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+    if (opts.hline) s += `<line x1="${ox - 4}" y1="50" x2="${ox + w * u + 4}" y2="50" stroke="#e53935" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+    if (opts.arrowV) s += `<path d="M28,${oy + 8} Q50,${oy - 14} 72,${oy + 8}" fill="none" stroke="#e53935" stroke-width="3"/><polygon points="72,${oy + 8} 64,${oy + 2} 70,${oy - 2}" fill="#e53935"/>`;
+    if (opts.arrowH) s += `<path d="M${ox + w * u - 8},28 Q${ox + w * u + 14},50 ${ox + w * u - 8},72" fill="none" stroke="#e53935" stroke-width="3"/><polygon points="${ox + w * u - 8},72 ${ox + w * u - 2},64 ${ox + w * u + 2},70" fill="#e53935"/>`;
+    for (const [x, y] of holes) s += `<circle cx="${ox + (x - (4 - w)) * u + u / 2}" cy="${oy + (y - (4 - h)) * u + u / 2}" r="${u * 0.3}" fill="#333"/>`;
+    return s + '</svg>';
+  }
+  function genFold(L) {
+    const type = L <= 4 ? pick(['v', 'h']) : L === 5 ? pick(['v', 'h', 'vh']) : pick(['vh', 'vh', 'v', 'h']);
+    const nh = L <= 4 ? 1 : L <= 6 ? rr(1, 2) : rr(2, 3);
+    const xs = type === 'h' ? [0, 1, 2, 3] : [2, 3], ys = type === 'v' ? [0, 1, 2, 3] : [2, 3];
+    const cells = xs.flatMap(x => ys.map(y => [x, y]));
+    const holes = sample(cells, nh);
+    const unf = (hs, t) => { let o = hs.slice(); if (t.includes('v')) o = o.concat(o.map(([x, y]) => [3 - x, y])); if (t.includes('h')) o = o.concat(o.map(([x, y]) => [x, 3 - y])); return o; };
+    const hk = hs => [...new Set(hs.map(c => c.join(',')))].sort().join(';');
+    const ans = unf(holes, type), K = hk(ans);
+    const cand = [holes, unf(holes, type === 'v' ? 'h' : type === 'h' ? 'v' : 'v'), unf(holes, type === 'vh' ? 'h' : type), type === 'vh' ? holes.concat(holes.map(([x, y]) => [3 - x, 3 - y])) : holes.concat(holes.map(([x, y]) => type === 'v' ? [x - 2, y] : [x, y - 2])), ans.slice(1).concat([[rnd(4), rnd(4)]])].filter(h => h.every(([x, y]) => x >= 0 && y >= 0 && x < 4 && y < 4));
+    const vals = [ans], keys = new Set([K]);
+    for (const c of shuffle(cand)) { if (vals.length >= 4) break; const k = hk(c); if (!keys.has(k)) { keys.add(k); vals.push(c); } }
+    let g = 0; while (vals.length < 4 && g++ < 30) { const c = unf(sample(cells, nh), type); const k = hk(c); if (!keys.has(k)) { keys.add(k); vals.push(c); } }
+    if (vals.length < 4) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    const steps = [];
+    if (type === 'v') steps.push(holesSvg([], 4, 4, { vline: 1, arrowV: 1 }), holesSvg(holes, 2, 4));
+    else if (type === 'h') steps.push(holesSvg([], 4, 4, { hline: 1, arrowH: 1 }), holesSvg(holes, 4, 2));
+    else steps.push(holesSvg([], 4, 4, { vline: 1, arrowV: 1 }), holesSvg([], 2, 4, { hline: 1 }), holesSvg(holes, 2, 2));
+    const hs = s => s.replace('class="fig"', 'class="fig" style="width:min(22vw,104px);height:min(22vw,104px)"');
+    return {
+      kind: 'fold', prompt: 'מקפלים דף ומנקבים חור. איך ייראה הדף כשנפתח אותו?',
+      say: `מקפלים את הדף ${type === 'vh' ? 'פעמיים' : 'פעם אחת'} לפי הקו האדום, ואז עושים ${nh === 1 ? 'חור אחד' : nh + ' חורים'}. איך ייראה הדף כשנפתח אותו?`,
+      stem: `<div class="seq" style="align-items:center">${steps.map(hs).join('<span class="arrow">⬅</span>')}</div>`,
+      opts: O.map(h => ({ html: holesSvg(h, 4, 4), key: hk(h) })), ans: order.indexOf(0),
+      check: i => hk(O[i]) === K, hint: 'כל חור עובר דרך כל השכבות של הדף. כשפותחים, החורים מופיעים כמו במראה משני צדי הקו.',
+      explain: `כל חור עובר דרך ${type === 'vh' ? 'ארבע' : 'שתי'} שכבות, ולכן כשפותחים יש ${ans.length} חורים, כמו בבואה במראה משני צדי הקו.`
+    };
+  }
+  function cubesSvg(H) {
+    // oblique-isometric (depth step != height step, so no two cube positions can coincide on screen)
+    const d = H.length, w = H[0].length, a = 13, b = 6.5, c = 14;
+    const P = (x, y, z) => [(x - y) * a, (x + y) * b - z * c];
+    const list = [];
+    for (let y = 0; y < d; y++) for (let x = 0; x < w; x++) for (let z = 0; z < H[y][x]; z++) list.push([x, y, z]);
+    list.sort((p, q) => (p[0] + p[1]) - (q[0] + q[1]) || p[2] - q[2]);
+    const xs = [], ys = [];
+    for (const [x, y, z] of list) for (const dx of [0, 1]) for (const dy of [0, 1]) for (const dz of [0, 1]) { const [u, v] = P(x + dx, y + dy, z + dz); xs.push(u); ys.push(v); }
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const S = Math.max(x1 - x0, y1 - y0) + 8, ox = (x0 + x1) / 2 - S / 2, oy = (y0 + y1) / 2 - S / 2;
+    let s = `<svg class="fig" viewBox="${ox} ${oy} ${S} ${S}">`;
+    const poly = (pts, f) => `<polygon points="${pts.map(p => p.join(',')).join(' ')}" fill="${f}" stroke="#5a3b00" stroke-width="1.2" stroke-linejoin="round"/>`;
+    for (const [x, y, z] of list) {
+      const t = [P(x, y, z + 1), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)];
+      const l = [P(x, y + 1, z + 1), P(x + 1, y + 1, z + 1), P(x + 1, y + 1, z), P(x, y + 1, z)];
+      const r = [P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x + 1, y + 1, z), P(x + 1, y, z)];
+      s += poly(t, '#fff176') + poly(l, '#ffca28') + poly(r, '#f9a825');
+    }
+    return s + '</svg>';
+  }
+  function genCubes(L) {
+    const [w, d, mh] = L <= 2 ? [2, 2, 2] : L <= 4 ? [3, 2, 3] : L <= 6 ? [3, 3, 3] : [3, 3, 4];
+    const H = Array.from({ length: d }, () => Array(w).fill(0));
+    for (let y = 0; y < d; y++) for (let x = 0; x < w; x++) { const lim = Math.min(y ? H[y - 1][x] : mh, x ? H[y][x - 1] : mh); H[y][x] = lim ? rr(L >= 5 ? 0 : 1, lim) : 0; }
+    // non-increasing toward the viewer => every tower top is visible
+    const total = H.flat().reduce((s, v) => s + v, 0); if (total < 3) return null;
+    const ok = H.every((row, y) => row.every((v, x) => (!y || H[y - 1][x] >= v) && (!x || row[x - 1] >= v)));
+    if (!ok) return null;
+    const visibleTops = H.flat().filter(v => v > 0).length;
+    const vals = numOpts(total, [total - 1, total + 1, total - 2, total + 2, visibleTops, total - visibleTops + 1].filter(v => v > 0 && v !== total), [1, 2]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    // independent recount by enumerating unit cubes
+    const recount = (() => { let c = 0; for (let y = 0; y < d; y++) for (let x = 0; x < w; x++) for (let z = 0; z < mh; z++) if (z < H[y][x]) c++; return c; })();
+    return {
+      kind: 'cubes', prompt: 'כמה קוביות יש בבניין?', say: 'כמה קוביות יש בבניין? זכור שיש גם קוביות שמסתתרות למטה, מתחת לקוביות אחרות.',
+      stem: `<div class="cell" style="width:min(50vw,210px);height:min(50vw,210px);background:#fff">${cubesSvg(H)}</div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => O[i] === recount, hint: 'ספור כל מגדל לחוד: כמה קומות יש לו? קוביה למעלה תמיד עומדת על קוביות שמתחתיה.',
+      explain: `סופרים כל מגדל לפי הגובה שלו: ${H.flat().filter(v => v).join(' + ')} = ${total}.`
+    };
+  }
+  function carpetFits(G) { // does some periodic rule a*i+b*j (mod k) explain every cell?
+    const R = G.length, Cn = G[0].length;
+    const layerOK = f => { for (let k = 1; k <= 4; k++) for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) { const m = {}; let ok = true; for (let i = 0; i < R && ok; i++) for (let j = 0; j < Cn && ok; j++) { const r = (a * i + b * j) % k, v = f(G[i][j]); if (m[r] === undefined) m[r] = v; else if (m[r] !== v) ok = false; } if (ok) return true; } return false; };
+    return layerOK(c => c[0]) && layerOK(c => c[1]);
+  }
+  function carpetSvg(G, hole) {
+    const R = G.length, Cn = G[0].length, u = Math.min(96 / Cn, 96 / R), ox = (100 - Cn * u) / 2, oy = (100 - R * u) / 2;
+    let s = `<svg class="fig" viewBox="0 0 100 100">`;
+    for (let i = 0; i < R; i++) for (let j = 0; j < Cn; j++) {
+      const x = ox + (Cn - 1 - j) * u, y = oy + i * u; // RTL columns
+      if (hole && i >= hole[0] && i < hole[0] + 2 && j >= hole[1] && j < hole[1] + 2) { if (i === hole[0] && j === hole[1]) s += `<rect x="${x - u}" y="${y}" width="${2 * u}" height="${2 * u}" fill="#fff" stroke="#ff9800" stroke-width="2" stroke-dasharray="4 3"/><text x="${x}" y="${y + u * 1.35}" font-size="${u}" text-anchor="middle" fill="#ff9800" font-weight="bold">?</text>`; continue; }
+      const [c, sh] = G[i][j];
+      s += `<rect x="${x}" y="${y}" width="${u}" height="${u}" fill="${COLORS[c][0]}" stroke="#fff" stroke-width="1"/>`;
+      s += `<g transform="translate(${x + u / 2},${y + u / 2}) scale(${u * 0.3})">${shapeEl(sh, 'fill="#fff" stroke="none"')}</g>`;
+    }
+    return s + '</svg>';
+  }
+  function genCarpet(L) {
+    const R = 5, Cn = 6;
+    const k1 = L <= 3 ? 2 : pick([2, 3]), a1 = rnd(k1), b1 = rnd(k1); if (!a1 && !b1) return null;
+    const pal = sample(COLK, k1);
+    const k2 = L <= 4 ? 1 : pick([2, 3]), a2 = rnd(k2), b2 = rnd(k2); const shp = sample(['circle', 'star', 'triangle', 'heart', 'diamond'], k2);
+    if (k2 > 1 && !a2 && !b2) return null;
+    const G = Array.from({ length: R }, (_, i) => Array.from({ length: Cn }, (_, j) => [pal[(a1 * i + b1 * j) % k1], shp[(a2 * i + b2 * j) % k2]]));
+    const hole = [rr(1, R - 3), rr(1, Cn - 3)];
+    const win = (G2, i0, j0) => [[G2[i0][j0], G2[i0][j0 + 1]], [G2[i0 + 1][j0], G2[i0 + 1][j0 + 1]]];
+    const wk = w => w.flat().map(c => c.join('')).join('/');
+    const ans = win(G, ...hole), K = wk(ans);
+    const fill = w => { const G2 = G.map(r => r.slice()); for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) G2[hole[0] + i][hole[1] + j] = w[i][j]; return G2; };
+    const vals = [ans], keys = new Set([K]); let g = 0;
+    while (vals.length < 4 && g++ < 80) {
+      let w; const t = rnd(3);
+      if (t === 0) { const i0 = rnd(R - 1), j0 = rnd(Cn - 1); w = win(G, i0, j0); }
+      else if (t === 1) w = [ans[0].slice().reverse(), ans[1].slice().reverse()];
+      else { w = ans.map(r => r.map(c => c.slice())); const i = rnd(2), j = rnd(2); w[i][j] = [pick(pal.length > 1 ? pal : COLK), w[i][j][1]]; if (Math.random() < 0.4) w[i][j][1] = pick(shp); }
+      const k = wk(w); if (!keys.has(k) && !carpetFits(fill(w))) { keys.add(k); vals.push(w); }
+    }
+    if (vals.length < 4 || !carpetFits(fill(ans))) return null;
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'carpet', prompt: 'איזו חתיכה משלימה את השטיח?', say: 'בשטיח חסרה חתיכה. איזו חתיכה משלימה את הדוגמה?',
+      stem: `<div class="cell" style="width:min(62vw,250px);height:min(52vw,210px);background:#fff">${carpetSvg(G, hole)}</div>`,
+      opts: O.map(w => ({ html: carpetSvg(w), key: wk(w) })), ans: order.indexOf(0),
+      check: i => carpetFits(fill(O[i])), hint: 'הסתכל על השורות והטורים שליד החור. איזה צבע וצורה צריכים להמשיך את הדוגמה?',
+      explain: 'הדוגמה בשטיח חוזרת על עצמה באלכסון, בשורות ובטורים. רק החתיכה הנכונה ממשיכה אותה בכל הכיוונים.'
+    };
+  }
+  function genSpatial(L) {
+    const k = pick({ 1: ['mirror', 'cubes'], 2: ['rotate', 'cubes', 'mirror'], 3: ['fold', 'carpet', 'rotate', 'cubes'], 4: ['rotate', 'fold', 'cubes', 'carpet'], 5: ['fold', 'mirror', 'carpet', 'rotate', 'cubes'], 6: ['fold', 'rotate', 'cubes', 'carpet'], 7: ['fold', 'rotate', 'carpet', 'cubes'], 8: ['fold', 'rotate', 'carpet', 'cubes'] }[L]);
+    return { rotate: genRotate, mirror: genMirror, fold: genFold, cubes: genCubes, carpet: genCarpet }[k](L);
+  }
+  // ================= 5. quantitative =================
+  const OPW = { '+': 'ועוד', '-': 'פחות', '×': 'כפול', ':': 'לחלק ל' };
+  const calc = (a, op, b) => op === '+' ? a + b : op === '-' ? a - b : op === '×' ? a * b : a / b;
+  function noCarry(a, b, op) { // typical digit slip: each column computed separately without carrying / borrowing
+    const A = String(a).split('').reverse(), B = String(b).split('').reverse(); let out = '';
+    for (let i = 0; i < Math.max(A.length, B.length); i++) { const x = +(A[i] || 0), y = +(B[i] || 0); out = (op === '+' ? (x + y) % 10 : Math.abs(x - y)) + out; }
+    return +out;
+  }
+  function genMental(L) {
+    let a, b, op, ans, expr, say, why = '';
+    const two = (x, o, y) => { a = x; op = o; b = y; ans = calc(x, o, y); };
+    switch (L) {
+      case 1: two(rr(10, 79), '+', pick([rr(1, 9), rr(1, 5) * 10])); break;
+      case 2: if (Math.random() < 0.5) two(rr(21, 89), '+', rr(11, 59)); else { const x = rr(40, 99); two(x, '-', rr(11, x - 10)); } break;
+      case 3: { const x = rr(1, 8) * 100 + rr(0, 9) * 10; if (Math.random() < 0.5) two(x, '+', pick([rr(1, 9) * 10, rr(1, 5) * 100])); else two(x + 200, '-', pick([rr(1, 9) * 10, rr(1, 2) * 100])); break; }
+      case 4: { const k = rnd(3); if (k === 0) { const x = rr(120, 580); two(x, '+', rr(110, 400)); } else if (k === 1) { const x = rr(400, 950); two(x, '-', rr(120, x - 100)); } else two(rr(12, 95), '×', pick([10, 100])); break; }
+      case 5: { const k = rnd(3); if (k === 0) two(rr(11, 49) * 100, '+', rr(5, 39) * 100); else if (k === 1) { const x = rr(30, 90) * 100; two(x, '-', rr(5, 25) * 100); } else two(rr(3, 9), '×', rr(3, 9)); break; }
+      case 6: { const k = rnd(3); if (k === 0) two(rr(12, 49), '×', rr(2, 9)); else if (k === 1) two(1000, '-', rr(101, 899)); else two(rr(1001, 4999), '+', rr(101, 999)); break; }
+      case 7: { const k = rnd(3); if (k === 0) two(rr(101, 250), '×', rr(2, 4)); else if (k === 1) { const y = rr(3, 9), q = rr(11, 30); two(y * q, ':', y); } else { const x = rr(3000, 9000); two(x, '-', rr(1001, x - 500)); } break; }
+      default: {
+        const k = rnd(3);
+        if (k === 0) { const x = rr(12, 25), y = rr(3, 6), z = rr(10, 90) * 10; ans = x * y + z; expr = `${x} × ${y} + ${z}`; say = `כמה זה ${x} כפול ${y}, ועוד ${z}?`; why = `קודם כפל: ${x} × ${y} = ${x * y}, ואז ${x * y} + ${z} = ${ans}.`; }
+        else if (k === 1) { const x = rr(11, 45) * 5, y = rr(11, 45) * 5; ans = 1000 - (x + y); expr = `1000 - (${x} + ${y})`; say = `כמה זה 1000 פחות, ${x} ועוד ${y}?`; why = `קודם מה שבסוגריים: ${x} + ${y} = ${x + y}, ואז 1000 - ${x + y} = ${ans}.`; }
+        else { const x = rr(2, 9), y = rr(11, 30), z = rr(2, 5); ans = (x + y) * z; expr = `(${x} + ${y}) × ${z}`; say = `כמה זה ${x} ועוד ${y}, והכל כפול ${z}?`; why = `קודם מה שבסוגריים: ${x + y}, ואז כפול ${z} = ${ans}.`; }
+      }
+    }
+    if (!expr) { expr = `${a} ${op} ${b}`; say = `כמה זה ${a} ${OPW[op]} ${b}?`; why = `${a} ${op} ${b} = ${ans}.`; if (op === '+' || op === '-') { const nc = noCarry(a, b, op); if (nc !== ans) why += ' שים לב לעבור על המאות והעשרות בזהירות.'; } }
+    if (!Number.isInteger(ans) || ans < 0) return null;
+    const sp = ans >= 1000 ? [10, 100, 1000] : ans >= 100 ? [1, 10, 100] : [1, 2, 10];
+    const errs = [ans + 10, ans - 10, ans + 100, ans - 100, ans + 1, ans - 1];
+    if (op === '+' || op === '-') errs.unshift(noCarry(a, b, op));
+    const vals = numOpts(ans, errs.filter(x => x !== ans && x >= 0), sp);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    // independent evaluation of the shown expression
+    const truth = Function('"use strict";return (' + expr.replace(/×/g, '*').replace(/:/g, '/') + ')')();
+    return {
+      kind: 'mental', prompt: 'חשבון בראש', say,
+      stem: `<div class="num" style="font-size:${expr.length > 12 ? 'clamp(26px,7.4vw,48px)' : 'clamp(32px,10vw,52px)'};direction:ltr;white-space:nowrap">${expr} = ?</div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => O[i] === truth, hint: op === '×' ? 'אפשר לפרק: עשרות לחוד ויחידות לחוד.' : 'אפשר לחשב קודם את המאות, אחר כך העשרות ובסוף היחידות.', explain: why
+    };
+  }
+  const OBJ = [['🍎', 'תפוח'], ['⭐', 'כוכב'], ['⚡', 'ברק'], ['🍓', 'תות'], ['🎈', 'בלון'], ['🍩', 'סופגנייה']];
+  function genPicEq(L) {
+    const n = L <= 4 ? 1 : L <= 6 ? 2 : 3;
+    const objs = sample(OBJ, n); const w = objs.map(() => rr(L <= 2 ? 1 : 2, L <= 2 ? 5 : L <= 5 ? 9 : 15));
+    const eqs = [];
+    if (n === 1) { const k = L <= 2 ? 2 : rr(2, 4); eqs.push([Array(k).fill(0)]); }
+    else if (n === 2) { eqs.push([[0, 0]]); eqs.push([[0, 1]]); }
+    else { eqs.push([[0, 0]]); eqs.push([[0, 1]]); eqs.push([[1, 2]]); if (Math.random() < 0.5) eqs[2] = [[1, 1, 2]]; }
+    const lines = eqs.map(([ids]) => ({ ids, sum: ids.reduce((s, i) => s + w[i], 0) }));
+    const ask = n - 1, ans = w[ask];
+    // brute-force every assignment 1..20 that satisfies all equations
+    const sols = new Set(); const rec = (i, cur) => { if (i === n) { if (lines.every(l => l.ids.reduce((s, j) => s + cur[j], 0) === l.sum)) sols.add(cur[ask]); return; } for (let v = 1; v <= 20; v++) rec(i + 1, [...cur, v]); }; rec(0, []);
+    if (sols.size !== 1 || !sols.has(ans)) return null;
+    const vals = numOpts(ans, [lines[lines.length - 1].sum, ans + 1, ans - 1, ans * 2, ans + 2].filter(x => x > 0 && x !== ans), [1, 2]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    const lineHtml = l => `<div class="pics" style="direction:ltr">${l.ids.map(i => objs[i][0]).join(' + ')} = <b class="num" style="font-size:34px">${l.sum}</b></div>`;
+    const lineSay = l => l.ids.map(i => objs[i][1]).join(' ועוד ') + ' שווה ' + l.sum;
+    return {
+      kind: 'piceq', prompt: `כמה שווה ${objs[ask][0]}?`, say: lines.map(lineSay).join('. ') + `. כמה שווה ${objs[ask][1]}?`,
+      stem: `<div style="display:flex;flex-direction:column;gap:4px;align-items:center">${lines.map(lineHtml).join('')}</div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => sols.has(O[i]), hint: n === 1 ? 'כמה פעמים מופיע אותו ציור? חלק את המספר שווה בשווה.' : 'התחל מהשורה שיש בה ציור אחד בלבד שחוזר על עצמו.',
+      explain: objs.map((o, i) => `${o[1]} = ${w[i]}`).join(', ') + '.'
+    };
+  }
+  function scaleSvg(left, right, tilt) { // tilt: -1 left pan down, 1 right pan down, 0 balanced; pans hold emoji/number strings
+    const t = tilt * 15, rad = t * Math.PI / 180;
+    const lx = 50 - 34 * Math.cos(rad), ly = 34 - 34 * Math.sin(-rad) * -1, rx = 50 + 34 * Math.cos(rad), ry = 34 + 34 * Math.sin(rad);
+    const ly2 = 34 - 34 * Math.sin(rad);
+    const pan = (x, y, items) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y + 14}" stroke="#795548" stroke-width="1.5"/><path d="M${x - 18},${y + 14} Q${x},${y + 24} ${x + 18},${y + 14}Z" fill="#bcaaa4" stroke="#5d4037" stroke-width="1.5"/><text x="${x}" y="${y + 12}" font-size="${[...items].length > 6 ? 7 : [...items].length > 3 ? 9 : 15}" text-anchor="middle">${items}</text>`;
+    void lx; void ly;
+    return `<svg viewBox="-8 4 116 76" style="width:min(41vw,200px)"><polygon points="50,34 42,74 58,74" fill="#8d6e63"/><line x1="${50 - 34 * Math.cos(rad)}" y1="${ly2}" x2="${rx}" y2="${ry}" stroke="#5d4037" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="34" r="3" fill="#3e2723"/>${pan(50 - 34 * Math.cos(rad), ly2, left)}${pan(rx, ry, right)}</svg>`;
+  }
+  function genBalance(L) {
+    const k = L <= 3 ? 'order' : L <= 5 ? pick(['order', 'missing']) : pick(['order4', 'convert', 'missing2']);
+    if (k === 'order' || k === 'order4') {
+      const m = k === 'order' ? 3 : 4; const objs = sample([['🔴', 'הכדור האדום'], ['🔵', 'הכדור הכחול'], ['🟢', 'הכדור הירוק'], ['🟡', 'הכדור הצהוב'], ['🟣', 'הכדור הסגול'], ['🟠', 'הכדור הכתום']], m);
+      const rank = shuffle([...Array(m).keys()]); // rank[i] = weight order of object i (bigger = heavier)
+      const byW = [...Array(m).keys()].sort((x, y) => rank[y] - rank[x]); // heaviest first
+      const pairs = []; for (let i = 0; i < m - 1; i++) pairs.push([byW[i], byW[i + 1]]); shuffle(pairs);
+      const askHeavy = Math.random() < 0.5 || L <= 2;
+      // generic check: enumerate all orderings consistent with the scales
+      const perms = a => a.length <= 1 ? [a] : a.flatMap((x, i) => perms([...a.slice(0, i), ...a.slice(i + 1)]).map(p => [x, ...p]));
+      const cons = perms([...Array(m).keys()]).filter(p => pairs.every(([h, l]) => p.indexOf(h) < p.indexOf(l)));
+      const extreme = new Set(cons.map(p => askHeavy ? p[0] : p[m - 1]));
+      const target = askHeavy ? byW[0] : byW[m - 1];
+      if (extreme.size !== 1) return null;
+      const vals = [target, ...[...Array(m).keys()].filter(i => i !== target)].slice(0, Math.min(4, m));
+      const order = shuffle([...vals.keys()]), O = order.map(i => vals[i]);
+      const scales = pairs.map(([h, l]) => Math.random() < 0.5 ? scaleSvg(objs[h][0], objs[l][0], -1) : scaleSvg(objs[l][0], objs[h][0], 1));
+      return {
+        kind: 'balance', prompt: askHeavy ? 'מי הכי כבד?' : 'מי הכי קל?',
+        say: pairs.map(([h, l]) => `${objs[h][1]} כבד יותר מ${objs[l][1].replace(/^ה/, 'ה')}`).join('. ') + `. מי ${askHeavy ? 'הכי כבד' : 'הכי קל'}?`,
+        stem: `<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${scales.join('')}</div>`,
+        opts: O.map(i => ({ html: emoOptQ(objs[i]), key: objs[i][0], say: objs[i][1] })), ans: order.indexOf(0), three: m === 3,
+        check: i => extreme.has(O[i]) && cons.every(p => (askHeavy ? p[0] : p[m - 1]) === O[i]), hint: 'הצד שיורד למטה הוא הצד הכבד יותר.',
+        explain: 'מסדרים מהכבד לקל: ' + byW.map(i => objs[i][1]).join(', ') + '.'
+      };
+    }
+    if (k === 'missing' || k === 'missing2') {
+      const twice = k === 'missing2'; const x = rr(3, twice ? 15 : 25), c = rr(2, 20); const total = (twice ? 2 * x : x) + c;
+      const sols = []; for (let v = 0; v <= 100; v++) if ((twice ? 2 * v : v) + c === total) sols.push(v);
+      if (sols.length !== 1) return null;
+      const vals = numOpts(x, [total - c + 1, total, total + c, x + 1, x - 1, twice ? total - c : x + 2].filter(v => v > 0 && v !== x), [1, 2]);
+      const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+      const L1 = twice ? `❓❓${c}` : `❓ ${c}`;
+      return {
+        kind: 'balance', prompt: twice ? 'כמה שוקלת כל שקית ❓?' : 'כמה שוקלת השקית ❓?',
+        say: twice ? `המאזניים מאוזנים. בצד אחד שתי שקיות סימן שאלה שוקלות אותו דבר, ועוד משקולת של ${c}. בצד השני ${total}. כמה שוקלת כל שקית?` : `המאזניים מאוזנים. בצד אחד שקית סימן שאלה ועוד משקולת של ${c}. בצד השני ${total}. כמה שוקלת השקית?`,
+        stem: scaleSvg(L1, String(total), 0).replace("min(41vw,200px)", "min(70vw,280px)"),
+        opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+        check: i => sols.includes(O[i]), hint: 'המאזניים מאוזנים, אז שני הצדדים שוקלים אותו דבר.',
+        explain: twice ? `${total} - ${c} = ${2 * x}, ושתי שקיות שוות: ${2 * x} לחלק ל־2 = ${x}.` : `${total} - ${c} = ${x}.`
+      };
+    }
+    // convert: 1 A = p B ; 1 B = q C  => 1 A = p*q C
+    const [A, B, C] = sample([['🍉', 'אבטיח'], ['🍍', 'אננס'], ['🍎', 'תפוח'], ['🍓', 'תות'], ['🍇', 'ענבים']], 3);
+    const p = rr(2, 3), q = rr(2, 4), ans = p * q;
+    const ratios = new Set(); for (let wc = 1; wc <= 6; wc++) { const wb = q * wc, wa = p * wb; ratios.add(wa / wc); }
+    const vals = numOpts(ans, [p + q, p, q, ans + 1, ans - 1].filter(v => v > 0 && v !== ans), [1, 2]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'balance', prompt: `${A[0]} שווה כמה ${C[0]}?`,
+      say: `${A[1]} אחד שוקל כמו ${p} ${B[1]}. ${B[1]} אחד שוקל כמו ${q} ${C[1]}. כמה ${C[1]} שוקלים כמו ${A[1]} אחד?`,
+      stem: `<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${scaleSvg(A[0], B[0].repeat(p), 0)}${scaleSvg(B[0], C[0].repeat(q), 0)}</div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => ratios.size === 1 && ratios.has(O[i]), hint: `כל ${B[1]} אפשר להחליף ב־${q} ${C[1]}.`,
+      explain: `${A[1]} = ${p} ${B[1]}, וכל ${B[1]} = ${q} ${C[1]}. אז ${p} × ${q} = ${ans}.`
+    };
+  }
+  const emoOptQ = o => `<div class="emo">${o[0]}</div><div class="nm">${o[1]}</div>`;
+  // numbers inside shapes: centre = rule(corners); the rule is found from the complete shapes
+  const TRI_RULES = [
+    ['sum', (a, b, c) => a + b + c, 'המספר באמצע הוא החיבור של שלושת המספרים בפינות.'],
+    ['prod', (a, b, c) => a * b * c, 'המספר באמצע הוא הכפל של שלושת המספרים בפינות.'],
+    ['ab+c', (a, b, c) => a * b + c, 'כופלים את שני המספרים העליונים ומוסיפים את התחתון.'],
+    ['ab-c', (a, b, c) => a * b - c, 'כופלים את שני המספרים העליונים ומורידים את התחתון.'],
+    ['(a+b)c', (a, b, c) => (a + b) * c, 'מחברים את שני העליונים וכופלים בתחתון.'],
+    ['a+b-c', (a, b, c) => a + b - c, 'מחברים את שני העליונים ומורידים את התחתון.']
+  ];
+  function triSvg(a, b, c, mid) {
+    return `<svg viewBox="0 0 100 92" style="width:min(27vw,112px)"><polygon points="50,6 96,86 4,86" fill="#fffde7" stroke="#3b4cca" stroke-width="3" stroke-linejoin="round"/>
+      <text x="50" y="30" font-size="15" text-anchor="middle" font-weight="bold" fill="#3b4cca">${a}</text>
+      <text x="22" y="80" font-size="15" text-anchor="middle" font-weight="bold" fill="#3b4cca">${c}</text>
+      <text x="78" y="80" font-size="15" text-anchor="middle" font-weight="bold" fill="#3b4cca">${b}</text>
+      <circle cx="50" cy="60" r="13" fill="${mid === '?' ? '#fff3e0' : '#e8eaf6'}" stroke="${mid === '?' ? '#ff9800' : '#7986cb'}" stroke-width="2"/><text x="50" y="65.5" font-size="14" text-anchor="middle" font-weight="bold" fill="${mid === '?' ? '#ff9800' : '#222'}">${mid}</text></svg>`;
+  }
+  function genShapeNum(L) {
+    const pool = L <= 4 ? ['sum'] : L <= 5 ? ['sum', 'prod', 'ab+c'] : ['prod', 'ab+c', 'ab-c', '(a+b)c', 'a+b-c'];
+    const rk = pick(pool); const [, f, why] = TRI_RULES.find(r => r[0] === rk);
+    const nEx = L >= 7 ? 3 : 2;
+    const ex = []; for (let i = 0; i <= nEx; i++) { const t = [rr(1, L <= 4 ? 9 : 6), rr(1, L <= 4 ? 9 : 6), rr(1, L <= 4 ? 9 : 5)]; ex.push(t); }
+    const vals0 = ex.map(t => f(...t)); if (vals0.some(v => v < 0 || v > 200)) return null;
+    // all rules x all corner orders that fit the complete shapes -> predicted centres of the last shape
+    const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+    const P = new Set();
+    for (const [, g] of TRI_RULES) for (const pm of perms) { const h = t => g(t[pm[0]], t[pm[1]], t[pm[2]]); if (ex.slice(0, nEx).every((t, i) => h(t) === vals0[i])) P.add(h(ex[nEx])); }
+    const ans = vals0[nEx]; if (P.size !== 1 || !P.has(ans)) return null;
+    const t = ex[nEx];
+    const vals = numOpts(ans, [t[0] + t[1] + t[2], t[0] * t[1] * t[2], t[0] * t[1] + t[2], (t[0] + t[1]) * t[2], ans + 1, ans - 1].filter(v => v >= 0 && !P.has(v)), [1, 2, 10]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'shapenum', prompt: 'איזה מספר חסר במשולש?', say: 'בכל המשולשים המספר באמצע נוצר מהמספרים בפינות באותה דרך. איזה מספר חסר במשולש האחרון?',
+      stem: `<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;direction:rtl">${ex.map((tt, i) => triSvg(tt[0], tt[1], tt[2], i === nEx ? '?' : vals0[i])).join('')}</div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => P.has(O[i]), hint: 'נסה חיבור במשולש הראשון. אם זה לא מסתדר, נסה כפל. בדוק שהחוק עובד בכל המשולשים!',
+      explain: why + ` במשולש האחרון: ${ans}.`
+    };
+  }
+  function genMachine(L) {
+    const sq = L >= 8 && Math.random() < 0.4;
+    const a = rr(2, L >= 7 ? 5 : 3), b = rr(-3, 9);
+    const f = x => sq ? x * x + b : a * x + b;
+    const xs = sample([1, 2, 3, 4, 5, 6, 7, 8, 10], 4);
+    if (xs.some(x => f(x) < 0)) return null;
+    const known = xs.slice(0, 3), q = xs[3], ans = f(q);
+    // families: any a*x+b, or x*x+b, fitted on the known pairs
+    const P = new Set();
+    const [x1, x2] = known; const A = (f(x2) - f(x1)) / (x2 - x1), B = f(x1) - A * x1;
+    if (known.every(x => A * x + B === f(x))) P.add(A * q + B);
+    const B2 = f(x1) - x1 * x1; if (known.every(x => x * x + B2 === f(x))) P.add(q * q + B2);
+    if (P.size !== 1 || !P.has(ans)) return null;
+    const vals = numOpts(ans, [a * q, q + b, ans + a, ans - a, ans + 1].filter(v => v >= 0 && !P.has(v)), [1, 2, 5]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    const row = (x, y) => `<div style="display:flex;align-items:center;gap:6px;direction:rtl;font-size:26px;font-weight:bold"><span class="ncell" style="min-width:56px;text-align:center;background:#e3f2fd;border:3px solid #64b5f6;border-radius:14px;padding:2px 8px">${x}</span><span>⬅ ⚙️ ⬅</span><span class="ncell" style="min-width:56px;text-align:center;background:${y === '?' ? '#fff3e0' : '#e8f5e9'};border:3px ${y === '?' ? 'dashed #ff9800' : 'solid #81c784'};border-radius:14px;padding:2px 8px">${y}</span></div>`;
+    return {
+      kind: 'machine', prompt: 'מכונת המספרים: מה ייצא?', say: `מכונת המספרים עושה תמיד אותו דבר. ${known.map(x => `נכנס ${x}, יוצא ${f(x)}`).join('. ')}. אם נכנס ${q}, מה ייצא?`,
+      stem: `<div style="display:flex;flex-direction:column;gap:6px;align-items:center">${known.map(x => row(x, f(x))).join('')}${row(q, '?')}</div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => P.has(O[i]), hint: 'מה המכונה עושה למספר? אולי כופלת ואז מוסיפה? בדוק את החוק על כל השורות.',
+      explain: sq ? `המכונה כופלת את המספר בעצמו${b ? (b > 0 ? ' ומוסיפה ' + b : ' ומורידה ' + (-b)) : ''}.` : `המכונה כופלת ב־${a}${b ? (b > 0 ? ' ומוסיפה ' + b : ' ומורידה ' + (-b)) : ''}. ${q} × ${a}${b ? (b > 0 ? ' + ' + b : ' - ' + (-b)) : ''} = ${ans}.`
+    };
+  }
+  const rep = (e, n) => n <= 12 ? e.repeat(n) : `${e}×${n}`;
+  function genWord(L) {
+    const T = [];
+    const add = (lv, fn) => { if (L >= lv[0] && L <= lv[1]) T.push(fn); };
+    add([1, 3], () => { const a = rr(3, L > 1 ? 40 : 9), b = rr(2, L > 1 ? 30 : 8); return { text: `לפיקאצ'ו יש <b>${a}</b> כדורים. הוא מצא עוד <b>${b}</b> כדורים. כמה כדורים יש לו עכשיו?`, pics: a + b <= 18 ? rep('🔴', a) + ' ➕ ' + rep('🔴', b) : '🔴 ➕ 🔴', ans: a + b, sim: () => { let s = 0; for (let i = 0; i < a; i++) s++; for (let i = 0; i < b; i++) s++; return s; }, wrong: [a - b, a + b + 1, a + b - 10], why: `${a} + ${b} = ${a + b}.` }; });
+    add([1, 3], () => { const a = rr(8, L > 1 ? 60 : 12), b = rr(2, a - 2); return { text: `היו <b>${a}</b> בלונים. <b>${b}</b> בלונים עפו. כמה בלונים נשארו?`, pics: a <= 14 ? rep('🎈', a) : '🎈🎈🎈', ans: a - b, sim: () => { let s = a; for (let i = 0; i < b; i++) s--; return s; }, wrong: [a + b, a - b + 1, a - b - 1], why: `${a} - ${b} = ${a - b}.` }; });
+    add([3, 5], () => { const n = rr(3, 6), k = rr(3, L >= 5 ? 12 : 6); return { text: `יש <b>${n}</b> חברים, ולכל אחד <b>${k}</b> מדבקות. כמה מדבקות יש לכולם ביחד?`, pics: rep('🧒', n), ans: n * k, sim: () => { let s = 0; for (let i = 0; i < n; i++) for (let j = 0; j < k; j++) s++; return s; }, wrong: [n + k, n * k + k, n * k - n], why: `${n} פעמים ${k}: ${n} × ${k} = ${n * k}.` }; });
+    add([4, 6], () => { const n = rr(2, 6), q = rr(3, 12); return { text: `<b>${n * q}</b> תותים מתחלקים שווה בשווה בין <b>${n}</b> ילדים. כמה תותים יקבל כל ילד?`, pics: rep('🍓', Math.min(n * q, 12)) + (n * q > 12 ? '…' : ''), ans: q, sim: () => { let left = n * q, each = 0; while (left >= n) { left -= n; each++; } return each; }, wrong: [n * q - n, q + 1, n], why: `${n * q} לחלק ל־${n} = ${q}.` }; });
+    add([4, 7], () => { const h = rr(2, 7), d = rr(1, 5); return { text: `בחצר יש <b>${h}</b> תרנגולות ו־<b>${d}</b> כלבים. כמה רגליים יש לכולם ביחד?`, pics: rep('🐔', h) + ' ' + rep('🐕', d), ans: 2 * h + 4 * d, sim: () => { let s = 0; for (let i = 0; i < h; i++) s += 2; for (let i = 0; i < d; i++) s += 4; return s; }, wrong: [(h + d) * 2, (h + d) * 4, h + d, 2 * h + 2 * d + 2], why: `לתרנגולת 2 רגליים ולכלב 4: ${h} × 2 + ${d} × 4 = ${2 * h + 4 * d}.` }; });
+    add([5, 8], () => { const k = rr(6, 15), n = rr(3, 7), m = rr(2, 9); return { text: `בכל קופסה יש <b>${k}</b> עפרונות. יש <b>${n}</b> קופסות, ועוד <b>${m}</b> עפרונות מחוץ לקופסות. כמה עפרונות יש בסך הכול?`, pics: rep('📦', n) + ' ➕ ' + rep('✏️', m), ans: k * n + m, sim: () => { let s = 0; for (let i = 0; i < n; i++) s += k; return s + m; }, wrong: [k * n, k * (n + 1), k + n + m, k * n + m + 1], why: `${n} × ${k} = ${k * n}, ועוד ${m} = ${k * n + m}.` }; });
+    add([6, 8], () => { const o = rr(5, 8), d = rr(2, 6), f = rr(2, 9); return { text: `דני בן <b>${o}</b>. אחותו נועה גדולה ממנו ב־<b>${d}</b> שנים. בת כמה תהיה נועה בעוד <b>${f}</b> שנים?`, pics: '👦 👧 🎂', ans: o + d + f, sim: () => { let age = o; age += d; for (let i = 0; i < f; i++) age++; return age; }, wrong: [o + f, o + d, d + f, o + d + f - 1], why: `נועה עכשיו בת ${o} + ${d} = ${o + d}, ובעוד ${f} שנים: ${o + d + f}.` }; });
+    add([6, 8], () => { const a = rr(8, 40), b = rr(3, 15); return { text: `לאש יש <b>${a}</b> קלפים. לפיקאצ'ו יש <b>${b}</b> קלפים יותר מלאש. כמה קלפים יש לשניהם ביחד?`, pics: '🃏 ⚡', ans: 2 * a + b, sim: () => { const p = a + b; return a + p; }, wrong: [a + b, 2 * a, a + 2 * b, 2 * (a + b)], why: `לפיקאצ'ו יש ${a} + ${b} = ${a + b}. ביחד: ${a} + ${a + b} = ${2 * a + b}.` }; });
+    add([7, 8], () => { const p = rr(3, 9), q = rr(3, 9); return { text: `ילדים עומדים בשורה. עומר הוא ה־<b>${p}</b> מההתחלה וה־<b>${q}</b> מהסוף. כמה ילדים יש בשורה?`, pics: '🧒🧒🧒⚡🧒🧒', ans: p + q - 1, sim: () => { const line = []; for (let i = 0; i < p - 1; i++) line.push('x'); line.push('O'); for (let i = 0; i < q - 1; i++) line.push('x'); return line.length; }, wrong: [p + q, p + q - 2, p + q + 1], why: `לפני עומר יש ${p - 1} ילדים, אחריו ${q - 1}, ועוד עומר עצמו: ${p - 1} + ${q - 1} + 1 = ${p + q - 1}.` }; });
+    add([7, 8], () => { const x = rr(6, 15), y = rr(1, x - 2); return { text: `מחברת עולה <b>${x}</b> שקלים. עט עולה <b>${y}</b> שקלים פחות ממחברת. כמה עולות 2 מחברות ועט אחד?`, pics: '📒📒 🖊️', ans: 3 * x - y, sim: () => { const pen = x - y; return x + x + pen; }, wrong: [2 * x + y, 2 * x, 3 * x, x + y], why: `העט עולה ${x} - ${y} = ${x - y}. 2 מחברות = ${2 * x}. ביחד ${2 * x} + ${x - y} = ${3 * x - y}.` }; });
+    add([8, 8], () => { const d = rr(1, 5), h = rr(1, 6), n = h + d, legs = 2 * h + 4 * d; return { text: `בחצר יש <b>${n}</b> חיות: תרנגולות וכלבים. לכולן ביחד יש <b>${legs}</b> רגליים. כמה כלבים יש?`, pics: '🐔 🐕 ❓', ans: d, sim: () => { for (let dd = 0; dd <= n; dd++) if (2 * (n - dd) + 4 * dd === legs) return dd; return -1; }, wrong: [h, n - 1, Math.floor(legs / 4), d + 1], why: `אם כולן היו תרנגולות היו ${2 * n} רגליים. יש עוד ${legs - 2 * n}, ולכל כלב 2 רגליים נוספות: ${legs - 2 * n} לחלק ל־2 = ${d}.` }; });
+    const w = pick(T)(); const truth = w.sim();
+    if (truth !== w.ans || w.ans < 0) return null;
+    const vals = numOpts(w.ans, w.wrong.filter(v => v >= 0 && v !== w.ans), [1, 2, 10]);
+    const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'word', prompt: '', say: w.text.replace(/<[^>]+>/g, ''),
+      stem: `<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="pics">${w.pics}</div><div class="story">${w.text}</div></div>`,
+      opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
+      check: i => O[i] === truth, hint: 'אפשר לצייר את זה בראש או על דף. מה קורה קודם, ומה אחר כך?', explain: w.why
+    };
+  }
+  function genQuant(L) {
+    const k = pick({ 1: ['mental', 'piceq', 'word'], 2: ['mental', 'balance', 'word', 'piceq'], 3: ['mental', 'piceq', 'balance', 'word'], 4: ['mental', 'shapenum', 'word', 'balance'], 5: ['mental', 'piceq', 'shapenum', 'machine', 'balance', 'word'], 6: ['mental', 'balance', 'word', 'shapenum', 'machine'], 7: ['mental', 'shapenum', 'machine', 'piceq', 'word'], 8: ['mental', 'word', 'shapenum', 'machine', 'balance', 'piceq'] }[L]);
+    return { mental: genMental, piceq: genPicEq, balance: genBalance, shapenum: genShapeNum, machine: genMachine, word: genWord }[k](L);
+  }
+
+  // ================= 6. verbal (spoken, with pictures) =================
+  const IT = {};
+  const DEF = {
+    'fruit food ~sweet': '🍎 תפוח,🍌 בננה,🍇 ענבים,🍓 תות,🍉 אבטיח,🍐 אגס,🍊 תפוז,🍒 דובדבנים,🍍 אננס',
+    'veg food': '🥕 גזר,🥒 מלפפון,🌽 תירס,🥦 ברוקולי,🍆 חציל,🧅 בצל',
+    'sweet food': '🍭 סוכרייה,🍫 שוקולד,🍩 סופגנייה,🍪 עוגייה,🎂 עוגה',
+    'sweet food cold': '🍦 גלידה',
+    'farm animal': '🐄 פרה,🐑 כבשה,🐴 סוס,🐐 עז',
+    'farm animal bird ~flies': '🐔 תרנגולת',
+    'wild animal': '🦁 אריה,🐯 נמר,🐘 פיל,🦒 ג׳ירפה,🦓 זברה,🐻 דוב,🐒 קוף',
+    'sea animal ~pet': '🐟 דג',
+    'sea animal': '🐙 תמנון,🐬 דולפין,🦀 סרטן,🐳 לוויתן,🦈 כריש',
+    'pet animal': '🐶 כלב,🐱 חתול,🐹 אוגר',
+    'bird animal flies ~sky': '🐦 ציפור,🦅 נשר,🦉 ינשוף',
+    'insect animal flies ~sky': '🐝 דבורה,🦋 פרפר',
+    'insect animal': '🐜 נמלה',
+    'vehicle land': '🚗 מכונית,🚌 אוטובוס,🚲 אופניים,🚂 רכבת,🛴 קורקינט,🚜 טרקטור,🚑 אמבולנס',
+    'vehicle air flies ~sky': '✈️ מטוס,🚁 מסוק,🚀 חללית',
+    'vehicle boat': '🚢 אונייה,⛵ מפרשית,🛶 קאנו',
+    'toy flies ~sky': '🎈 בלון,🪁 עפיפון',
+    'clothes': '👕 חולצה,👖 מכנסיים,👗 שמלה,🧦 גרביים,🧢 כובע,👟 נעל',
+    'clothes winter ~cold': '🧤 כפפות,🧣 צעיף',
+    'music': '🎸 גיטרה,🥁 תוף,🎹 פסנתר,🎺 חצוצרה,🎻 כינור,🎷 סקסופון',
+    'ball toy': '⚽ כדורגל,🏀 כדורסל,🎾 כדור טניס,🏐 כדורעף',
+    'tool': '🔨 פטיש,🔧 מפתח ברגים,🪚 מסור,🪛 מברג,✂️ מספריים',
+    'sky': '🌙 ירח,☁️ ענן,🌈 קשת',
+    'sky ~hot': '⭐ כוכב',
+    'sky hot': '☀️ שמש',
+    'hot': '🔥 אש',
+    'hot ~food': '☕ תה חם',
+    'cold winter': '❄️ שלג,⛄ איש שלג',
+    'cold ~winter': '🧊 קרח'
+  };
+  for (const [tags, list] of Object.entries(DEF)) for (const it of list.split(',')) { const [e, ...n] = it.split(' '); IT[e] = { e, n: n.join(' '), t: new Set(tags.split(' ').filter(t => t[0] !== '~')), amb: new Set(tags.split(' ').filter(t => t[0] === '~').map(t => t.slice(1))) }; NM[e] = NM[e] || n.join(' '); }
+  const ITL = Object.values(IT);
+  const TAGS = [...new Set(ITL.flatMap(i => [...i.t]))];
+  const has = (e, t) => IT[e].t.has(t);
+  const BROAD = ['food', 'animal', 'vehicle', 'clothes', 'music', 'tool'];
+  const SUB = { food: ['fruit', 'veg', 'sweet'], animal: ['farm', 'wild', 'sea', 'pet', 'bird'], vehicle: ['land', 'air', 'boat'] };
+  const CROSS = ['flies', 'cold', 'hot', 'sky', 'winter', 'toy'];
+  const TN = { fruit: 'פירות', veg: 'ירקות', sweet: 'ממתקים', food: 'אוכל', animal: 'בעלי חיים', farm: 'חיות משק', wild: 'חיות בר', sea: 'חיים במים', pet: 'חיות מחמד', bird: 'ציפורים', insect: 'חרקים', vehicle: 'כלי תחבורה', land: 'נוסעים ביבשה', air: 'טסים באוויר', boat: 'שטים במים', clothes: 'בגדים', winter: 'דברים של חורף', music: 'כלי נגינה', ball: 'כדורים', toy: 'צעצועים', tool: 'כלי עבודה', sky: 'נמצאים בשמיים', hot: 'דברים חמים', cold: 'דברים קרים', flies: 'דברים שעפים' };
+  const members = t => ITL.filter(i => i.t.has(t)).map(i => i.e);
+  function oddCheck(items) { // generic: the odd one is whatever a category containing exactly 3 of the 4 leaves out
+    for (const e of items) for (const t of IT[e].amb) if (items.filter(x => has(x, t)).length >= 2) return null;
+    const out = new Set();
+    for (const t of TAGS) { const inn = items.filter(x => has(x, t)); if (inn.length === 3) out.add(items.find(x => !has(x, t))); }
+    return out;
+  }
+  function genOdd(L) {
+    let T, odd;
+    if (L <= 2) { T = pick(BROAD.concat(['fruit', 'ball'])); }
+    else if (L <= 4) { const par = pick(Object.keys(SUB)); T = pick(SUB[par]); }
+    else T = pick(L >= 6 ? CROSS : CROSS.concat(['farm', 'wild', 'sea', 'land', 'boat']));
+    const mem = members(T); if (mem.length < 3) return null;
+    const three = sample(mem, 3);
+    let cands;
+    if (L <= 2) cands = ITL.filter(i => !BROAD.some(b => i.t.has(b) && three.every(x => has(x, b))) && !i.t.has(T)).map(i => i.e);
+    else if (L <= 4) { const par = Object.keys(SUB).find(p => SUB[p].includes(T)); cands = members(par).filter(e => !has(e, T)); }
+    else cands = ITL.filter(i => !i.t.has(T) && [...i.t].some(t => three.some(x => has(x, t)))).map(i => i.e);
+    if (!cands.length) return null;
+    odd = pick(cands);
+    const items = shuffle([...three, odd]); const out = oddCheck(items);
+    if (!out || out.size !== 1 || !out.has(odd)) return null;
+    return {
+      kind: 'odd', prompt: 'מי לא שייך?', say: `${items.map(nm).join(', ')}. מי לא שייך לקבוצה?`, stem: '',
+      opts: items.map(e => ({ html: emoOpt(e), key: e, say: nm(e) })), ans: items.indexOf(odd),
+      check: i => out.has(items[i]), hint: 'מה משותף לשלושה מהם?',
+      explain: `${three.map(nm).join(', ')}: כולם ${TN[T]}. ${nm(odd)} לא.`
+    };
+  }
+  function genBelongs(L) {
+    const T = pick(L <= 3 ? ['fruit', 'veg', 'music', 'tool', 'clothes', 'ball', 'sea', 'wild'] : L <= 5 ? ['farm', 'wild', 'sea', 'land', 'boat', 'sweet', 'veg', 'winter'] : CROSS.concat(['air', 'bird']));
+    const mem = members(T); if (mem.length < 4) return null;
+    const [a, b, c, ans] = sample(mem, 4); const shown = [a, b, c];
+    const tags = TAGS.filter(t => shown.every(x => has(x, t)));
+    for (const e of [...shown, ans]) for (const t of IT[e].amb) if (shown.filter(x => has(x, t)).length >= 2) return null;
+    const dist = shuffle(ITL.filter(i => !tags.some(t => i.t.has(t)) && ![...i.amb].some(t => tags.includes(t))).map(i => i.e)).slice(0, 3);
+    if (dist.length < 3) return null;
+    const vals = [ans, ...dist]; const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'belongs', prompt: 'מי מתאים לקבוצה?', say: `${shown.map(nm).join(', ')}. מי עוד מתאים לקבוצה? ${O.map(nm).join(', ')}.`,
+      stem: `<div class="pics" style="font-size:52px;background:#f3e5f5;border-radius:20px;padding:4px 14px">${shown.join(' ')}</div>`,
+      opts: O.map(e => ({ html: emoOpt(e), key: e, say: nm(e) })), ans: order.indexOf(0),
+      check: i => tags.some(t => has(O[i], t)), hint: 'מה משותף לשלושת הציורים?', explain: `כולם ${TN[T]}, וגם ${nm(ans)}.`
+    };
+  }
+  const OPP = [['🔥', 'חם', '❄️', 'קר'], ['☀️', 'יום', '🌙', 'לילה'], ['😀', 'שמח', '😢', 'עצוב'], ['⬆️', 'למעלה', '⬇️', 'למטה'], ['🐘', 'גדול', '🐜', 'קטן'], ['🐆', 'מהיר', '🐢', 'איטי'], ['🔓', 'פתוח', '🔒', 'סגור'], ['🛫', 'ממריא', '🛬', 'נוחת'], ['💧', 'רטוב', '🌵', 'יבש'], ['📢', 'רועש', '🤫', 'שקט']];
+  const OW = {}; OPP.forEach(([a, an, b, bn]) => { OW[a] = an; OW[b] = bn; });
+  const oppOf = e => { for (const [a, , b] of OPP) { if (a === e) return b; if (b === e) return a; } };
+  function genOpp(L) {
+    const p = pick(OPP); const flip = Math.random() < 0.5; const X = flip ? p[2] : p[0], ans = oppOf(X);
+    const others = shuffle(OPP.filter(q => q !== p).flatMap(q => [q[0], q[2]]));
+    const dist = []; const used = new Set([X, ans]);
+    for (const e of others) { if (dist.length >= 3) break; if (!used.has(e) && !used.has(oppOf(e))) { dist.push(e); used.add(e); } }
+    const vals = [ans, ...dist]; const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    const oo = e => `<div class="emo">${e}</div><div class="nm" style="font-size:18px;color:#333">${OW[e]}</div>`;
+    return {
+      kind: 'opp', prompt: `מה ההפך של "${OW[X]}"?`, say: `מה ההפך של ${OW[X]}? ${O.map(e => OW[e]).join(', ')}.`,
+      stem: `<div class="ana"><div class="box" style="width:110px;height:110px">${oo(X)}</div></div>`,
+      opts: O.map(e => ({ html: oo(e), key: e, say: OW[e] })), ans: order.indexOf(0),
+      check: i => oppOf(X) === O[i], hint: 'הפך זה הכי רחוק שיש: אם משהו לא זה, מה הוא?', explain: `ההפך של ${OW[X]} הוא ${OW[ans]}.`
+    };
+  }
+  const CHAINS = [['🥚 ביצה', '🐣 אפרוח', '🐔 תרנגולת'], ['🌰 זרע', '🌱 נבט', '🌳 עץ'], ['👶 תינוק', '🧒 ילד', '🧑 מבוגר', '👴 סבא'], ['🌅 זריחה', '☀️ צהריים', '🌇 שקיעה', '🌙 לילה'], ['🧊 קרח', '💧 מים', '♨️ אדים'], ['🌾 חיטה', '🍞 לחם', '🥪 כריך'], ['⏰ מתעוררים', '🪥 מצחצחים שיניים', '🎒 לוקחים תיק', '🏫 בית ספר'], ['🛒 קונים', '🍳 מבשלים', '🍽️ אוכלים', '🧽 שוטפים כלים'], ['☁️ ענן', '🌧️ גשם', '🌈 קשת'], ['🐛 זחל', '🦋 פרפר']].map(c => c.map(s => { const [e, ...n] = s.split(' '); NM[e] = NM[e] || n.join(' '); return e; }));
+  function genOrder(L) {
+    const mid = L >= 6 && Math.random() < 0.5;
+    const ch = pick(CHAINS.filter(c => (mid ? c.length >= 3 : true) && (L < 5 || c.length >= 4 || Math.random() < 0.3)));
+    if (!ch) return null;
+    let shown, ans, pattern;
+    if (mid) { const i = rr(1, ch.length - 2); shown = ch.slice(0, ch.length); ans = ch[i]; pattern = shown.map((x, j) => j === i ? null : x); }
+    else { const k = ch.length - 1; shown = ch.slice(0, k); ans = ch[k]; pattern = [...shown, null]; }
+    // generic: which items fit the gap in ANY chain matching the pattern?
+    const fitsSet = new Set();
+    for (const c of CHAINS) for (let s = 0; s + pattern.length <= c.length; s++) { if (pattern.every((x, j) => x === null || c[s + j] === x)) fitsSet.add(c[s + pattern.indexOf(null)]); }
+    if (fitsSet.size !== 1) return null;
+    const near = ch.filter(x => x !== ans), far = shuffle(CHAINS.filter(c => c !== ch).flat());
+    const dist = [...new Set([...shuffle(near).slice(0, L >= 4 ? 2 : 1), ...far])].filter(x => x !== ans && !fitsSet.has(x)).slice(0, 3);
+    const vals = [ans, ...dist]; const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
+    return {
+      kind: 'order', prompt: mid ? 'מה חסר באמצע?' : 'מה בא אחר כך?',
+      say: (mid ? pattern.map(x => x ? nm(x) : 'משהו חסר').join(', ') + '. מה חסר?' : pattern.filter(Boolean).map(nm).join(', ואז ') + '. מה בא אחר כך?') + ' ' + O.map(nm).join(', ') + '.',
+      stem: `<div class="seq">${pattern.map(x => x ? `<div class="cell" style="width:min(15vw,80px);height:min(15vw,80px);font-size:min(9vw,46px)">${x}</div>` : '<div class="cell q" style="width:min(15vw,80px);height:min(15vw,80px)">?</div>').join('<span class="arrow">⬅</span>')}</div>`,
+      opts: O.map(e => ({ html: emoOpt(e), key: e, say: nm(e) })), ans: order.indexOf(0),
+      check: i => fitsSet.has(O[i]), hint: 'מה קורה קודם ומה קורה אחר כך?', explain: 'הסדר הוא: ' + ch.map(nm).join(', ואז ') + '.'
+    };
+  }
+  function genVerbal(L) {
+    const k = pick({ 1: ['odd', 'odd', 'belongs'], 2: ['odd', 'opp', 'belongs'], 3: ['odd', 'belongs', 'opp', 'order'], 4: ['odd', 'order', 'belongs', 'opp'], 5: ['odd', 'order', 'belongs', 'opp'], 6: ['odd', 'belongs', 'order'], 7: ['odd', 'belongs', 'order'], 8: ['odd', 'belongs', 'order'] }[L]);
+    return { odd: genOdd, belongs: genBelongs, opp: genOpp, order: genOrder }[k](L);
+  }
+
+  // ================= app =================
+  const SECS = [
+    { id: 'matrix', nm: 'מטריצות', em: '🧩', gen: genMatrix, intro: 'מטריצות: מה חסר בטבלה?' },
+    { id: 'seq', nm: 'סדרות', em: '🔢', gen: genSeq, intro: 'סדרות: מה בא אחר כך?' },
+    { id: 'ana', nm: 'אנלוגיות', em: '🔗', gen: genAnalogy, intro: 'אנלוגיות: מה הקשר?' },
+    { id: 'spatial', nm: 'מרחבי', em: '🧊', gen: genSpatial, intro: 'חשיבה מרחבית: סיבובים, מראות, קיפולים וקוביות' },
+    { id: 'quant', nm: 'כמותי', em: '➗', gen: genQuant, intro: 'חשבון וחשיבה כמותית' },
+    { id: 'verbal', nm: 'מילולי', em: '💬', gen: genVerbal, intro: 'מילים וקבוצות' }
+  ];
+  const SEC = Object.fromEntries(SECS.map(s => [s.id, s]));
+  const MAXL = 8, UP = 3, DOWN = 2;
+  function verify(q) {
+    if (!q || !Array.isArray(q.opts) || q.opts.length < 3) return false;
+    const keys = q.opts.map(o => o.key); if (new Set(keys).size !== keys.length) return false;
+    let n = 0; for (let i = 0; i < q.opts.length; i++) if (q.check(i)) n++;
+    return n === 1 && q.ans >= 0 && q.ans < q.opts.length && !!q.check(q.ans);
+  }
+  function makeQ(sid, L) {
+    for (let t = 0; t < 400; t++) { let q = null; try { q = SEC[sid].gen(L); } catch (e) { q = null; } if (verify(q)) { q.sec = sid; q.lvl = L; return q; } }
+    throw new Error('no question ' + sid + ' L' + L);
+  }
+  // ---- state ----
+  const KEY = 'omerGifted';
+  const blank = () => ({ lvl: 1, streak: 0, miss: 0, n: 0, ok: 0, t: 0 });
+  let S = { sec: {}, stars: 0, tests: [], voice: true };
+  try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); if (o && typeof o === 'object') S = Object.assign(S, o); } catch (e) {}
+  SECS.forEach(s => { S.sec[s.id] = Object.assign(blank(), S.sec[s.id] || {}); S.sec[s.id].lvl = Math.max(1, Math.min(MAXL, S.sec[s.id].lvl | 0 || 1)); });
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  // ---- audio + speech ----
+  let actx = null;
+  function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
+  function tone(f, d, type = 'sine', v = 0.2, delay = 0) {
+    const a = ac(); if (!a) return;
+    const o = a.createOscillator(), g = a.createGain(), t0 = a.currentTime + delay;
+    o.type = type; o.frequency.setValueAtTime(f, t0); g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + d);
+    o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + d + 0.05);
+  }
+  const yesS = () => [660, 880, 1100].forEach((f, i) => tone(f, 0.18, 'sine', 0.2, i * 0.09));
+  const hmS = () => { tone(330, 0.15, 'sine', 0.12); tone(300, 0.2, 'sine', 0.12, 0.13); };
+  const tapS = () => tone(520, 0.1, 'triangle', 0.14);
+  const upS = () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.2, 'triangle', 0.2, i * 0.12));
+  function say(txt, force) {
+    if ((!S.voice && !force) || !window.speechSynthesis || !txt) return;
+    try { const u = new SpeechSynthesisUtterance(txt); u.lang = 'he-IL'; u.rate = 0.92; u.pitch = 1.25; const v = speechSynthesis.getVoices().find(v => /^he/i.test(v.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+  }
+  const hush = () => { try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} };
+  // ---- visuals ----
+  const cf = el('confetti'), cx = cf.getContext('2d'); let parts = [], anim = false;
+  function sizeCf() { cf.width = innerWidth; cf.height = innerHeight; } sizeCf(); addEventListener('resize', sizeCf);
+  function burst(d) { const r = d.getBoundingClientRect(); for (let i = 0; i < 14; i++) parts.push(mk(r.left + r.width / 2, r.top + r.height / 2, 6)); run(); }
+  function confetti(n) { for (let i = 0; i < n; i++) parts.push(mk(Math.random() * innerWidth, -20 - Math.random() * 200, 2)); run(); }
+  function mk(x, y, sp) { const a = Math.random() * Math.PI * 2; return { x, y, vx: Math.cos(a) * sp * Math.random(), vy: Math.sin(a) * sp * Math.random() - 2, life: 1, c: ['#ffcb05', '#ff5252', '#40c4ff', '#69f0ae', '#e040fb'][Math.floor(Math.random() * 5)], r: 6 + Math.random() * 8 }; }
+  function run() { if (anim) return; anim = true; requestAnimationFrame(step); }
+  function step() {
+    cx.clearRect(0, 0, cf.width, cf.height);
+    parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 0.008; drawStar(cx, p.x, p.y, p.r, p.c); });
+    parts = parts.filter(p => p.life > 0 && p.y < cf.height + 30);
+    if (parts.length) requestAnimationFrame(step); else { anim = false; cx.clearRect(0, 0, cf.width, cf.height); }
+  }
+  function drawHero(happy) { const c = el('hero').getContext('2d'); c.clearRect(0, 0, 360, 360); drawMouse(c, 190, 220, 220, { happy }); }
+  function drawPika(mood) { const c = el('pika').getContext('2d'); c.clearRect(0, 0, 140, 140); drawMouse(c, 74, 88, 104, { happy: mood === 1 ? 1 : 0, dizzy: mood === -1 ? 1 : 0 }); }
+  let toastT = 0;
+  function toast(t) { const d = el('toast'); d.innerHTML = t; d.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => d.classList.remove('on'), 1700); }
+  function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); scrollTo(0, 0); }
+  const paintStars = () => { el('starsPill').textContent = '⭐ ' + S.stars; };
+  // ---- tiles ----
+  const dots = l => '●'.repeat(l) + '○'.repeat(MAXL - l);
+  function paintTiles() {
+    el('tiles').innerHTML = SECS.map((s, i) => `<button class="tile t${i}" data-s="${s.id}"><div class="em">${s.em}</div><div class="nm">${s.nm}</div><div class="lv">רמה ${S.sec[s.id].lvl} <span class="lvdots">${dots(S.sec[s.id].lvl)}</span></div></button>`).join('') +
+      `<button class="tile t6" data-s="mix"><div class="em">🎲</div><div class="nm">ערבוב</div><div class="lv">מכל הנושאים</div></button>`;
+    el('tiles').querySelectorAll('.tile').forEach(b => b.onclick = () => { tapS(); startPractice(b.dataset.s); });
+  }
+  // ---- play ----
+  const LAB = ['א', 'ב', 'ג', 'ד', 'ה'];
+  let mode = null, cur = null, practiceSec = null, tries = 0, answered = false, tStart = 0, score = 0;
+  let test = null, timerI = 0;
+  function render(q) {
+    cur = q; tries = 0; answered = false; tStart = performance.now();
+    el('secPill').style.display = mode === 'test' ? 'none' : ''; el('secPill').textContent = SEC[q.sec].em + ' ' + SEC[q.sec].nm + (mode === 'practice' ? ' · רמה ' + q.lvl : '');
+    el('prompt').innerHTML = q.prompt || '';
+    el('stem').innerHTML = q.stem || '';
+    const O = el('opts'); O.className = 'opts' + (q.opts.length === 3 || q.three ? ' three' : '');
+    O.innerHTML = q.opts.map((o, i) => `<button class="opt" data-i="${i}"><span class="lab">${LAB[i]}</span>${o.html}</button>`).join('');
+    O.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i, b));
+    const fb = el('fb'); fb.className = 'fb'; fb.innerHTML = '';
+    el('hintBtn').style.display = mode === 'practice' ? '' : 'none'; el('nextBtn').style.display = 'none';
+    el('chap').textContent = mode === 'test' ? `פרק ${test.chap[test.i] + 1} מתוך ${test.nChap}: ${SEC[q.sec].nm} · שאלה ${test.i + 1} מתוך ${test.qs.length}` : '';
+    drawPika(0);
+    el('scorePill').textContent = '⭐ ' + (mode === 'test' ? (test.i + 1) + '/' + test.qs.length : S.stars);
+    say(q.say);
+  }
+  function nextPractice() {
+    const sid = practiceSec === 'mix' ? pick(SECS).id : practiceSec;
+    render(makeQ(sid, S.sec[sid].lvl));
+  }
+  function startPractice(sid) { mode = 'practice'; practiceSec = sid; el('timer').style.display = 'none'; show('sPlay'); if (sid !== 'mix') say(SEC[sid].intro); nextPractice(); }
+  function feedback(good, html) { const fb = el('fb'); fb.className = 'fb on ' + (good ? 'good' : 'bad'); fb.innerHTML = html; }
+  function choose(i, btn) {
+    if (answered) return; ac();
+    const q = cur, st = S.sec[q.sec], ok = q.check(i);
+    if (mode === 'test') {
+      answered = true; tapS(); btn.classList.add('picked');
+      test.res.push({ sec: q.sec, ok, t: (performance.now() - tStart) / 1000 });
+      setTimeout(() => { test.i++; if (test.i < test.qs.length) render(test.qs[test.i]); else finishTest(); }, 550);
+      return;
+    }
+    const first = tries === 0; tries++;
+    if (first) { st.n++; st.t += Math.min(600, (performance.now() - tStart) / 1000); }
+    if (ok) {
+      answered = true; btn.classList.add('right'); yesS(); burst(btn); drawPika(1);
+      el('opts').querySelectorAll('.opt').forEach((b, j) => { if (j !== i) b.classList.add('faded'); });
+      let lvlMsg = '';
+      if (first) {
+        st.ok++; S.stars++; st.miss = 0; st.streak++;
+        if (st.streak >= UP) { st.streak = 0; if (st.lvl < MAXL) { st.lvl++; lvlMsg = `<div>⬆️ עלית לרמה ${st.lvl}!</div>`; setTimeout(() => { upS(); toast('⬆️ רמה ' + st.lvl + '!'); confetti(60); }, 350); } }
+      } else st.streak = 0;
+      save();
+      feedback(true, `<div class="ttl">${pick(['✅ נכון!', '🎉 מצוין!', '⚡ יופי!', '🌟 כל הכבוד!'])}</div><div>${q.explain || ''}</div>${lvlMsg}`);
+      say((first ? 'נכון! ' : 'נכון, הפעם הצלחת! ') + (q.explain || '').replace(/<[^>]+>/g, ''));
+      el('hintBtn').style.display = 'none'; el('nextBtn').style.display = '';
+      el('scorePill').textContent = '⭐ ' + S.stars;
+    } else {
+      btn.classList.add('wrong'); hmS(); drawPika(-1);
+      if (first) { st.streak = 0; st.miss++; if (st.miss >= DOWN) { st.miss = 0; if (st.lvl > 1) { st.lvl--; } } save(); }
+      if (tries >= 2) {
+        answered = true;
+        const opts = el('opts').querySelectorAll('.opt');
+        opts[q.ans].classList.add('right'); opts.forEach((b, j) => { if (j !== q.ans && !b.classList.contains('wrong')) b.classList.add('faded'); });
+        feedback(false, `<div class="ttl">💛 לא נורא, לומדים!</div><div>התשובה היא ${LAB[q.ans]}. ${q.explain || ''}</div>`);
+        say('לא נורא. ' + (q.explain || '').replace(/<[^>]+>/g, ''));
+        el('hintBtn').style.display = 'none'; el('nextBtn').style.display = '';
+      } else {
+        btn.classList.add('faded');
+        feedback(false, `<div class="ttl">🤔 כמעט! נסה שוב</div><div>💡 ${q.hint || ''}</div>`);
+        say('כמעט! נסה שוב. ' + (q.hint || ''));
+      }
+    }
+  }
+  el('nextBtn').onclick = () => { tapS(); hush(); nextPractice(); };
+  el('hintBtn').onclick = () => { if (!cur || answered) return; feedback(false, `<div>💡 ${cur.hint || ''}</div>`); say(cur.hint, true); };
+  el('repeatBtn').onclick = () => { if (cur) say(cur.say, true); };
+  el('quitBtn').onclick = () => { hush(); clearInterval(timerI); if (mode === 'test') { goStart(); } else { paintTiles(); show('sSections'); } };
+  // ---- practice test ----
+  const PLAN = [['matrix', 3], ['seq', 3], ['ana', 2], ['spatial', 3], ['quant', 2], ['verbal', 2]];
+  const TEST_MIN = 15;
+  function startTest() {
+    mode = 'test'; hush();
+    const qs = [], chap = [];
+    PLAN.forEach(([sid, n], c) => { for (let k = 0; k < n; k++) { qs.push(makeQ(sid, S.sec[sid].lvl)); chap.push(c); } });
+    test = { qs, chap, nChap: PLAN.length, i: 0, res: [], t0: performance.now(), over: false };
+    const T = el('timer'); T.style.display = ''; T.classList.remove('over');
+    clearInterval(timerI); timerI = setInterval(tick, 500); tick();
+    show('sPlay'); say('מבחן תרגול! חמש עשרה שאלות. אין לחץ, פשוט עונים הכי טוב שאפשר.');
+    setTimeout(() => render(qs[0]), 50);
+  }
+  function tick() {
+    if (!test) return;
+    const p = Math.min(1, (performance.now() - test.t0) / (TEST_MIN * 60000));
+    el('tfill').style.cssText = `left:auto;right:0;width:${p * 100}%`; el('trun').style.cssText = `right:${p * 100}%;transform:translateX(50%)`;
+    if (p >= 1 && !test.over) { test.over = true; el('timer').classList.add('over'); toast('⏰ הזמן נגמר<br>אפשר להמשיך בנחת'); }
+  }
+  function finishTest() {
+    clearInterval(timerI); const R = test.res, ok = R.filter(r => r.ok).length;
+    const secs = {}; PLAN.forEach(([sid]) => { const rs = R.filter(r => r.sec === sid); secs[sid] = { n: rs.length, ok: rs.filter(r => r.ok).length, t: rs.reduce((s, r) => s + r.t, 0) }; });
+    const total = (performance.now() - test.t0) / 1000;
+    S.stars += ok; S.tests.unshift({ d: new Date().toISOString(), ok, n: R.length, time: Math.round(total), secs }); S.tests = S.tests.slice(0, 10); save();
+    el('sumLine').innerHTML = `ענית נכון על <b>${ok}</b> מתוך <b>${R.length}</b> שאלות · ⏱️ ${Math.floor(total / 60)}:${String(Math.round(total % 60)).padStart(2, '0')} דקות`;
+    el('sumTable').innerHTML = '<tr><th>נושא</th><th>נכון</th><th>זמן ממוצע</th></tr>' + PLAN.map(([sid]) => { const s = secs[sid]; return `<tr><td>${SEC[sid].em} ${SEC[sid].nm}</td><td>${'⭐'.repeat(s.ok)}${'☆'.repeat(s.n - s.ok)} ${s.ok}/${s.n}</td><td>${s.n ? Math.round(s.t / s.n) : 0} שניות</td></tr>`; }).join('');
+    show('sSum'); confetti(120); upS(); say(`כל הכבוד! ענית נכון על ${ok} מתוך ${R.length} שאלות.`);
+    test.done = true;
+  }
+  el('againBtn').onclick = () => { tapS(); startTest(); };
+  el('sumHome').onclick = () => { tapS(); goStart(); };
+  // ---- start / nav ----
+  function goStart() { mode = null; cur = null; test = null; hush(); clearInterval(timerI); paintStars(); drawHero(1); show('sStart'); }
+  el('practiceBtn').onclick = () => { tapS(); paintTiles(); show('sSections'); say('במה נתאמן? מטריצות, סדרות, אנלוגיות, מרחבי, כמותי, או מילולי.'); };
+  el('testBtn').onclick = () => { tapS(); startTest(); };
+  el('backStart').onclick = () => { tapS(); goStart(); };
+  el('sayPick').onclick = () => say('במה נתאמן? מטריצות, סדרות, אנלוגיות, מרחבי, כמותי, או מילולי.', true);
+  el('homeBtn').onclick = () => { location.href = '../index.html'; };
+  // ---- parents (long-press the title, or #parents) ----
+  function paintParent() {
+    el('parentTable').innerHTML = '<tr><th>נושא</th><th>רמה</th><th>דיוק</th><th>זמן ממוצע</th><th>שאלות</th></tr>' + SECS.map(s => { const st = S.sec[s.id]; return `<tr><td>${s.em} ${s.nm}</td><td><span class="lvsel"><button data-s="${s.id}" data-d="1">+</button><b>${st.lvl}</b><button data-s="${s.id}" data-d="-1">−</button></span></td><td>${st.n ? Math.round(100 * st.ok / st.n) + '%' : '—'}</td><td>${st.n ? Math.round(st.t / st.n) + ' ש׳' : '—'}</td><td>${st.n}</td></tr>`; }).join('');
+    el('parentTable').querySelectorAll('.lvsel button').forEach(b => b.onclick = () => { const st = S.sec[b.dataset.s]; st.lvl = Math.max(1, Math.min(MAXL, st.lvl + +b.dataset.d)); st.streak = 0; st.miss = 0; save(); paintParent(); });
+    el('voiceTog').textContent = '🔊 הקראה אוטומטית: ' + (S.voice ? 'פועלת' : 'כבויה');
+    el('lastTests').innerHTML = '<b>מבחני תרגול אחרונים:</b> ' + (S.tests.length ? S.tests.slice(0, 5).map(t => `${new Date(t.d).toLocaleDateString('he-IL')} – ${t.ok}/${t.n} (${Math.round(t.time / 60)} דק׳)`).join(' · ') : 'עדיין לא נעשה מבחן.');
+  }
+  function openParent() { hush(); paintParent(); el('parentOv').classList.remove('hide'); }
+  el('closeParent').onclick = () => { el('parentOv').classList.add('hide'); paintTiles(); if (location.hash === '#parents') history.replaceState(null, '', location.pathname); };
+  el('voiceTog').onclick = () => { S.voice = !S.voice; save(); paintParent(); };
+  el('resetBtn').onclick = () => { if (!confirm('לאפס את כל ההתקדמות?')) return; S = { sec: {}, stars: 0, tests: [], voice: S.voice }; SECS.forEach(s => S.sec[s.id] = blank()); save(); paintParent(); paintStars(); };
+  let lpT = 0; const T = el('title');
+  T.addEventListener('pointerdown', () => { clearTimeout(lpT); lpT = setTimeout(openParent, 700); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => T.addEventListener(ev, () => clearTimeout(lpT)));
+  T.addEventListener('contextmenu', e => e.preventDefault());
+  if (location.hash === '#parents') openParent();
+  addEventListener('hashchange', () => { if (location.hash === '#parents') openParent(); });
+  if (window.speechSynthesis) try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch (e) {}
+  goStart(); drawHero(1);
+  // hooks for automated checks
+  window.GIFTED = { secs: SECS.map(s => s.id), MAXL, gen: (sid, L) => SEC[sid].gen(L), verify, makeQ, state: () => S, current: () => cur, test: () => test,
+    preview: (sid, L, kind) => { let q; for (let i = 0; i < 300; i++) { q = makeQ(sid, L); if (!kind || q.kind === kind) break; } mode = 'practice'; practiceSec = sid; el('timer').style.display = 'none'; show('sPlay'); render(q); return q.kind; } };
+})();
+</script>
+</body>
+</html>
