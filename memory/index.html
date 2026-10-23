@@ -7,31 +7,51 @@
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
   html, body { margin: 0; min-height: 100%; font-family: "Arial Rounded MT Bold", "Varela Round", Arial, sans-serif; background: radial-gradient(circle at 50% 0, #b3e5fc, #4fc3f7 50%, #3949ab); }
-  body { display: flex; flex-direction: column; align-items: center; padding: 10px 8px 24px; min-height: 100vh; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 10px 8px 24px; min-height: 100vh; overflow-x: hidden; touch-action: manipulation; }
   .top { width: 100%; max-width: 820px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .round { width: 62px; height: 62px; border-radius: 50%; font-size: 30px; background: #fff; border: 4px solid #3b4cca; box-shadow: 0 5px 0 #23308a; cursor: pointer; }
+  .side { display: flex; gap: 8px; }
+  .round { width: 62px; height: 62px; border-radius: 50%; font-size: 30px; background: #fff; border: 4px solid #3b4cca; box-shadow: 0 5px 0 #23308a; cursor: pointer; padding: 0; }
   .round:active { transform: translateY(4px); box-shadow: 0 1px 0 #23308a; }
-  .stars { background: rgba(255,255,255,.92); border: 4px solid #ffcb05; border-radius: 30px; padding: 6px 18px; font-size: 30px; font-weight: bold; color: #3b4cca; box-shadow: 0 4px 0 #c79a00; min-width: 120px; text-align: center; }
-  #board { display: grid; gap: 12px; width: 100%; max-width: 820px; margin-top: 14px; perspective: 900px; }
-  .card { position: relative; aspect-ratio: 3/4; cursor: pointer; }
+  .round.on { background: #ffcb05; }
+  .stars { background: rgba(255,255,255,.92); border: 4px solid #ffcb05; border-radius: 30px; padding: 6px 14px; font-size: 28px; font-weight: bold; color: #3b4cca; box-shadow: 0 4px 0 #c79a00; min-width: 100px; text-align: center; }
+  #board { display: grid; gap: 12px; width: 100%; max-width: 820px; margin-top: 14px; --cw: 90px; }
+  #board.moving { display: block; position: relative; gap: 0; border-radius: 28px; background: rgba(255,255,255,.16); border: 4px dashed rgba(255,255,255,.65); overflow: hidden; touch-action: none; }
+  .card { position: relative; aspect-ratio: 3/4; cursor: pointer; perspective: 800px; }
+  #board.moving .card { position: absolute; left: 0; top: 0; aspect-ratio: auto; will-change: transform; }
   .inner { position: absolute; inset: 0; transition: transform .45s; transform-style: preserve-3d; }
   .card.open .inner, .card.done .inner { transform: rotateY(180deg); }
-  .face { position: absolute; inset: 0; border-radius: 22px; border: 6px solid #fff; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 7px 0 rgba(0,0,0,.25); }
-  .back { background: repeating-linear-gradient(45deg, #ffcb05 0 18px, #ffd740 18px 36px); font-size: clamp(34px, 9vw, 64px); }
-  .front { background: #fffde7; transform: rotateY(180deg); font-size: clamp(44px, 12vw, 90px); }
+  .card.gone { opacity: 0; scale: .2; pointer-events: none; transition: opacity .5s, scale .5s; }
+  .face { position: absolute; inset: 0; border-radius: calc(var(--cw) * .2); border: max(3px, min(6px, calc(var(--cw) * .07))) solid #fff; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 0 rgba(0,0,0,.25); }
+  .back { background: repeating-linear-gradient(45deg, #ffcb05 0 18px, #ffd740 18px 36px); font-size: calc(var(--cw) * .48); }
+  .front { background: #fffde7; transform: rotateY(180deg); font-size: calc(var(--cw) * .6); }
   .front img { width: 88%; height: 88%; object-fit: contain; }
   .card.done .front { background: #c8e6c9; animation: pop .5s; }
   .card.nope .front { animation: shake .4s; }
   @keyframes pop { 50% { transform: rotateY(180deg) scale(1.12); } }
   @keyframes shake { 25% { transform: rotateY(180deg) translateX(-6px); } 75% { transform: rotateY(180deg) translateX(6px); } }
-  .overlay { position: fixed; inset: 0; background: rgba(20,30,90,.55); display: flex; align-items: center; justify-content: center; z-index: 10; }
+  .overlay { position: fixed; inset: 0; background: rgba(20,30,90,.55); display: flex; align-items: center; justify-content: center; z-index: 10; overflow-y: auto; }
   .overlay.hide { display: none; }
-  .panel { background: #fff; border: 8px solid #ffcb05; border-radius: 36px; padding: 22px 26px; text-align: center; max-width: 92vw; box-shadow: 0 12px 0 rgba(0,0,0,.25); }
-  .panel h1 { margin: 4px 0 6px; font-size: clamp(32px, 8vw, 54px); color: #3b4cca; }
-  .panel canvas { width: 180px; height: 180px; }
-  .big { display: block; margin: 12px auto 0; font-family: inherit; font-weight: bold; font-size: 40px; color: #fff; background: linear-gradient(135deg, #43a047, #00c853); border: 6px solid #fff; border-radius: 40px; padding: 12px 44px; box-shadow: 0 8px 0 #1b5e20; cursor: pointer; }
+  .panel { background: #fff; border: 8px solid #ffcb05; border-radius: 36px; padding: 18px 20px; text-align: center; max-width: 94vw; box-shadow: 0 12px 0 rgba(0,0,0,.25); margin: auto; }
+  .panel h1 { margin: 2px 0 4px; font-size: clamp(30px, 8vw, 50px); color: #3b4cca; }
+  .panel canvas { width: 150px; height: 150px; }
+  .big { display: block; margin: 12px auto 0; font-family: inherit; font-weight: bold; font-size: 40px; color: #fff; background: linear-gradient(135deg, #43a047, #00c853); border: 6px solid #fff; border-radius: 40px; padding: 10px 44px; box-shadow: 0 8px 0 #1b5e20; cursor: pointer; }
   .big:active { transform: translateY(6px); box-shadow: 0 2px 0 #1b5e20; }
   .lv { font-size: 26px; color: #555; margin-top: 4px; }
+  .diffs { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+  .diff { font-family: inherit; font-weight: bold; font-size: 24px; line-height: 1.15; width: 92px; padding: 8px 4px; border-radius: 24px; border: 5px solid #e0e0e0; background: #fff; color: #333; cursor: pointer; box-shadow: 0 5px 0 #bdbdbd; transition: transform .15s; }
+  .diff b { display: block; font-size: 34px; }
+  .diff.on { transform: scale(1.1); }
+  .diff[data-d="0"].on { border-color: #43a047; background: #e8f5e9; box-shadow: 0 5px 0 #2e7d32; }
+  .diff[data-d="1"].on { border-color: #fb8c00; background: #fff3e0; box-shadow: 0 5px 0 #e65100; }
+  .diff[data-d="2"].on { border-color: #e53935; background: #ffebee; box-shadow: 0 5px 0 #b71c1c; }
+  .toggle { font-family: inherit; font-weight: bold; font-size: 26px; margin-top: 14px; padding: 10px 20px; border-radius: 30px; border: 5px solid #e0e0e0; background: #fff; color: #333; cursor: pointer; box-shadow: 0 5px 0 #bdbdbd; }
+  .toggle .sw { display: inline-block; width: 44px; height: 26px; border-radius: 13px; background: #ccc; vertical-align: middle; position: relative; margin-inline-start: 8px; transition: background .2s; }
+  .toggle .sw::after { content: ""; position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: right .2s; }
+  .toggle.on { border-color: #7e57c2; background: #ede7f6; box-shadow: 0 5px 0 #4527a0; }
+  .toggle.on .sw { background: #7e57c2; }
+  .toggle.on .sw::after { right: 21px; }
+  .small { font-family: inherit; font-size: 26px; margin-top: 12px; padding: 6px 18px; border-radius: 24px; border: 4px solid #3b4cca; background: #fff; cursor: pointer; }
+  @media (max-height: 700px) { .panel canvas { width: 100px; height: 100px; } .big { font-size: 32px; padding: 8px 34px; } }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 11; }
 </style>
 </head>
@@ -39,13 +59,22 @@
   <div class="top">
     <button class="round" id="homeBtn" aria-label="תפריט">🏠</button>
     <div class="stars" id="stars">⭐ 0</div>
-    <button class="round" id="muteBtn" aria-label="קול">🔊</button>
+    <div class="side">
+      <button class="round" id="moveBtn" aria-label="קלפים זזים">🌀</button>
+      <button class="round" id="muteBtn" aria-label="קול">🔊</button>
+    </div>
   </div>
   <div id="board"></div>
   <div class="overlay" id="startOv"><div class="panel">
     <canvas id="hero" width="360" height="360"></canvas>
     <h1>הזיכרון של פיקאצ'ו</h1>
     <div class="lv">🃏 ➜ 🃏 = ⭐</div>
+    <div class="diffs" id="diffs">
+      <button class="diff" data-d="0"><b>🙂</b>קל</button>
+      <button class="diff" data-d="1"><b>😃</b>בינוני</button>
+      <button class="diff" data-d="2"><b>🔥</b>קשה</button>
+    </div>
+    <button class="toggle" id="moveTog">🌀 קלפים זזים<span class="sw"></span></button>
     <button class="big" id="startBtn">▶ שחק</button>
   </div></div>
   <div class="overlay hide" id="winOv"><div class="panel">
@@ -53,6 +82,7 @@
     <h1>כל הכבוד! 🎉</h1>
     <div class="lv" id="winLv"></div>
     <button class="big" id="nextBtn">▶ עוד!</button>
+    <button class="small" id="setBtn" aria-label="בחירת רמה">⚙️ 🙂😃🔥</button>
   </div></div>
   <canvas id="confetti"></canvas>
 <script>
@@ -141,16 +171,30 @@
     return cv.toDataURL();
   }
   // card faces: pictures + friendly emoji (emoji are system fonts, no copyrighted art)
+  const F = (t, say) => ({ t, say });
   const FACES = [
     { img: () => mouseImg(1, 1), say: 'פיקאצ׳ו' },
     { img: ballImg, say: 'כדור' },
-    { t: '⚡', say: 'ברק' }, { t: '🍎', say: 'תפוח' }, { t: '⭐', say: 'כוכב' },
-    { t: '🔥', say: 'אש' }, { t: '💧', say: 'טיפה' }, { t: '🍃', say: 'עלה' },
-    { t: '🌈', say: 'קשת' }, { t: '🎈', say: 'בלון' }, { t: '🍓', say: 'תות' }, { t: '🌙', say: 'ירח' }
+    F('⚡', 'ברק'), F('🍎', 'תפוח'), F('⭐', 'כוכב'), F('🔥', 'אש'), F('💧', 'טיפה'), F('🍃', 'עלה'),
+    F('🌈', 'קשת'), F('🎈', 'בלון'), F('🍓', 'תות'), F('🌙', 'ירח'),
+    // look-alike extras for the harder levels
+    F('🍏', 'תפוח ירוק'), F('🍒', 'דובדבן'), F('🌟', 'כוכב נוצץ'), F('☀️', 'שמש'), F('💦', 'טיפות'),
+    F('🔴', 'אדום'), F('🟠', 'כתום'), F('🟡', 'צהוב'), F('🟢', 'ירוק'), F('🔵', 'כחול'), F('🟣', 'סגול'),
+    F('🐶', 'כלב'), F('🐱', 'חתול'), F('🐭', 'עכבר'), F('🐹', 'אוגר')
   ];
   FACES.forEach(f => { if (f.img) f.src = f.img(); });
-  const LEVELS = [3, 4, 6, 8, 10, 12]; // pairs
-  let level = 0, stars = 0, open = [], lock = false, found = 0, pairs = 0;
+  const byT = t => FACES.find(f => f.t === t);
+  const SIMILAR = [['🍎', '🍏', '🍒', '🍓'], ['⭐', '🌟', '☀️', '🌙'], ['💧', '💦', '🔵'], ['🔴', '🟠', '🟡', '🟢', '🟣'], ['🐶', '🐱', '🐭', '🐹'], ['🔥', '⚡']].map(g => g.map(byT));
+  // difficulty: pairs per level, how long the first peek lasts, how fast cards drift, when look-alike cards start
+  const DIFFS = [
+    { levels: [3, 4, 5, 6], peek: 2400, step: 100, minPeek: 1800, perPair: 150, speed: 0.30, similarFrom: 99 },
+    { levels: [4, 5, 6, 8, 10], peek: 1700, step: 150, minPeek: 900, perPair: 90, speed: 0.42, similarFrom: 3 },
+    { levels: [6, 8, 10, 12], peek: 1100, step: 150, minPeek: 500, perPair: 50, speed: 0.55, similarFrom: 1 }
+  ];
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem('omerMemory') || '{}'); } catch (e) {}
+  let diff = [0, 1, 2].includes(saved.d) ? saved.d : 1, moving = !!saved.m;
+  let level = 0, stars = 0, open = [], lock = false, found = 0, pairs = 0, peeking = false, dealId = 0;
+  function save() { try { localStorage.setItem('omerMemory', JSON.stringify({ d: diff, m: moving })); } catch (e) {} }
   // audio
   let actx = null, muted = false;
   function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
@@ -165,54 +209,168 @@
   const yesS = () => { [660, 880, 1100].forEach((f, i) => tone(f, 0.18, 'sine', 0.2, i * 0.09)); };
   const hmS = () => { tone(330, 0.15, 'sine', 0.12); tone(300, 0.2, 'sine', 0.12, 0.13); };
   const winS = () => { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, 0.22, 'triangle', 0.2, i * 0.13)); };
+  const whooshS = () => { for (let i = 0; i < 8; i++) tone(300 + i * 60, 0.12, 'sine', 0.06, i * 0.12); };
+  let lastBonk = 0;
+  const bonkS = () => { const n = performance.now(); if (n - lastBonk < 120) return; lastBonk = n; tone(180 + Math.random() * 60, 0.06, 'sine', 0.05); };
   function say(txt) {
     if (muted || !window.speechSynthesis) return;
     try { const u = new SpeechSynthesisUtterance(txt); u.lang = 'he-IL'; u.rate = 0.95; u.pitch = 1.3; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
   }
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function cols(n) { const wide = innerWidth > innerHeight; if (n <= 6) return 3; if (n <= 8) return 4; if (n <= 12) return wide ? 6 : 4; if (n <= 16) return wide ? 8 : 4; if (n <= 20) return wide ? 5 : 4; return wide ? 6 : 4; }
+  const cards = () => [...el('board').children];
+
+  // ---------- layout ----------
+  let phys = null; // { W, H, w, h } of the moving board
   function layout() {
-    const b = el('board'), n = b.children.length, c = cols(n), rows = Math.ceil(n / c);
-    b.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
-    const availH = innerHeight - 110, cardW = Math.min((Math.min(innerWidth, 820) - 16 - (c - 1) * 12) / c, (availH - (rows - 1) * 12) / rows * 0.75);
-    b.style.maxWidth = Math.max(200, cardW * c + (c - 1) * 12) + 'px';
+    const b = el('board'), all = cards(), n = all.length; if (!n) return;
+    if (!moving) {
+      b.classList.remove('moving'); b.style.height = ''; b.style.width = '';
+      all.forEach(c => { c.style.transform = ''; c.style.width = ''; c.style.height = ''; c.classList.remove('gone'); });
+      const c = cols(n), rows = Math.ceil(n / c);
+      b.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
+      const availH = innerHeight - 110, cardW = Math.min((Math.min(innerWidth, 820) - 16 - (c - 1) * 12) / c, (availH - (rows - 1) * 12) / rows * 0.75);
+      b.style.maxWidth = Math.max(200, cardW * c + (c - 1) * 12) + 'px';
+      b.style.setProperty('--cw', Math.max(40, cardW) + 'px');
+      phys = null; return;
+    }
+    b.classList.add('moving'); b.style.gridTemplateColumns = '';
+    const W = Math.min(innerWidth - 16, 820), H = Math.max(260, innerHeight - 104);
+    b.style.maxWidth = W + 'px'; b.style.width = W + 'px'; b.style.height = H + 'px';
+    const iw = b.clientWidth, ih = b.clientHeight;
+    const c = Math.max(2, Math.min(n, Math.round(Math.sqrt(iw * n / (0.75 * ih))))), rows = Math.ceil(n / c);
+    const cellW = iw / c, cellH = ih / rows;
+    let w = Math.min(cellW * 0.8, cellH * 0.8 * 0.75);
+    const occ = n * w * w * 4 / 3 / (iw * ih); if (occ > 0.42) w *= Math.sqrt(0.42 / occ);
+    const h = w * 4 / 3, old = phys;
+    phys = { W: iw, H: ih, w, h };
+    b.style.setProperty('--cw', w + 'px');
+    all.forEach((d, i) => {
+      d.style.width = w + 'px'; d.style.height = h + 'px';
+      if (d.classList.contains('done')) d.classList.add('gone');
+      let p = d._p;
+      if (!p || !old) {
+        const ang = Math.random() * Math.PI * 2;
+        p = d._p = { x: (i % c + 0.5) * cellW, y: (Math.floor(i / c) + 0.5) * cellH, vx: Math.cos(ang), vy: Math.sin(ang) };
+      } else { p.x *= iw / old.W; p.y *= ih / old.H; }
+      p.x = Math.min(iw - w / 2, Math.max(w / 2, p.x)); p.y = Math.min(ih - h / 2, Math.max(h / 2, p.y));
+      d.style.transform = `translate3d(${p.x - w / 2}px, ${p.y - h / 2}px, 0)`;
+    });
+    startLoop();
+  }
+
+  // ---------- moving-cards physics (axis-aligned boxes, equal mass, elastic) ----------
+  let looping = false, lastT = 0, burstStart = 0, burstEnd = 0;
+  const GAP = 6;
+  function startLoop() { if (looping) return; looping = true; lastT = performance.now(); requestAnimationFrame(tick); }
+  function tick(t) {
+    if (!moving || !phys) { looping = false; return; }
+    const dt = Math.min(0.033, Math.max(0, (t - lastT) / 1000)); lastT = t;
+    if (!peeking) physicsStep(dt, t);
+    requestAnimationFrame(tick);
+  }
+  function physicsStep(dt, now) {
+    const { W, H, w, h } = phys;
+    const bodies = [];
+    cards().forEach(d => { if (d._p && !d.classList.contains('gone')) { d._p.frozen = d.classList.contains('open') || d.classList.contains('done'); bodies.push(d._p); } });
+    let target = w * DIFFS[diff].speed;
+    if (now < burstEnd) target *= 1 + 5 * (burstEnd - now) / (burstEnd - burstStart);
+    const k = Math.min(1, dt * 3);
+    bodies.forEach(p => {
+      if (p.frozen) return;
+      let sp = Math.hypot(p.vx, p.vy);
+      if (sp < 1e-3) { const a = Math.random() * Math.PI * 2; p.vx = Math.cos(a); p.vy = Math.sin(a); sp = 1; }
+      const ns = sp + (target - sp) * k; p.vx *= ns / sp; p.vy *= ns / sp;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+    });
+    const walls = p => {
+      if (p.x < w / 2) { p.x = w / 2; p.vx = Math.abs(p.vx); }
+      if (p.x > W - w / 2) { p.x = W - w / 2; p.vx = -Math.abs(p.vx); }
+      if (p.y < h / 2) { p.y = h / 2; p.vy = Math.abs(p.vy); }
+      if (p.y > H - h / 2) { p.y = H - h / 2; p.vy = -Math.abs(p.vy); }
+    };
+    bodies.forEach(p => { if (!p.frozen) walls(p); });
+    for (let it = 0; it < 3; it++) {
+      for (let i = 0; i < bodies.length; i++) for (let j = i + 1; j < bodies.length; j++) {
+        const a = bodies[i], b = bodies[j];
+        if (a.frozen && b.frozen) continue;
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const ox = w + GAP - Math.abs(dx), oy = h + GAP - Math.abs(dy);
+        if (ox <= 0 || oy <= 0) continue;
+        const ax = ox / w < oy / h ? 'x' : 'y', sgn = (ax === 'x' ? dx : dy) >= 0 ? 1 : -1, ov = ax === 'x' ? ox : oy;
+        const v = ax === 'x' ? 'vx' : 'vy';
+        const wa = a.frozen ? 0 : b.frozen ? 1 : 0.5, wb = 1 - wa;
+        a[ax] -= sgn * ov * wa; b[ax] += sgn * ov * wb;
+        if (it === 0 && (b[v] - a[v]) * sgn < 0) { // approaching: bounce
+          if (a.frozen) b[v] = -b[v];
+          else if (b.frozen) a[v] = -a[v];
+          else { const tmp = a[v]; a[v] = b[v]; b[v] = tmp; }
+          if (!peeking && now >= burstEnd) bonkS();
+        }
+      }
+      bodies.forEach(p => { if (!p.frozen) walls(p); });
+    }
+    cards().forEach(d => { const p = d._p; if (p && !d.classList.contains('gone')) d.style.transform = `translate3d(${p.x - w / 2}px, ${p.y - h / 2}px, 0)`; });
+  }
+
+  // ---------- game ----------
+  function pickFaces() {
+    const D = DIFFS[diff];
+    if (level >= D.similarFrom) {
+      const pool = [];
+      shuffle(SIMILAR.slice()).forEach(g => shuffle(g.slice()).forEach(f => { if (!pool.includes(f)) pool.push(f); }));
+      return pool.slice(0, pairs);
+    }
+    const faces = shuffle(FACES.slice(0, 12)).slice(0, pairs);
+    if (level === 0 && !faces.includes(FACES[0])) faces[0] = FACES[0];
+    return faces;
   }
   function deal() {
-    pairs = LEVELS[Math.min(level, LEVELS.length - 1)]; found = 0; open = []; lock = false;
-    const faces = shuffle(FACES.slice()).slice(0, pairs);
-    if (level === 0 && !faces.includes(FACES[0])) faces[0] = FACES[0];
-    const deck = shuffle(faces.concat(faces));
-    const b = el('board'); b.innerHTML = '';
-    deck.forEach((f, i) => {
+    const D = DIFFS[diff], my = ++dealId;
+    pairs = D.levels[Math.min(level, D.levels.length - 1)]; found = 0; open = []; lock = true;
+    const deck = shuffle(pickFaces().flatMap(f => [f, f]));
+    const b = el('board'); b.innerHTML = ''; phys = null;
+    deck.forEach(f => {
       const d = document.createElement('div'); d.className = 'card'; d.dataset.k = FACES.indexOf(f); d.tabIndex = 0;
       d.innerHTML = `<div class="inner"><div class="face back">⚡</div><div class="face front">${f.src ? `<img src="${f.src}" alt="">` : f.t}</div></div>`;
-      d.addEventListener('click', () => flip(d));
+      d.addEventListener('pointerdown', e => { e.preventDefault(); flip(d); });
       d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(d); } });
       b.appendChild(d);
     });
     layout();
-    // quick peek at the start so it's gentle
-    const all = [...b.children]; lock = true;
-    setTimeout(() => all.forEach(c => c.classList.add('open')), 250);
-    setTimeout(() => { all.forEach(c => c.classList.remove('open')); lock = false; }, 250 + 1200 + pairs * 120);
+    // peek at the start (shorter at higher levels / harder modes)
+    const all = cards(), peek = Math.max(D.minPeek, D.peek - level * D.step) + pairs * D.perPair;
+    peeking = true;
+    setTimeout(() => { if (my === dealId) all.forEach(c => c.classList.add('open')); }, 250);
+    setTimeout(() => {
+      if (my !== dealId) return;
+      all.forEach(c => c.classList.remove('open')); peeking = false;
+      if (moving) { // shuffle burst: cards zoom around and bump, then slow down
+        burstStart = performance.now() + 450; burstEnd = burstStart + 1800; whooshS();
+        setTimeout(() => { if (my === dealId) lock = false; }, 450 + 1800);
+        peeking = true; setTimeout(() => { if (my === dealId) peeking = false; }, 450);
+      } else lock = false;
+    }, 250 + peek);
   }
   function flip(d) {
     ac();
-    if (lock || d.classList.contains('open') || d.classList.contains('done')) return;
+    if (lock || peeking || d.classList.contains('open') || d.classList.contains('done')) return;
     d.classList.add('open'); flipS(); open.push(d);
     say(FACES[+d.dataset.k].say);
     if (open.length === 2) {
-      lock = true; const [a, b] = open;
+      lock = true; const [a, b] = open, my = dealId;
       if (a.dataset.k === b.dataset.k) {
         setTimeout(() => {
+          if (my !== dealId) return;
           a.classList.add('done'); b.classList.add('done'); a.classList.remove('open'); b.classList.remove('open');
           yesS(); stars++; found++; el('stars').textContent = '⭐ ' + stars; burst(a); burst(b);
           open = []; lock = false;
+          if (moving) setTimeout(() => { if (my === dealId && moving) { a.classList.add('gone'); b.classList.add('gone'); } }, 650);
           if (found === pairs) setTimeout(win, 700);
         }, 450);
       } else {
         setTimeout(() => { a.classList.add('nope'); b.classList.add('nope'); hmS(); }, 500);
-        setTimeout(() => { a.classList.remove('open', 'nope'); b.classList.remove('open', 'nope'); open = []; lock = false; }, 1300);
+        setTimeout(() => { if (my !== dealId) return; a.classList.remove('open', 'nope'); b.classList.remove('open', 'nope'); open = []; lock = false; }, 1300);
       }
     }
   }
@@ -235,13 +393,30 @@
     parts = parts.filter(p => p.life > 0 && p.y < cf.height + 30);
     if (parts.length) requestAnimationFrame(step); else { anim = false; cx.clearRect(0, 0, cf.width, cf.height); }
   }
-  el('startBtn').addEventListener('click', () => { ac(); el('startOv').classList.add('hide'); say('מצא זוגות!'); deal(); });
+  // ---------- controls ----------
+  function paintChoices() {
+    document.querySelectorAll('.diff').forEach(x => x.classList.toggle('on', +x.dataset.d === diff));
+    el('moveTog').classList.toggle('on', moving); el('moveBtn').classList.toggle('on', moving);
+  }
+  function setMoving(m) {
+    moving = m; save(); paintChoices();
+    cards().forEach(d => { d._p = null; }); phys = null; layout();
+  }
+  document.querySelectorAll('.diff').forEach(x => x.addEventListener('click', () => { ac(); diff = +x.dataset.d; save(); paintChoices(); tone(440 + diff * 160, 0.12, 'triangle', 0.15); }));
+  el('moveTog').addEventListener('click', () => { ac(); setMoving(!moving); tone(moving ? 700 : 400, 0.12, 'triangle', 0.15); });
+  el('moveBtn').addEventListener('click', () => { ac(); setMoving(!moving); if (moving) say('קלפים זזים!'); });
+  el('startBtn').addEventListener('click', () => { ac(); level = 0; el('startOv').classList.add('hide'); say('מצא זוגות!'); deal(); });
   el('nextBtn').addEventListener('click', () => { el('winOv').classList.add('hide'); deal(); });
+  el('setBtn').addEventListener('click', () => { el('winOv').classList.add('hide'); paintChoices(); el('startOv').classList.remove('hide'); });
   el('homeBtn').addEventListener('click', () => { location.href = '../index.html'; });
   el('muteBtn').addEventListener('click', () => { muted = !muted; el('muteBtn').textContent = muted ? '🔇' : '🔊'; if (muted && window.speechSynthesis) speechSynthesis.cancel(); });
   addEventListener('resize', () => { sizeCf(); layout(); });
-  sizeCf(); drawHero('hero', 1);
-  window.__game = { get level() { return level; }, get found() { return found; }, get pairs() { return pairs; } };
+  sizeCf(); drawHero('hero', 1); paintChoices();
+  window.__game = {
+    get level() { return level; }, get found() { return found; }, get pairs() { return pairs; },
+    get moving() { return moving; }, get diff() { return diff; }, get lock() { return lock; }, get peeking() { return peeking; }, get phys() { return phys; },
+    jump(n) { level = n; el('startOv').classList.add('hide'); el('winOv').classList.add('hide'); deal(); } // test hook
+  };
 })();
 </script>
 </body>
