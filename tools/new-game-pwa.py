@@ -10,7 +10,7 @@ For each app folder it writes/refreshes:
                         (only if missing or --icons; drawn from an emoji with Pillow + Noto Color Emoji)
   pwa.js                copy of tools/templates/pwa.js (SW registration + install button/overlay)
   sw.js                 from tools/templates/sw.js with a content-hash VERSION and the folder's file list
-  index.html            <!-- PWA --> head block (manifest, theme-color, apple tags, pwa.js) – idempotent
+  index.html            <!-- PWA --> head block (manifest, theme-color, apple tags, pwa.js, ../shared/parental.js) – idempotent
 and adds a tile to the root menu if the game isn't linked yet. The menu's sw.js also precaches every game,
 so it is always regenerated too (that's why you run it after editing any game).
 The game's start screen needs an element with data-pwa-slot (the install button goes inside it).
@@ -21,7 +21,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = '/omer-games/'           # GitHub Pages base path
 TPL = os.path.join(ROOT, 'tools', 'templates')
 EMOJI_FONT = '/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf'
-SKIP_DIRS = {'tools', '.git', '.github'}
+SKIP_DIRS = {'tools', '.git', '.github', 'shared'}
+SHARED = ['shared/parental.js']  # site-wide files every app loads + precaches (parental controls)
 MENU = '.'
 
 
@@ -117,6 +118,7 @@ def patch_html(folder, m):
              '<meta name="apple-mobile-web-app-status-bar-style" content="default">\n'
              f'<meta name="apple-mobile-web-app-title" content="{m["short_name"]}">\n'
              '<script src="pwa.js" defer></script>\n'
+             f'<script src="{"" if folder == MENU else "../"}shared/parental.js" defer></script>\n'
              '<!-- /PWA -->')
     if '<!-- PWA -->' in h:
         h = re.sub(r'<!-- PWA -->.*?<!-- /PWA -->', lambda _: block, h, flags=re.S)
@@ -132,7 +134,7 @@ def write_sw(folder, files, app):
     hsh = hashlib.sha1()
     for f in files:
         hsh.update(f.encode())
-        hsh.update(open(os.path.join(base, f), 'rb').read())
+        hsh.update(open(os.path.normpath(os.path.join(base, f)), 'rb').read())
     hsh.update(open(os.path.join(TPL, 'sw.js'), 'rb').read())
     lst = ['./'] + files
     sw = open(os.path.join(TPL, 'sw.js'), encoding='utf-8').read()
@@ -189,8 +191,8 @@ def main():
         refresh(MENU, argparse.Namespace(name='המשחקים של עומר', short='המשחקים של עומר', emoji='🎮', colors='#ffcb05,#3b4cca', theme=None, icons=False))
     # (re)generate every service worker – the menu one precaches all games so it must follow any change
     for g in games():
-        write_sw(g, app_files(g), g)
-    menu_files = app_files(MENU) + [f'{g}/{f}' for g in games() for f in app_files(g)]
+        write_sw(g, app_files(g) + ['../' + f for f in SHARED], g)
+    menu_files = app_files(MENU) + SHARED + [f'{g}/{f}' for g in games() for f in app_files(g)]
     write_sw(MENU, menu_files, 'menu')
     print('service workers updated for:', ', '.join(['menu'] + games()))
 

@@ -2,7 +2,7 @@
    Cache-first for this app's files, versioned cache name so updates roll out; page navigations are
    served from cache and refreshed in the background. Only deletes its own old caches. */
 const APP = 'memory';
-const VERSION = '8fe517aa66';
+const VERSION = '6a65dd9e6a';
 const PREFIX = 'omer-' + APP + '-';
 const CACHE = PREFIX + VERSION;
 const FILES = [
@@ -13,8 +13,10 @@ const FILES = [
   "icons/icon-maskable-512.png",
   "index.html",
   "manifest.webmanifest",
-  "pwa.js"
+  "pwa.js",
+  "../shared/parental.js"
 ];
+const SHARED = new Set(FILES.map(f => new URL(f, self.registration.scope).pathname).filter(p => !(location.origin + p).startsWith(self.registration.scope)));
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
@@ -26,7 +28,8 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== location.origin || !url.href.startsWith(self.registration.scope)) return;
+  const shared = SHARED.has(url.pathname); // site-wide files (e.g. ../shared/parental.js) outside this scope
+  if (url.origin !== location.origin || (!url.href.startsWith(self.registration.scope) && !shared)) return;
   if (req.mode === 'navigate') {
     // folder URL -> its index.html; ignore ?install=1 etc.
     const page = url.pathname.endsWith('/') ? url.pathname + 'index.html' : url.pathname;
