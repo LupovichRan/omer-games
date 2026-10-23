@@ -68,6 +68,17 @@
   #again.on { display: block; }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; width: 100%; height: 100%; }
 </style>
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3949ab">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="המעבדה">
+<script src="pwa.js" defer></script>
+<!-- /PWA -->
 </head>
 <body>
 <div class="top">
@@ -88,6 +99,7 @@
       <button class="tile t2" data-go="ramp">⚽<span>מגלשה</span></button>
       <button class="tile t3" data-go="mag">🧲<span>מגנט</span></button>
     </div>
+    <div data-pwa-slot></div>
   </div>
 </div>
 

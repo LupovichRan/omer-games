@@ -20,9 +20,21 @@
   .c3 { background: linear-gradient(135deg, #66bb6a, #00897b); }
   .c4 { background: linear-gradient(135deg, #ab47bc, #ec407a); }
 </style>
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3b4cca">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="משחקי עומר">
+<script src="pwa.js" defer></script>
+<!-- /PWA -->
 </head>
 <body>
   <h1>🎮 המשחקים של עומר 🎮</h1>
+  <div data-pwa-slot style="margin:-12px 0 18px"></div>
   <div class="games">
     <!-- GAMES: add a new <a class="game"> block for each new game (newest first is fine) -->
     <a class="game c3" href="memory/index.html"><div class="icon">🃏</div><div class="name">הזיכרון של פיקאצ'ו</div></a>

@@ -31,6 +31,17 @@
   @media (max-aspect-ratio: 1/1) { #boltBtn { width: 92px; height: 92px; font-size: 22px; } #boltBtn span { font-size: 32px; } }
   .hidden { display: none !important; }
 </style>
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#e53935">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="פיקאצ'ו">
+<script src="pwa.js" defer></script>
+<!-- /PWA -->
 </head>
 <body>
 <canvas id="game"></canvas>
@@ -51,6 +62,7 @@
   <canvas id="startPika" width="260" height="260"></canvas>
   <button class="btn bigbtn" id="playBtn">▶ שחק!</button>
   <div class="hint">⬅️ ➡️ &nbsp; 👆 &nbsp; ⚡</div>
+  <div data-pwa-slot></div>
 </div>
 
 <script>

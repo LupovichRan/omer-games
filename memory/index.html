@@ -54,6 +54,17 @@
   @media (max-height: 700px) { .panel canvas { width: 100px; height: 100px; } .big { font-size: 32px; padding: 8px 34px; } }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 11; }
 </style>
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#00897b">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="זיכרון">
+<script src="pwa.js" defer></script>
+<!-- /PWA -->
 </head>
 <body>
   <div class="top">
@@ -76,6 +87,7 @@
     </div>
     <button class="toggle" id="moveTog">🌀 קלפים זזים<span class="sw"></span></button>
     <button class="big" id="startBtn">▶ שחק</button>
+    <div data-pwa-slot></div>
   </div></div>
   <div class="overlay hide" id="winOv"><div class="panel">
     <canvas id="hero2" width="360" height="360"></canvas>
