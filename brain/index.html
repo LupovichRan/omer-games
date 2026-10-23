@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>חדר כושר למוח</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { margin: 0; min-height: 100%; font-family: "Arial Rounded MT Bold", "Varela Round", Arial, sans-serif; background: radial-gradient(circle at 50% 0, #fff59d, #ffca28 35%, #5c6bc0 100%); }
+  body { display: flex; flex-direction: column; align-items: center; padding: 8px 8px 24px; min-height: 100vh; overflow-x: hidden; touch-action: manipulation; color: #1a237e; }
+  .round { width: 58px; height: 58px; border-radius: 50%; font-size: 28px; background: #fff; border: 4px solid #3b4cca; box-shadow: 0 5px 0 #23308a; cursor: pointer; padding: 0; flex: none; color: #000; }
+  .round:active { transform: translateY(4px); box-shadow: 0 1px 0 #23308a; }
+  .stars { background: rgba(255,255,255,.92); border: 4px solid #ffcb05; border-radius: 30px; padding: 6px 14px; font-size: 26px; font-weight: bold; color: #3b4cca; box-shadow: 0 4px 0 #c79a00; text-align: center; white-space: nowrap; }
+  .hide { display: none !important; }
+  /* home */
+  #home { width: 100%; max-width: 860px; display: flex; flex-direction: column; align-items: center; }
+  .htop { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+  #hero { width: 130px; height: 130px; }
+  #title { margin: 0; font-size: clamp(32px, 9vw, 54px); color: #fff; text-shadow: 0 4px 0 #3b4cca, 0 0 12px #3b4cca; cursor: default; text-align: center; }
+  .sub { font-size: 20px; color: #fff; text-shadow: 0 2px 0 #3b4cca; margin: 2px 0 10px; text-align: center; }
+  .tracks { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; width: 100%; }
+  .track { font-family: inherit; border: 5px solid #fff; border-radius: 28px; padding: 12px 6px; cursor: pointer; color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.3); box-shadow: 0 7px 0 rgba(0,0,0,.25); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .track:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .track .ic { font-size: 50px; line-height: 1.1; }
+  .track .nm { font-size: 27px; font-weight: bold; }
+  .track .lv { font-size: 19px; background: rgba(255,255,255,.3); border-radius: 14px; padding: 2px 10px; margin-top: 3px; }
+  .t-math { background: linear-gradient(135deg, #42a5f5, #1565c0); } .t-logic { background: linear-gradient(135deg, #ab47bc, #6a1b9a); }
+  .t-spatial { background: linear-gradient(135deg, #26a69a, #00695c); } .t-read { background: linear-gradient(135deg, #ef5350, #b71c1c); }
+  .t-sci { background: linear-gradient(135deg, #66bb6a, #2e7d32); } .t-eng { background: linear-gradient(135deg, #ffa726, #e65100); }
+  /* play */
+  #play { width: 100%; max-width: 860px; display: flex; flex-direction: column; align-items: center; }
+  .ptop { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .ptitle { flex: 1; text-align: center; color: #fff; text-shadow: 0 2px 0 #3b4cca; font-size: 22px; font-weight: bold; line-height: 1.15; }
+  .ptitle .lvb { display: inline-block; background: #fff; color: #3b4cca; text-shadow: none; border-radius: 16px; padding: 1px 10px; margin-top: 2px; font-size: 20px; }
+  .tools { display: flex; gap: 6px; }
+  #langBtn { font-size: 24px; }
+  #langBtn.en { background: #ffe0b2; }
+  .bar { width: 100%; height: 14px; background: rgba(255,255,255,.4); border-radius: 7px; margin: 8px 0 4px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffeb3b, #ff9800); border-radius: 7px; transition: width .4s; }
+  .card { position: relative; width: 100%; background: #fff; border: 6px solid #ffcb05; border-radius: 30px; padding: 12px 12px 14px; box-shadow: 0 8px 0 rgba(0,0,0,.2); margin-top: 6px; text-align: center; }
+  .card.ltr { direction: ltr; }
+  .guide { position: absolute; top: -10px; inset-inline-start: -8px; width: 74px; height: 74px; pointer-events: none; }
+  .qtext { font-size: clamp(20px, 5.4vw, 28px); font-weight: bold; color: #283593; margin: 0 52px 6px; min-height: 30px; line-height: 1.3; }
+  .qtext.readq { font-size: clamp(30px, 8vw, 46px); margin: 6px 4px; color: #b71c1c; }
+  .eq { direction: ltr; font-weight: bold; color: #1a237e; white-space: nowrap; margin: 4px 0; }
+  .vis { font-size: clamp(30px, 8.5vw, 50px); line-height: 1.25; margin: 4px 0; word-wrap: break-word; }
+  .vis svg { max-width: 100%; height: auto; }
+  .vis .seq { direction: ltr; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .vis .seq span { min-width: 1.3em; padding: 2px 6px; border-radius: 14px; background: #f3f4ff; }
+  .vis .seq span.q { background: #fff59d; border: 3px dashed #f9a825; }
+  .vis .seq.nums span { font-size: .8em; font-weight: bold; color: #3949ab; }
+  .grp { display: inline-block; border: 3px dashed #90caf9; border-radius: 18px; padding: 2px 6px; margin: 3px; font-size: .62em; max-width: 46%; }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-top: 14px; }
+  .choices.c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .ch { position: relative; font-family: inherit; font-weight: bold; font-size: clamp(26px, 7.5vw, 42px); min-height: 92px; border-radius: 26px; border: 5px solid #fff; background: linear-gradient(180deg, #fff, #e8eaf6); color: #1a237e; box-shadow: 0 7px 0 #7986cb; cursor: pointer; padding: 6px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; direction: ltr; }
+  .ch.rtl { direction: rtl; }
+  .ch.emo { font-size: clamp(48px, 13vw, 72px); }
+  .vis .seq.nums.sm { gap: 4px; }
+  .vis .seq.nums.sm span { font-size: .62em; padding: 2px 4px; min-width: 0; }
+  .hint .hx div { unicode-bidi: plaintext; }
+  #parent select { max-width: 34vw; width: 100%; font-size: 17px; }
+  #parent td:last-child { max-width: 36vw; }
+  .ltrm { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  .ch:active { transform: translateY(5px); box-shadow: 0 2px 0 #7986cb; }
+  .ch .em { font-size: 1.25em; }
+  .ch .tx { font-size: .55em; margin-top: 4px; }
+  .ch svg { max-height: 110px; max-width: 100%; }
+  .ch.ok { background: linear-gradient(180deg, #c8e6c9, #66bb6a); box-shadow: 0 7px 0 #2e7d32; animation: pop .4s; }
+  .ch.bad { background: linear-gradient(180deg, #ffcdd2, #ef9a9a); box-shadow: 0 7px 0 #c62828; animation: shake .4s; }
+  .ch.dim { opacity: .45; }
+  .ch .spk { position: absolute; top: 4px; left: 6px; font-size: 18px; background: #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #9fa8da; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; vertical-align: middle; }
+  .frac b { border-bottom: 4px solid currentColor; padding: 0 4px; }
+  @keyframes pop { 50% { transform: scale(1.08); } }
+  @keyframes shake { 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+  .hint { width: 100%; margin-top: 14px; background: #fff8e1; border: 5px solid #ffb300; border-radius: 24px; padding: 10px 14px; font-size: clamp(20px, 5vw, 26px); color: #5d4037; text-align: center; }
+  .hint .hx { }
+  .big { display: block; margin: 12px auto 0; font-family: inherit; font-weight: bold; font-size: 34px; color: #fff; background: linear-gradient(135deg, #43a047, #00c853); border: 6px solid #fff; border-radius: 40px; padding: 8px 40px; box-shadow: 0 8px 0 #1b5e20; cursor: pointer; }
+  .big:active { transform: translateY(6px); box-shadow: 0 2px 0 #1b5e20; }
+  .overlay { position: fixed; inset: 0; background: rgba(20,30,90,.6); display: flex; align-items: center; justify-content: center; z-index: 10; overflow-y: auto; padding: 10px; }
+  .panel { background: #fff; border: 8px solid #ffcb05; border-radius: 34px; padding: 16px 18px; text-align: center; max-width: 96vw; box-shadow: 0 12px 0 rgba(0,0,0,.25); margin: auto; }
+  .panel h1 { margin: 2px 0 6px; font-size: clamp(28px, 7vw, 44px); color: #3b4cca; }
+  #upHero { width: 150px; height: 150px; }
+  #parent table { border-collapse: collapse; font-size: 18px; margin: 8px auto; }
+  #parent td, #parent th { border-bottom: 2px solid #eee; padding: 6px 6px; text-align: center; }
+  #parent select { font-size: 16px; padding: 4px; max-width: 46vw; font-family: inherit; }
+  #parent .pbtn { font-family: inherit; font-size: 18px; padding: 8px 14px; border-radius: 16px; border: 3px solid #3b4cca; background: #fff; cursor: pointer; margin: 4px; }
+  #parent .note { font-size: 15px; color: #666; max-width: 520px; margin: 4px auto; }
+  #toast { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(.5); opacity: 0; font-size: 64px; pointer-events: none; transition: all .3s; z-index: 12; text-shadow: 0 4px 0 rgba(0,0,0,.2); }
+  #toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+</style>
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3949ab">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="כושר מוח">
+<script src="pwa.js" defer></script>
+<!-- /PWA -->
+</head>
+<body>
+  <div id="home">
+    <div class="htop">
+      <button class="round" id="homeBtn" aria-label="תפריט">🏠</button>
+      <div class="stars" id="starsH">⭐ 0</div>
+      <button class="round" id="sayHome" aria-label="הקראה">🔊</button>
+    </div>
+    <canvas id="hero" width="300" height="300"></canvas>
+    <h1 id="title">חדר כושר למוח</h1>
+    <div class="sub">🧠 בחר אימון – כל הצלחה מעלה שלב!</div>
+    <div class="tracks" id="tracks"></div>
+    <div data-pwa-slot></div>
+  </div>
+  <div id="play" class="hide">
+    <div class="ptop">
+      <button class="round" id="backBtn" aria-label="חזרה">⬅️</button>
+      <div class="ptitle"><span id="ptName"></span><br><span class="lvb" id="ptLv"></span></div>
+      <div class="tools">
+        <button class="round" id="langBtn" aria-label="שפה">🇮🇱</button>
+        <button class="round" id="sayBtn" aria-label="הקראה">🔊</button>
+      </div>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="stars" id="starsP">⭐ 0</div>
+    <div class="card" id="card">
+      <canvas class="guide" id="guide" width="150" height="150"></canvas>
+      <div class="qtext" id="qtext"></div>
+      <div class="eq" id="eq"></div>
+      <div class="vis" id="vis"></div>
+    </div>
+    <div class="choices" id="choices"></div>
+    <div class="hint hide" id="hint"><div id="hintTx"></div><button class="big" id="gotIt">הבנתי ▶</button></div>
+  </div>
+  <div class="overlay hide" id="upOv"><div class="panel">
+    <canvas id="upHero" width="300" height="300"></canvas>
+    <h1 id="upTx">עלית שלב! ⚡</h1>
+    <button class="big" id="upGo">▶ ממשיכים</button>
+  </div></div>
+  <div class="overlay hide" id="parent"><div class="panel">
+    <h1>👨‍👩‍👦 פאנל הורים</h1>
+    <div class="note">רמה נוכחית, דיוק וקביעת שלב לכל מסלול. השלב משתנה לבד: 3 תשובות נכונות ברצף ← עולה (בחשבון, אם ענה מהר – קופץ 2), 2 טעויות ← יורד שלב אחד.</div>
+    <table id="ptab"></table>
+    <label style="font-size:18px"><input type="checkbox" id="autoRead"> הקראה אוטומטית של כל שאלה</label><br>
+    <button class="pbtn" id="resetBtn">🗑️ איפוס התקדמות</button>
+    <button class="pbtn" id="closeParent">✖ סגור</button>
+  </div></div>
+  <div id="toast"></div>
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  function drawMouse(c, x, y, s, opts = {}) {
+    const { dizzy = 0, happy = 0, t = 0, facing = 1 } = opts;
+    c.save(); c.translate(x, y); c.scale(facing * s / 100, s / 100);
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    const Y = '#ffd83a', O = '#5a3b00';
+    // tail (lightning bolt)
+    c.save(); c.translate(-38, 15); c.rotate(-0.25 + Math.sin(t * 6) * 0.08);
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(-18, -22); c.lineTo(-8, -26); c.lineTo(-30, -52); c.lineTo(-10, -56); c.lineTo(-38, -92); c.lineTo(-2, -60); c.lineTo(-14, -56); c.lineTo(4, -30); c.lineTo(-6, -26); c.lineTo(10, -4); c.closePath();
+    c.fillStyle = Y; c.fill(); c.lineWidth = 3; c.strokeStyle = O; c.stroke();
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(-10, -14); c.lineTo(4, -10); c.closePath(); c.fillStyle = '#8b5a00'; c.fill();
+    c.restore();
+    // feet
+    c.fillStyle = Y; c.strokeStyle = O; c.lineWidth = 3;
+    [[-20, 42], [20, 42]].forEach(([fx, fy]) => { c.beginPath(); c.ellipse(fx, fy, 14, 8, 0, 0, Math.PI * 2); c.fill(); c.stroke(); });
+    // body
+    c.beginPath(); c.ellipse(0, 15, 38, 32, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    // back stripes hint
+    // ears
+    const ear = (dir) => {
+      c.save(); c.translate(dir * 20, -40); c.rotate(dir * (0.45 + Math.sin(t * 4) * 0.04));
+      c.beginPath(); c.moveTo(-10, 0); c.quadraticCurveTo(-8, -40, 0, -62); c.quadraticCurveTo(8, -40, 10, 0); c.closePath();
+      c.fillStyle = Y; c.fill(); c.stroke();
+      c.save(); c.clip(); c.fillStyle = '#222'; c.fillRect(-15, -70, 30, 26); c.restore();
+      c.beginPath(); c.moveTo(-10, 0); c.quadraticCurveTo(-8, -40, 0, -62); c.quadraticCurveTo(8, -40, 10, 0); c.stroke();
+      c.restore();
+    };
+    ear(-1); ear(1);
+    // head
+    c.beginPath(); c.ellipse(0, -25, 40, 34, 0, 0, Math.PI * 2); c.fillStyle = Y; c.fill(); c.stroke();
+    // arms
+    c.beginPath(); c.ellipse(-24, 12, 9, 6, 0.6, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.beginPath(); c.ellipse(24, 12, 9, 6, -0.6, 0, Math.PI * 2); c.fill(); c.stroke();
+    // cheeks
+    c.fillStyle = '#ff3b3b';
+    c.beginPath(); c.arc(-27, -14, 9, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(27, -14, 9, 0, Math.PI * 2); c.fill();
+    // eyes
+    if (dizzy > 0) {
+      c.strokeStyle = '#222'; c.lineWidth = 3;
+      [-15, 15].forEach(ex => { c.beginPath(); for (let a = 0; a < 12; a += 0.3) { const r = a * 0.7; const px = ex + Math.cos(a + t * 8) * r, py = -30 + Math.sin(a + t * 8) * r; a === 0 ? c.moveTo(px, py) : c.lineTo(px, py); } c.stroke(); });
+    } else if (happy > 0) {
+      c.strokeStyle = '#222'; c.lineWidth = 4;
+      [-15, 15].forEach(ex => { c.beginPath(); c.arc(ex, -28, 7, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); });
+    } else {
+      c.fillStyle = '#222';
+      [-15, 15].forEach(ex => { c.beginPath(); c.arc(ex, -30, 7, 0, Math.PI * 2); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(ex - 2, -33, 2.6, 0, Math.PI * 2); c.fill(); c.fillStyle = '#222'; });
+    }
+    // nose
+    c.fillStyle = '#222'; c.beginPath(); c.ellipse(0, -21, 2.5, 1.8, 0, 0, Math.PI * 2); c.fill();
+    // mouth
+    c.strokeStyle = '#222'; c.lineWidth = 2.5;
+    if (happy > 0 || dizzy === 0) {
+      c.beginPath(); c.moveTo(-8, -15); c.quadraticCurveTo(-4, -10, 0, -15); c.quadraticCurveTo(4, -10, 8, -15); c.stroke();
+      if (happy > 0) { c.fillStyle = '#c0392b'; c.beginPath(); c.moveTo(-6, -14); c.quadraticCurveTo(0, -2, 6, -14); c.closePath(); c.fill(); }
+    } else { c.beginPath(); c.arc(0, -11, 4, 0, Math.PI * 2); c.stroke(); }
+    c.restore();
+    if (dizzy > 0) { // circling stars
+      for (let i = 0; i < 3; i++) { const a = t * 5 + i * 2.1; drawStar(c, x + Math.cos(a) * s * 0.45, y - s * 0.75 + Math.sin(a) * s * 0.12, s * 0.09, '#fff176'); }
+    }
+  }
+
+  function drawStar(c, x, y, r, col) {
+    c.save(); c.translate(x, y); c.beginPath();
+    for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.45 : r; const a = -Math.PI / 2 + i * Math.PI / 5; c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    c.closePath(); c.fillStyle = col; c.fill(); c.lineWidth = 2; c.strokeStyle = '#e6a700'; c.stroke(); c.restore();
+  }
+/* ===== helpers ===== */
+const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = n => (typeof n === 'number' && Math.abs(n) >= 1000) ? n.toLocaleString('en-US') : String(n);
+const P = (L, he, en) => L === 'en' ? en : he;
+const mix = (...fs) => pick(fs)();
+const ONES = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const TENS = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function numWord(n) {
+  if (n < 20) return ONES[n];
+  if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : '');
+  if (n === 100) return 'one hundred';
+  return String(n);
+}
+// build a choice list: vals[0] is the answer
+function mk(vals, o = {}) {
+  const uniq = []; vals.forEach(v => { if (!uniq.some(u => u === v)) uniq.push(v); });
+  let list = [uniq[0], ...shuffle(uniq.slice(1)).slice(0, (o.n || 4) - 1)];
+  list = o.sort ? list.slice().sort((a, b) => a - b) : shuffle(list);
+  return { choices: list.map(v => ({ v, t: o.label ? o.label(v) : fmt(v), say: o.say ? o.say(v) : null, rtl: !!o.rtl })), ans: list.indexOf(uniq[0]) };
+}
+// plausible numeric distractors (answer first)
+function near(ans, extra = []) {
+  const ok = x => Number.isInteger(x) && x >= 0 && x !== ans;
+  const out = shuffle(extra.filter(ok)).slice(0, 2);
+  const st = [];
+  if (ans < 30) st.push(1, 2, 3); else st.push(1, 10);
+  if (ans >= 30 && ans < 1000) st.push(2, 20);
+  if (ans >= 100) st.push(100, 10);
+  if (ans >= 1000) st.push(1000, 100, 1000);
+  if (ans >= 10000) st.push(10000, 10000);
+  if (ans >= 100000) st.push(100000);
+  const pool = shuffle(st.flatMap(s => [ans + s, ans - s])).filter(ok);
+  return [ans, ...out, ...pool];
+}
+function fracHTML(k, d) { return `<span class="frac"><b>${k}</b><span>${d}</span></span>`; }
+/* ===== MATH ===== */
+const OPS = { '+': ['+', 'ועוד', 'plus', (a, b) => a + b], '-': ['−', 'פחות', 'minus', (a, b) => a - b], '*': ['×', 'כפול', 'times', (a, b) => a * b], '/': ['÷', 'חלקי', 'divided by', (a, b) => a / b] };
+const ITEMS = [{ he: 'תותים', en: 'strawberries', e: '🍓' }, { he: 'כדורים', en: 'balls', e: '⚽' }, { he: 'מדבקות', en: 'stickers', e: '⭐' }, { he: 'עוגיות', en: 'cookies', e: '🍪' }, { he: 'קלפים', en: 'cards', e: '🃏' }, { he: 'בלונים', en: 'balloons', e: '🎈' }, { he: 'תפוחים', en: 'apples', e: '🍎' }];
+const HEROES = [["פיקאצ'ו", 'Pikachu'], ['אש', 'Ash'], ['בולבזאור', 'Bulbasaur'], ["צ'רמנדר", 'Charmander'], ['סקווירטל', 'Squirtle']];
+const PLACE_HE = ['אחדות', 'עשרות', 'מאות', 'אלפים', 'עשרות האלפים', 'מאות האלפים'];
+const PLACE_EN = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands', 'hundred-thousands'];
+const ROUND_HE = ['', 'לעשרת הקרובה', 'למאה הקרובה', 'לאלף הקרוב', 'לעשרת האלפים הקרובה', 'למאת האלפים הקרובה'];
+const ROUND_EN = ['', 'the nearest ten', 'the nearest hundred', 'the nearest thousand', 'the nearest ten thousand', 'the nearest hundred thousand'];
+const FNAME = { '1/2': ['חצי', 'one half'], '1/3': ['שליש', 'one third'], '1/4': ['רבע', 'one quarter'], '1/5': ['חמישית', 'one fifth'], '1/10': ['עשירית', 'one tenth'], '3/4': ['שלושה רבעים', 'three quarters'], '2/3': ['שני שלישים', 'two thirds'], '2/5': ['שתי חמישיות', 'two fifths'] };
+
+function mathQ(L, lvl, o) {
+  let c;
+  const vals = near(o.ans, o.extra || []);
+  const useWords = L === 'en' && lvl >= 6 && o.ans <= 100 && Math.random() < 0.4 && !o.noWords;
+  if (useWords) c = mk([vals[0], ...vals.slice(1).filter(v => v <= 100)], { label: numWord, say: numWord });
+  else c = mk(vals, { sort: true });
+  return { track: 'math', lang: L, text: o.text, eq: o.eq || '', vis: o.vis || '', say: o.say, choices: c.choices, ans: c.ans, hint: o.hint, meta: { check: o.check, kind: o.kind }, key: 'm' + (o.key || o.check) };
+}
+function bin(L, lvl, a, op, b, vis, extra) {
+  const [sym, he, en, f] = OPS[op]; const ans = f(a, b);
+  const eq = `${fmt(a)} ${sym} ${fmt(b)} = ☐`;
+  let hint;
+  const multi = a >= 10 && b >= 10;
+  if (op === '+') hint = P(L, multi ? 'מחברים לפי מקומות: אלפים עם אלפים, מאות עם מאות, עשרות עם עשרות, אחדות עם אחדות.' : 'סופרים קדימה מהמספר הגדול.', multi ? 'Add place by place: thousands, hundreds, tens, ones.' : 'Count on from the bigger number.');
+  if (op === '-') hint = P(L, 'אפשר לספור קדימה מ-' + fmt(b) + ' עד ' + fmt(a) + '.', 'Count up from ' + fmt(b) + ' to ' + fmt(a) + '.');
+  if (op === '*') hint = P(L, `${fmt(a)} × ${fmt(b)} זה ${fmt(a)} קבוצות של ${fmt(b)}.`, `${fmt(a)} × ${fmt(b)} means ${fmt(a)} groups of ${fmt(b)}.`);
+  if (op === '/') hint = P(L, `כמה פעמים ${b} נכנס ב-${fmt(a)}? בודקים: ${b} × ${fmt(ans)} = ${fmt(a)}`, `How many times does ${b} fit in ${fmt(a)}? Check: ${b} × ${fmt(ans)} = ${fmt(a)}`);
+  const ex = extra || [];
+  if (op === '+' || op === '-') { ex.push(ans + 10, ans - 10); if (ans >= 100) ex.push(ans + 100, ans - 100); }
+  if (op === '*') ex.push(a * (b + 1), a * (b - 1), (a + 1) * b);
+  return mathQ(L, lvl, {
+    eq, vis, ans, extra: ex, kind: op, check: `${a}${op}${b}==?`,
+    text: P(L, 'כמה זה?', 'What is it?'),
+    say: P(L, `כמה זה ${a} ${he} ${b}?`, `What is ${a} ${en} ${b}?`),
+    hint: hint + '\n' + `${fmt(a)} ${sym} ${fmt(b)} = ${fmt(ans)}`
+  });
+}
+const pics = (n, e) => e.repeat(n);
+function addPics(L, lvl) {
+  const it = pick(ITEMS); const a = R(1, 6), b = R(1, 10 - a);
+  const q = bin(L, lvl, a, '+', b, `<div>${pics(a, it.e)} <b style="color:#3b4cca">+</b> ${pics(b, it.e)}</div>`);
+  q.say = P(L, `יש ${a} ${it.he} ועוד ${b}. כמה ${it.he} יש בסך הכול?`, `${a} ${it.en} and ${b} more. How many ${it.en} in all?`); return q;
+}
+function subPics(L, lvl) {
+  const it = pick(ITEMS); const a = R(4, 10), b = R(1, a - 1);
+  const q = bin(L, lvl, a, '-', b, `<div>${pics(a - b, it.e)}<span style="opacity:.3">${pics(b, it.e)}</span></div>`);
+  q.say = P(L, `היו ${a} ${it.he}. ${b} הלכו. כמה נשארו?`, `There were ${a} ${it.en}. ${b} went away. How many are left?`); return q;
+}
+function missing(L, lvl, max, form) {
+  form = form || pick(['a+', '+b', '-b']);
+  let b, c, eq, chk, say, ans, a;
+  if (form === 'a+') { ans = R(2, max - 2); b = R(2, max - ans); c = ans + b; eq = `☐ + ${fmt(b)} = ${fmt(c)}`; chk = `?+${b}==${c}`; say = P(L, `איזה מספר ועוד ${b} שווה ${c}?`, `What number plus ${b} equals ${c}?`); }
+  else if (form === '+b') { a = R(2, max - 2); ans = R(2, max - a); c = a + ans; eq = `${fmt(a)} + ☐ = ${fmt(c)}`; chk = `${a}+?==${c}`; say = P(L, `${a} ועוד איזה מספר שווה ${c}?`, `${a} plus what number equals ${c}?`); }
+  else if (form === '-b') { ans = R(Math.ceil(max / 3), max); b = R(1, ans - 1); c = ans - b; eq = `☐ − ${fmt(b)} = ${fmt(c)}`; chk = `?-${b}==${c}`; say = P(L, `מאיזה מספר מורידים ${b} ומקבלים ${c}?`, `What number minus ${b} equals ${c}?`); }
+  else { b = R(2, 9); ans = R(2, Math.max(3, Math.floor(max / b))); c = ans * b; eq = `☐ × ${fmt(b)} = ${fmt(c)}`; chk = `?*${b}==${c}`; say = P(L, `איזה מספר כפול ${b} שווה ${c}?`, `What number times ${b} equals ${c}?`); }
+  return mathQ(L, lvl, { eq, ans, check: chk, kind: 'missing', text: P(L, 'איזה מספר חסר?', 'What number is missing?'), say: P(L, 'איזה מספר חסר? ', 'What number is missing? ') + say,
+    hint: P(L, 'מוצאים את החסר בעזרת הפעולה ההפוכה.', 'Use the opposite operation to find it.') + '\n' + eq.replace('☐', fmt(ans)) });
+}
+function compare(L, lvl, digits) {
+  const lo = 10 ** (digits - 1), hi = 10 ** digits - 1; let a = R(lo, hi), b;
+  const r = Math.random();
+  if (r < 0.15) b = a; else if (r < 0.6) { const s = String(a).split(''); const i = R(0, s.length - 2); [s[i], s[i + 1]] = [s[i + 1], s[i]]; b = +s.join(''); if (b === a || b < lo) b = Math.min(hi, a + R(1, 9)); if (b === a) b = a - 1; } else b = R(lo, hi);
+  const ansV = a > b ? '>' : a < b ? '<' : '==';
+  const lab = { '<': '<', '==': '=', '>': '>' }; const sayHe = { '<': 'קטן מ', '==': 'שווה ל', '>': 'גדול מ' }; const sayEn = { '<': 'less than', '==': 'equal to', '>': 'greater than' };
+  const choices = ['<', '==', '>'].map(v => ({ v, t: lab[v], say: P(L, sayHe[v], sayEn[v]) }));
+  return { track: 'math', lang: L, text: P(L, 'איזה סימן מתאים?', 'Which sign fits?'), eq: `${fmt(a)} ☐ ${fmt(b)}`, vis: '', choices, ans: choices.findIndex(x => x.v === ansV),
+    say: P(L, `איזה סימן מתאים? ${a} ... ${b}. גדול מ, קטן מ, או שווה?`, `Which sign fits? ${a} ... ${b}. Greater than, less than, or equal?`),
+    hint: P(L, 'משווים מהספרה הכי שמאלית (הכי גדולה). הצד הפתוח של הסימן פונה למספר הגדול.', 'Compare from the leftmost (biggest) digit. The open side faces the bigger number.') + '\n' + `${fmt(a)} ${lab[ansV]} ${fmt(b)}`,
+    meta: { check: `${a}?${b}`, kind: 'cmp' }, key: `mc${a}_${b}` };
+}
+function distinctDigits(D) { const d = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]); if (d[0] === 0) d.push(d.shift()); return +d.slice(0, D).join(''); }
+function placeValue(L, lvl, D) {
+  const N = distinctDigits(D); const p = R(0, D - 1); const ans = Math.floor(N / 10 ** p) % 10;
+  const others = String(N).split('').map(Number).filter(x => x !== ans);
+  const fill = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter(x => x !== ans && !others.includes(x)));
+  const c = mk([ans, ...others, ...fill.slice(0, Math.max(0, 3 - others.length))], { sort: true });
+  const digits = String(N).split('').map((d, i) => `${d} = ${P(L, PLACE_HE, PLACE_EN)[D - 1 - i]}`).join('\n');
+  return { track: 'math', lang: L, text: P(L, `איזו ספרה במקום ה${PLACE_HE[p]}?`, `Which digit is in the ${PLACE_EN[p]} place?`), eq: fmt(N), vis: '', choices: c.choices, ans: c.ans,
+    say: P(L, `במספר ${N}, איזו ספרה נמצאת במקום ה${PLACE_HE[p]}?`, `In the number ${N}, which digit is in the ${PLACE_EN[p]} place?`),
+    hint: digits, meta: { check: `Math.floor(${N}/${10 ** p})%10==?`, kind: 'place' }, key: `mp${N}_${p}` };
+}
+function rounding(L, lvl, D, p) {
+  let N; do { N = R(10 ** (D - 1), 10 ** D - 1); } while (N % 10 ** p === 5 * 10 ** (p - 1) || N % 10 ** p === 0);
+  const u = 10 ** p, ans = Math.round(N / u) * u, fl = Math.floor(N / u) * u, ce = fl + u;
+  const ex = [fl === ans ? ce : fl, ans + u, ans - u, Math.round(N / (u * 10)) * u * 10, Math.round(N / (u / 10)) * (u / 10)];
+  return mathQ(L, lvl, { eq: fmt(N) + ' ≈ ☐', ans, extra: ex, noWords: true, kind: 'round', check: `Math.round(${N}/${u})*${u}==?`, key: `r${N}_${p}`,
+    text: P(L, `עגלו ${ROUND_HE[p]}`, `Round to ${ROUND_EN[p]}`), say: P(L, `עגלו את ${N} ${ROUND_HE[p]}`, `Round ${N} to ${ROUND_EN[p]}`),
+    hint: P(L, `מסתכלים על הספרה במקום ה${PLACE_HE[p - 1]}: 5 ומעלה – מעגלים למעלה, פחות מ-5 – למטה.`, `Look at the ${PLACE_EN[p - 1]} digit: 5 or more rounds up, less than 5 rounds down.`) + `\n${fmt(N)} ≈ ${fmt(ans)}` });
+}
+function expanded(L, lvl, D) {
+  const N = R(10 ** (D - 1), 10 ** D - 1); const ds = String(N).split('').map(Number);
+  const terms = ds.map((d, i) => d * 10 ** (D - 1 - i)).filter(x => x > 0);
+  if (terms.length < 3 || terms.length === D) { if (Math.random() < 0.7) return expanded(L, lvl, D); }
+  if (terms.length < 2) return expanded(L, lvl, D);
+  const squeezed = +(String(N).split('').filter(d => d !== '0').join(''));
+  return mathQ(L, lvl, { eq: terms.map(fmt).join(' + ') + ' = ☐', ans: N, extra: [squeezed, N + 10 ** (D - 2), N - 10 ** (D - 2)], noWords: true, kind: 'exp', check: terms.join('+') + '==?',
+    text: P(L, 'איזה מספר זה?', 'What number is this?'), say: P(L, 'כמה זה ' + terms.join(' ועוד ') + '?', 'What is ' + terms.join(' plus ') + '?'),
+    hint: P(L, 'כל מחובר ממלא מקום אחד. מקום ריק מקבל 0.', 'Each part fills one place. An empty place gets a 0.') + `\n= ${fmt(N)}` });
+}
+function groups(L, lvl, maxG, maxN) {
+  const it = pick(ITEMS); const g = R(2, maxG), n = R(2, maxN);
+  const vis = Array.from({ length: g }, () => `<span class="grp">${it.e.repeat(n)}</span>`).join('');
+  const q = bin(L, lvl, g, '*', n, vis);
+  q.say = P(L, `יש ${g} קבוצות, ובכל קבוצה ${n} ${it.he}. כמה ${it.he} יש בסך הכול?`, `${g} groups with ${n} ${it.en} in each. How many ${it.en} in all?`);
+  q.text = P(L, `${g} קבוצות של ${n}`, `${g} groups of ${n}`); return q;
+}
+function share(L, lvl) {
+  const it = pick(ITEMS); const k = R(2, 4), each = R(2, 5), N = k * each;
+  const vis = `<div>${it.e.repeat(N)}</div><div>${'🧒'.repeat(k)}</div>`;
+  const q = bin(L, lvl, N, '/', k, vis);
+  q.say = P(L, `${N} ${it.he} מתחלקים שווה בשווה בין ${k} ילדים. כמה מקבל כל ילד?`, `${N} ${it.en} are shared equally by ${k} kids. How many does each kid get?`);
+  q.text = P(L, 'כמה מקבל כל ילד?', 'How many does each kid get?'); return q;
+}
+function pieSVG(k, d) {
+  const r = 70, cx = 80, cy = 80; let s = `<svg viewBox="0 0 160 160" width="150" height="150">`;
+  for (let i = 0; i < d; i++) {
+    const a0 = -Math.PI / 2 + i * 2 * Math.PI / d, a1 = a0 + 2 * Math.PI / d;
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0), x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    s += `<path d="M${cx},${cy} L${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)} Z" fill="${i < k ? '#ffd83a' : '#fff'}" stroke="#5a3b00" stroke-width="3"/>`;
+  }
+  return s + '</svg>';
+}
+function fracPic(L, lvl) {
+  const d = pick([2, 3, 4, 5, 6, 8]), k = R(1, d - 1); const ansV = `${k}/${d}`;
+  const cands = [[d - k, d], [k + 1, d], [k, d + 1], [k - 1, d], [k, d - 1], [k + 1, d + 1], [1, d + 2]].filter(([a, b]) => a >= 1 && b >= 2 && a < b && b <= 10 && a * d !== k * b).map(([a, b]) => `${a}/${b}`);
+  const c = mk([ansV, ...cands], { label: v => fracHTML(...v.split('/')), say: v => P(L, v.replace('/', ' מתוך '), v.replace('/', ' out of ')) });
+  return { track: 'math', lang: L, text: P(L, 'איזה חלק מהעיגול צבוע?', 'What part of the circle is colored?'), eq: '', vis: pieSVG(k, d), choices: c.choices, ans: c.ans,
+    say: P(L, 'איזה חלק מהעיגול צבוע בצהוב?', 'What part of the circle is colored yellow?'),
+    hint: P(L, `סופרים: ${k} חלקים צבועים מתוך ${d} חלקים שווים.`, `Count: ${k} colored parts out of ${d} equal parts.`) + `\n${k}/${d}`, meta: { check: `?==${k}/${d}`, kind: 'frac' }, key: 'mf' + ansV };
+}
+function fracOf(L, lvl, adv) {
+  const f = adv ? pick(['3/4', '2/3', '2/5', '1/10', '1/4', '1/3']) : pick(['1/2', '1/4', '1/3', '1/5', '1/10']);
+  const [k, d] = f.split('/').map(Number); const N = d * R(adv ? 4 : 2, adv ? 60 : 25) * (Math.random() < .5 ? 1 : 2); const ans = N * k / d;
+  return mathQ(L, lvl, { eq: '', vis: `<div style="font-size:.9em;direction:ltr">${fracHTML(k, d)} × ${fmt(N)} = ☐</div>`, ans, extra: [N / d, N - ans, ans * 2], kind: 'fracof', check: `${N}*${k}/${d}==?`,
+    text: P(L, `כמה זה ${FNAME[f][0]} מ-${fmt(N)}?`, `What is ${FNAME[f][1]} of ${fmt(N)}?`), say: P(L, `כמה זה ${FNAME[f][0]} מ-${N}?`, `What is ${FNAME[f][1]} of ${N}?`),
+    hint: P(L, `מחלקים ${fmt(N)} ל-${d} חלקים שווים: כל חלק ${fmt(N / d)}. לוקחים ${k}.`, `Split ${fmt(N)} into ${d} equal parts: each is ${fmt(N / d)}. Take ${k}.`) + `\n= ${fmt(ans)}` });
+}
+function word(L, lvl, kind, big) {
+  const it = pick(ITEMS), h = pick(HEROES); const nm = P(L, h[0], h[1]); let a, b, c, ans, he, en, chk;
+  if (kind === 'add') { a = big ? R(120, 900) : R(12, 60); b = big ? R(120, 900) : R(11, 39); ans = a + b; chk = `${a}+${b}==?`;
+    he = `ל${nm} יש ${a} ${it.he}. הוא קיבל עוד ${b}. כמה ${it.he} יש לו עכשיו?`; en = `${nm} has ${a} ${it.en}. He gets ${b} more. How many ${it.en} does he have now?`; }
+  else if (kind === 'sub') { a = big ? R(500, 2000) : R(30, 99); b = R(Math.floor(a / 5), a - 3); ans = a - b; chk = `${a}-${b}==?`;
+    he = `ל${nm} היו ${a} ${it.he}. הוא נתן ${b} לחברים. כמה ${it.he} נשארו לו?`; en = `${nm} had ${a} ${it.en}. He gave ${b} to friends. How many ${it.en} are left?`; }
+  else if (kind === 'mul') { a = R(3, big ? 12 : 9); b = R(3, big ? 25 : 10); ans = a * b; chk = `${a}*${b}==?`;
+    he = `ל${nm} יש ${a} קופסאות. בכל קופסה ${b} ${it.he}. כמה ${it.he} יש בסך הכול?`; en = `${nm} has ${a} boxes with ${b} ${it.en} in each box. How many ${it.en} in all?`; }
+  else if (kind === 'div') { b = R(2, 9); ans = R(3, big ? 40 : 10); a = ans * b; chk = `${a}/${b}==?`;
+    he = `${nm} חילק ${a} ${it.he} שווה בשווה בין ${b} חברים. כמה קיבל כל חבר?`; en = `${nm} shared ${a} ${it.en} equally among ${b} friends. How many did each friend get?`; }
+  else if (kind === 'multi') { a = R(3, big ? 15 : 8); b = R(4, big ? 25 : 12); c = R(2, a * b - 2); ans = a * b - c; chk = `${a}*${b}-${c}==?`;
+    he = `ל${nm} יש ${a} קופסאות, ובכל קופסה ${b} ${it.he}. הוא נתן ${c} לחבר. כמה ${it.he} נשארו לו?`; en = `${nm} has ${a} boxes with ${b} ${it.en} in each. He gives ${c} to a friend. How many ${it.en} are left?`; }
+  else { c = R(2, 6); ans = R(5, big ? 60 : 20); const tot = ans * c; a = R(1, tot - 1); b = tot - a; chk = `(${a}+${b})/${c}==?`;
+    he = `${nm} מצא ${a} ${it.he} ועוד ${b} ${it.he}, וחילק את כולם שווה בשווה בין ${c} חברים. כמה קיבל כל חבר?`; en = `${nm} found ${a} ${it.en} and then ${b} more. He shared them all equally among ${c} friends. How many did each friend get?`; }
+  const pretty = chk.replace('==?', ' = ' + fmt(ans)).replace(/\*/g, ' × ').replace(/\//g, ' ÷ ').replace(/\+/g, ' + ').replace(/-/g, ' − ');
+  return mathQ(L, lvl, { text: P(L, he, en), say: P(L, he, en), vis: `<div style="font-size:.8em">${it.e}</div>`, ans, extra: kind === 'sub' ? [a + b] : kind === 'add' ? [Math.abs(a - b)] : [], kind: 'word', check: chk,
+    hint: P(L, 'כותבים תרגיל מהסיפור:', 'Turn the story into an exercise:') + '\n' + pretty });
+}
+function orderOps(L, lvl) {
+  const f = R(0, 2); let a = R(2, 20), b = R(2, 9), c = R(2, 9), eq, chk, ans, wrong;
+  if (f === 0) { ans = a + b * c; wrong = (a + b) * c; eq = `${a} + ${b} × ${c}`; chk = `${a}+${b}*${c}==?`; }
+  else if (f === 1) { a = R(3, 12); b = R(3, 12); c = R(1, a * b - 1); ans = a * b - c; wrong = a * (b - c); eq = `${a} × ${b} − ${c}`; chk = `${a}*${b}-${c}==?`; }
+  else { ans = (a + b) * c; wrong = a + b * c; eq = `(${a} + ${b}) × ${c}`; chk = `(${a}+${b})*${c}==?`; }
+  return mathQ(L, lvl, { eq: eq + ' = ☐', ans, extra: [wrong], kind: 'ops', check: chk, text: P(L, 'קודם סוגריים, אחר כך כפל, ואז חיבור וחיסור', 'Brackets first, then times, then plus/minus'),
+    say: P(L, 'כמה זה ' + eq.replace(/\+/g, 'ועוד').replace(/×/g, 'כפול').replace(/−/g, 'פחות').replace('(', 'בסוגריים: ').replace(')', ', סוף סוגריים,'), 'What is ' + eq.replace(/\+/g, 'plus').replace(/×/g, 'times').replace(/−/g, 'minus').replace('(', 'open bracket, ').replace(')', ', close bracket,')),
+    hint: P(L, 'סדר פעולות: סוגריים, אחר כך כפל, ואז חיבור/חיסור.', 'Order: brackets, then times, then plus/minus.') + `\n${eq} = ${ans}`, key: 'o' + chk });
+}
+const rnd = (lo, hi, unit) => R(Math.ceil(lo / unit), Math.floor(hi / unit)) * unit;
+function addSub(L, lvl, lo, hi, unit = 1, opt = {}) {
+  const op = Math.random() < .5 ? '+' : '-';
+  let a = rnd(lo, hi, unit), b = rnd(lo, hi, opt.unitB || unit);
+  if (op === '-' && b > a) [a, b] = [b, a]; if (op === '-' && a === b) a += unit;
+  return bin(L, lvl, a, op, b);
+}
+function noRegroup(L, lvl) {
+  const op = Math.random() < .5 ? '+' : '-'; let a, b;
+  if (op === '+') { const t1 = R(1, 7), t2 = R(1, 8 - t1), o1 = R(0, 8), o2 = R(0, 9 - o1); a = t1 * 10 + o1; b = t2 * 10 + o2; }
+  else { const t1 = R(3, 9), t2 = R(1, t1 - 1), o1 = R(1, 9), o2 = R(0, o1); a = t1 * 10 + o1; b = t2 * 10 + o2; }
+  return bin(L, lvl, a, op, b);
+}
+function regroup(L, lvl) {
+  const op = Math.random() < .5 ? '+' : '-'; let a, b;
+  if (op === '+') { const o1 = R(2, 9), o2 = R(10 - o1, 9); a = R(1, 6) * 10 + o1; b = R(1, 8 - Math.floor(a / 10)) * 10 + o2; }
+  else { const o1 = R(0, 8), o2 = R(o1 + 1, 9); a = R(3, 9) * 10 + o1; b = R(1, Math.floor(a / 10) - 1) * 10 + o2; }
+  return bin(L, lvl, a, op, b);
+}
+const MATH_DESC = ['', 'חיבור עד 10 בתמונות', 'חיבור וחיסור עד 20', 'מספר חסר, השוואה', 'דו-ספרתי בלי המרה, קבוצות', 'דו-ספרתי עם המרה', 'מספר חסר, כפל עד 5, חלוקה', 'לוח הכפל, שברים, בעיות מילוליות', 'תלת-ספרתי עגול, ערך המקום', 'תלת-ספרתי, עיגול, בעיות כפל/חילוק', 'דו-ספרתי × חד-ספרתי, חילוק', 'ארבע ספרות עגול, פירוק מספר', 'ארבע ספרות, עיגול, חלק ממספר', '×10/100/1000, תלת × חד', 'חמש ספרות, השוואה וערך מקום עד 6 ספרות', 'דו × דו, חילוק תלת-ספרתי', 'מאות אלפים, עיגול', 'סדר פעולות, שברים, בעיות רב-שלביות', 'טריקים: +999, ×25, מספר חסר גדול', 'כפל דו×דו, חילוק 4 ספרות, 6 ספרות', 'אלופים: ריבועים, כפל עגול גדול'];
+function genMath(lvl, L) {
+  switch (lvl) {
+    case 1: return mix(() => addPics(L, lvl), () => addPics(L, lvl), () => subPics(L, lvl));
+    case 2: return mix(() => addSub(L, lvl, 3, 15), () => { const a = R(6, 9), b = R(11 - a, 9); return bin(L, lvl, a, '+', b); }, () => { const a = R(11, 19), b = R(2, 9); return bin(L, lvl, a, '-', b); });
+    case 3: return mix(() => missing(L, lvl, 20), () => compare(L, lvl, 2), () => bin(L, lvl, R(2, 8) * 10 + R(5, 9), '+', R(3, 9)));
+    case 4: return mix(() => noRegroup(L, lvl), () => noRegroup(L, lvl), () => groups(L, lvl, 4, 5), () => missing(L, lvl, 30));
+    case 5: return mix(() => regroup(L, lvl), () => regroup(L, lvl), () => compare(L, lvl, 3), () => groups(L, lvl, 5, 5));
+    case 6: return mix(() => missing(L, lvl, 100), () => bin(L, lvl, R(2, 5), '*', R(2, 10)), () => share(L, lvl), () => regroup(L, lvl));
+    case 7: return mix(() => bin(L, lvl, R(2, 10), '*', R(2, 10)), () => fracPic(L, lvl), () => word(L, lvl, pick(['add', 'sub'])), () => missing(L, lvl, 100));
+    case 8: return mix(() => addSub(L, lvl, 100, 900, 10), () => placeValue(L, lvl, 3), () => compare(L, lvl, 4), () => bin(L, lvl, R(3, 10), '*', R(3, 10)));
+    case 9: return mix(() => addSub(L, lvl, 100, 999), () => rounding(L, lvl, 3, pick([1, 2])), () => word(L, lvl, pick(['mul', 'div'])), () => fracPic(L, lvl));
+    case 10: return mix(() => bin(L, lvl, R(12, 99), '*', R(2, 9)), () => { const b = R(2, 9), q = R(3, Math.floor(99 / b)); return bin(L, lvl, b * q, '/', b); }, () => missing(L, lvl, 100, 'x'), () => word(L, lvl, pick(['add', 'sub', 'mul', 'div'])));
+    case 11: return mix(() => addSub(L, lvl, 1000, 9000, 100), () => placeValue(L, lvl, 4), () => expanded(L, lvl, 4), () => addSub(L, lvl, 100, 999));
+    case 12: return mix(() => addSub(L, lvl, 1000, 9999, 1, { unitB: 10 }), () => rounding(L, lvl, 4, pick([2, 3])), () => fracOf(L, lvl, false), () => word(L, lvl, pick(['add', 'sub']), true));
+    case 13: return mix(() => bin(L, lvl, R(2, 999), '*', pick([10, 100, 1000])), () => { const u = pick([10, 100]); return bin(L, lvl, R(2, 999) * u, '/', u); }, () => bin(L, lvl, R(101, 999), '*', R(2, 9)), () => expanded(L, lvl, 5));
+    case 14: return mix(() => addSub(L, lvl, 10000, 99000, 1000), () => compare(L, lvl, pick([5, 6])), () => placeValue(L, lvl, 6), () => addSub(L, lvl, 1000, 9999));
+    case 15: return mix(() => bin(L, lvl, R(11, 99), '*', pick([10, 20, 30, 40, 50, 11, R(12, 19)])), () => { const b = R(2, 9), q = R(12, Math.floor(999 / b)); return bin(L, lvl, b * q, '/', b); }, () => word(L, lvl, pick(['mul', 'div', 'multi'])), () => missing(L, lvl, 1000));
+    case 16: return mix(() => addSub(L, lvl, 100000, 900000, 1000), () => addSub(L, lvl, 100000, 900000, 10000), () => rounding(L, lvl, pick([5, 6]), pick([3, 4, 5])), () => placeValue(L, lvl, 6));
+    case 17: return mix(() => orderOps(L, lvl), () => fracOf(L, lvl, true), () => word(L, lvl, pick(['multi', 'share']), true), () => addSub(L, lvl, 10000, 99999, 100));
+    case 18: return mix(() => { const a = R(10000, 999999); const t = pick([999, 998, 99, 9999, 1001]); return Math.random() < .5 ? bin(L, lvl, a, '+', t) : bin(L, lvl, a, '-', t); }, () => bin(L, lvl, R(2, 48), '*', pick([25, 50])),
+      () => { const b = rnd(1000, 9000, 100), c = rnd(1000, 9000, 100); return mathQ(L, lvl, { eq: `☐ − ${fmt(b)} = ${fmt(c)}`, ans: b + c, kind: 'missing', check: `?-${b}==${c}`, text: P(L, 'איזה מספר חסר?', 'What number is missing?'), say: P(L, `איזה מספר חסר? מאיזה מספר מורידים ${b} ומקבלים ${c}?`, `What number is missing? What number minus ${b} equals ${c}?`), hint: P(L, 'מחברים בחזרה:', 'Add it back:') + `\n${fmt(c)} + ${fmt(b)} = ${fmt(b + c)}` }); }, () => orderOps(L, lvl));
+    case 19: return mix(() => bin(L, lvl, R(12, 35), '*', R(12, 35)), () => { const b = R(2, 9), q = R(100, Math.floor(9999 / b)); return bin(L, lvl, b * q, '/', b); }, () => addSub(L, lvl, 100000, 999999, 1, { unitB: 100 }), () => fracOf(L, lvl, true));
+    default: return mix(() => { const n = R(11, 25); return bin(L, lvl, n, '*', n); }, () => bin(L, lvl, R(11, 99) * 10, '*', R(2, 9) * 10), () => word(L, lvl, pick(['multi', 'share', 'mul']), true), () => missing(L, lvl, 1000, 'x'), () => addSub(L, lvl, 100000, 999999));
+  }
+}
+
+/* ===== LOGIC ===== */
+const COLORS = ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠'], SHAPES = ['⭐', '🔺', '⬛', '⚪', '❤️', '🔷'], POKE = ['⚡', '🔥', '💧', '🍃', '❄️', '🌙'];
+const CATS = { animal: ['🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐸', '🐵', '🦁', '🐯', '🐮'], fruit: ['🍎', '🍌', '🍇', '🍓', '🍉', '🍐', '🍒', '🍍', '🥝', '🍑'], vehicle: ['🚗', '🚌', '🚲', '✈️', '🚂', '🚀', '🚁', '🚤', '🚜', '🛴'], ball: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐'], weather: ['☀️', '🌧️', '❄️', '⛈️', '🌈', '🌪️'], clothes: ['👕', '👖', '🧦', '🧢', '👟', '🧤', '👗'] };
+const CAT_NAME = { animal: 'חיות', fruit: 'פירות', vehicle: 'כלי תחבורה', ball: 'כדורים', weather: 'מזג אוויר', clothes: 'בגדים' };
+function seqQ(lvl, seq, miss, kind, extra, opts = {}) {
+  const ansV = seq[miss]; const isNum = typeof ansV === 'number';
+  const shown = seq.map((x, i) => i === miss ? '<span class="q">❓</span>' : `<span>${isNum ? fmt(x) : x}</span>`).join('');
+  const c = isNum ? mk(near(ansV, extra), { sort: true }) : mk([ansV, ...extra], {});
+  const last = miss === seq.length - 1;
+  return { track: 'logic', lang: 'he', text: last ? 'מה בא אחר כך?' : 'מה חסר בסדרה?', eq: '', vis: `<div class="seq ${isNum ? 'nums' : ''}${isNum && seq.map(x => fmt(x)).join('').length > 16 ? ' sm' : ''}">${shown}</div>`,
+    say: last ? (isNum ? 'מה המספר הבא בסדרה? ' + seq.slice(0, -1).join(', ') : 'מה בא אחר כך בסדרה?') : 'איזה מספר חסר בסדרה? ' + seq.map((x, i) => i === miss ? 'משהו' : x).join(', '),
+    choices: c.choices, ans: c.ans, hint: opts.hint, meta: { kind, seq: seq.slice(), miss, ...(opts.meta || {}) }, key: 'l' + kind + seq.join(',') + miss };
+}
+function cyc(lvl, alph, pat, len) {
+  const sym = shuffle(alph).slice(0, Math.max(...pat) + 1); const seq = Array.from({ length: len }, (_, i) => sym[pat[i % pat.length]]);
+  const others = sym.filter(s => s !== seq[len - 1]).concat(shuffle(alph.filter(a => !sym.includes(a))).slice(0, 2));
+  return seqQ(lvl, seq, len - 1, 'cycle', others, { meta: { period: pat.length }, hint: `החלק שחוזר הוא: ${seq.slice(0, pat.length).join(' ')} – ושוב מההתחלה.` });
+}
+function arith(lvl, start, step, len, miss) {
+  if (step < 0) start = Math.max(start, -step * len + R(0, 20));
+  const seq = Array.from({ length: len }, (_, i) => start + i * step);
+  miss = miss ?? len - 1;
+  return seqQ(lvl, seq, miss, 'arith', [seq[miss] + step, seq[miss] - 1, seq[miss] + 1], { hint: `בכל צעד ${step > 0 ? 'מוסיפים' : 'מורידים'} ${Math.abs(step)}.\n${seq.join(', ')}` });
+}
+function geo(lvl, start, r, len, miss) {
+  const seq = Array.from({ length: len }, (_, i) => start * r ** i); miss = miss ?? len - 1;
+  if (Math.random() < .3 && r === 2 && miss === len - 1) { seq.reverse(); return seqQ(lvl, seq, len - 1, 'geo', [seq[len - 2] - 2, seq[len - 1] + 1, seq[len - 1] * 2 + 1], { hint: `כל מספר הוא חצי מהקודם.\n${seq.join(', ')}` }); }
+  return seqQ(lvl, seq, miss, 'geo', [seq[miss] + (seq[1] - seq[0]), seq[miss] + r, seq[miss] - r], { hint: `כל מספר הוא פי ${r} מהקודם.\n${seq.join(', ')}` });
+}
+function oddCat(lvl) {
+  const cs = shuffle(Object.keys(CATS)); const main = shuffle(CATS[cs[0]]).slice(0, 3); const odd = pick(CATS[cs[1]].filter(x => !Object.values(CATS).some((v, i) => v.includes(x) && Object.keys(CATS)[i] === cs[0])));
+  const items = shuffle([...main, odd]);
+  return { track: 'logic', lang: 'he', text: 'מי לא שייך לקבוצה?', eq: '', vis: '', say: 'מי לא שייך לקבוצה? איזה מהם שונה מכולם?', choices: items.map(v => ({ v, t: v })), ans: items.indexOf(odd),
+    hint: `שלושה הם ${CAT_NAME[cs[0]]}, ו-${odd} לא.`, meta: { kind: 'oddcat', items }, key: 'lo' + items.join('') };
+}
+const PROPS = { even: x => x % 2 === 0, odd: x => x % 2 === 1, mult5: x => x % 5 === 0, mult10: x => x % 10 === 0, mult3: x => x % 3 === 0, mult4: x => x % 4 === 0, twodig: x => x >= 10 && x < 100, big: x => x >= 100 };
+const PROP_NAME = { even: 'זוגיים', odd: 'אי-זוגיים', mult5: 'מתחלקים ב-5', mult10: 'עגולים (מתחלקים ב-10)', mult3: 'מתחלקים ב-3', mult4: 'מתחלקים ב-4' };
+function uniqueOutliers(items) { const out = new Set(); for (const p in PROPS) { const t = items.filter(PROPS[p]); if (t.length === 1) out.add(items.indexOf(t[0])); if (t.length === items.length - 1) out.add(items.findIndex(x => !PROPS[p](x))); } return out; }
+function oddNum(lvl, propsAllowed) {
+  for (let tries = 0; tries < 500; tries++) {
+    const p = pick(propsAllowed); const max = lvl > 10 ? 99 : 60;
+    const good = new Set(); while (good.size < 3) { const x = R(2, max); if (PROPS[p](x)) good.add(x); }
+    let bad; do { bad = R(2, max); } while (PROPS[p](bad) || good.has(bad));
+    const items = shuffle([...good, bad]); const out = uniqueOutliers(items);
+    if (out.size === 1 && out.has(items.indexOf(bad))) {
+      return { track: 'logic', lang: 'he', text: 'איזה מספר לא שייך?', eq: '', vis: '', say: 'איזה מספר לא שייך? שלושה מספרים דומים, ואחד שונה. ' + items.join(', '),
+        choices: items.map(v => ({ v, t: String(v) })), ans: items.indexOf(bad), hint: `שלושת האחרים ${PROP_NAME[p]}, ו-${bad} לא.`, meta: { kind: 'oddnum', items }, key: 'ln' + items.join(',') };
+    }
+  }
+  return oddCat(lvl);
+}
+function grow(lvl) {
+  const e = pick(SHAPES), s0 = R(1, 3), st = R(1, lvl > 8 ? 3 : 2); const n = 4; const seq = Array.from({ length: n }, (_, i) => s0 + i * st);
+  const q = seqQ(lvl, seq, n - 1, 'arith', [seq[n - 1] + 1, seq[n - 1] - 1, seq[n - 1] + st]);
+  q.vis = `<div class="seq">${seq.slice(0, n - 1).map(k => `<span style="font-size:.55em;max-width:30%">${e.repeat(k)}</span>`).join('')}<span class="q" style="font-size:.6em">❓</span></div>`;
+  q.text = 'כמה צורות יהיו בתמונה הבאה?'; q.say = 'הצורות גדלות. כמה צורות יהיו בתמונה הבאה?'; q.hint = `בכל פעם נוספות ${st}.\n${seq.join(', ')}`; q.key += 'g'; return q;
+}
+function fibQ(lvl, miss) { const s = [R(1, 9), R(1, 9)]; for (let i = 2; i < 7; i++) s.push(s[i - 1] + s[i - 2]); miss = miss ?? 6;
+  return seqQ(lvl, s, miss, 'fib', [s[miss] + 1, s[miss] - 1, (s[miss - 1] || 0) * 2], { hint: `כל מספר = סכום שני המספרים שלפניו.\n${s.join(', ')}` }); }
+function genLogic(lvl) {
+  switch (lvl) {
+    case 1: return cyc(lvl, pick([COLORS, POKE]), [0, 1], R(5, 7));
+    case 2: return cyc(lvl, pick([COLORS, SHAPES, POKE]), pick([[0, 1, 2], [0, 0, 1], [0, 1, 1]]), R(7, 8));
+    case 3: return mix(() => arith(lvl, R(1, 20), pick([1, 2]), 5), () => cyc(lvl, pick([SHAPES, POKE]), pick([[0, 1, 2], [0, 1, 1, 2], [0, 0, 1, 1]]), R(9, 10)));
+    case 4: return mix(() => oddCat(lvl), () => arith(lvl, R(1, 30), pick([2, 5, 10]), 5));
+    case 5: return mix(() => arith(lvl, R(1, 50), pick([2, 5, 10, -2, -5, -10]), 5), () => cyc(lvl, pick([COLORS, SHAPES]), pick([[0, 1, 2, 3], [0, 1, 0, 2], [0, 0, 1, 2]]), R(9, 11)));
+    case 6: return mix(() => grow(lvl), () => arith(lvl, R(1, 40), pick([3, 4, -3]), 5), () => oddCat(lvl));
+    case 7: return mix(() => oddNum(lvl, ['even', 'odd', 'mult5', 'mult10']), () => grow(lvl), () => arith(lvl, R(10, 100), pick([5, 10, 20, -10]), 5));
+    case 8: return mix(() => geo(lvl, R(1, 5), 2, 5), () => arith(lvl, R(1, 100), pick([3, 4, 6, -4]), 5), () => oddNum(lvl, ['even', 'odd', 'mult5']));
+    case 9: return mix(() => arith(lvl, R(1, 100), pick([6, 7, 8, 9, 11, 25, -6, -7]), 5), () => geo(lvl, R(1, 6), 2, 5), () => arith(lvl, R(1, 60), pick([3, 4, 5]), 5, R(1, 3)));
+    case 10: {
+      const d1 = R(1, 5), d2 = R(d1 + 1, 9) * (Math.random() < .25 ? -1 : 1); const s = [R(10, 30)]; for (let i = 1; i < 7; i++) s.push(s[i - 1] + (i % 2 ? d1 : d2));
+      if (s.some(x => x < 0)) return genLogic(9);
+      return seqQ(lvl, s, 6, 'alt', [s[5] + d1, s[6] + 1, s[6] - 1, s[5] + d2], { hint: `שני כללים לסירוגין: +${d1}, ואז ${d2 > 0 ? '+' : ''}${d2}.\n${s.join(', ')}` });
+    }
+    case 11: return mix(() => geo(lvl, R(1, 3), 3, 5), () => geo(lvl, R(1, 9), 10, 4), () => { const s = [R(1, 10)]; const d0 = R(1, 3); for (let i = 1; i < 6; i++) s.push(s[i - 1] + d0 + i - 1);
+      return seqQ(lvl, s, 5, 'diff2', [s[5] + 1, s[5] - 1, s[4] + (s[4] - s[3])], { meta: { d2: 1 }, hint: `ההפרש גדל ב-1 בכל צעד.\n${s.join(', ')}` }); }, () => oddNum(lvl, ['mult3', 'mult4', 'mult5', 'even']));
+    case 12: return mix(() => fibQ(lvl), () => fibQ(lvl, R(4, 6)));
+    case 13: return mix(() => { const k = R(1, 6); const s = Array.from({ length: 5 }, (_, i) => (k + i) ** 2); return seqQ(lvl, s, 4, 'square', [s[4] + 1, s[4] - 1, s[3] + (s[3] - s[2])], { hint: `מספר כפול עצמו: ${s.map((x, i) => `${k + i}×${k + i}`).join(', ')}` }); },
+      () => { const s = [R(1, 10)]; const d0 = 2 * R(1, 2); for (let i = 1; i < 6; i++) s.push(s[i - 1] + d0 + 2 * (i - 1)); return seqQ(lvl, s, 5, 'diff2', [s[5] + 2, s[5] - 2, s[4] + (s[4] - s[3])], { meta: { d2: 2 }, hint: `ההפרש גדל ב-2 בכל צעד.\n${s.join(', ')}` }); },
+      () => fibQ(lvl, R(3, 5)));
+    case 14: { const m = pick([2, 3]), c = pick([1, -1, 2, -2, 3]); const s = [R(2, m === 2 ? 9 : 5)]; for (let i = 1; i < 5; i++) s.push(s[i - 1] * m + c);
+      return seqQ(lvl, s, 4, 'lin2', [s[3] * m, s[3] * m - c, s[4] + 1], { hint: `כפול ${m}, ואז ${c > 0 ? 'ועוד' : 'פחות'} ${Math.abs(c)}.\n${s.join(', ')}` }); }
+    default: return mix(() => {
+      const m = R(2, 5), c = R(-1, 5); const xs = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).slice(0, 4); const ys = xs.map(x => m * x + c);
+      const ansV = ys[3]; const cc = mk(near(ansV, [m * xs[3], xs[3] + c + m, ansV + m]), { sort: true });
+      return { track: 'logic', lang: 'he', text: 'מכונת מספרים: מה יוצא?', eq: '', vis: `<div class="seq nums">${xs.map((x, i) => `<span>${x} ➜ ${i < 3 ? ys[i] : '❓'}</span>`).join('')}</div>`,
+        say: 'מכונת מספרים. ' + xs.slice(0, 3).map((x, i) => `נכנס ${x}, יוצא ${ys[i]}`).join('. ') + `. נכנס ${xs[3]}, מה יוצא?`, choices: cc.choices, ans: cc.ans,
+        hint: `הכלל: כפול ${m}${c ? (c > 0 ? ' ועוד ' : ' פחות ') + Math.abs(c) : ''}.\n${xs[3]} ➜ ${ansV}`, meta: { kind: 'map', xs, ys }, key: 'lm' + xs.join(',') + ys.join(',') };
+    }, () => arith(lvl, R(50, 300), pick([-7, -8, 9, 12, 15, 25, -25]), 6, R(1, 4)), () => geo(lvl, R(1, 4), pick([2, 3]), 6, R(2, 4)), () => genLogic(R(12, 14)));
+  }
+}
+/* ===== SPATIAL ===== */
+const norm = cs => { const mx = Math.min(...cs.map(c => c[0])), my = Math.min(...cs.map(c => c[1])); return cs.map(([x, y]) => [x - mx, y - my]).sort((a, b) => a[0] - b[0] || a[1] - b[1]); };
+const key = cs => norm(cs).map(c => c.join(',')).join(';');
+const rot = cs => norm(cs.map(([x, y]) => [-y, x]));
+const mir = cs => norm(cs.map(([x, y]) => [-x, y]));
+const rots = cs => { const r = [norm(cs)]; for (let i = 0; i < 3; i++) r.push(rot(r[r.length - 1])); return r; };
+const sameRot = (a, b) => rots(a).some(r => key(r) === key(b));
+const sameAny = (a, b) => sameRot(a, b) || sameRot(mir(a), b);
+const uniqBy = arr => arr.filter((x, i, a) => a.findIndex(y => key(y) === key(x)) === i);
+function poly(n) {
+  for (;;) {
+    const cs = [[0, 0]]; const has = (x, y) => cs.some(c => c[0] === x && c[1] === y);
+    while (cs.length < n) { const [x, y] = pick(cs); const [dx, dy] = pick([[1, 0], [-1, 0], [0, 1], [0, -1]]); if (!has(x + dx, y + dy)) cs.push([x + dx, y + dy]); }
+    const N = norm(cs); const w = Math.max(...N.map(c => c[0])), h = Math.max(...N.map(c => c[1])); if (w <= 3 && h <= 3) return N;
+  }
+}
+const chiral = cs => !sameRot(cs, mir(cs));
+const dec = s => s.split(';').map(p => p.split(',').map(Number));
+function polySVG(cs, col = '#ffd83a', sz = 30, extra = '') {
+  const N = norm(cs); const w = Math.max(...N.map(c => c[0])) + 1, h = Math.max(...N.map(c => c[1])) + 1;
+  return `<svg viewBox="-4 -4 ${w * sz + 8} ${h * sz + 8}" width="${w * sz + 8}" height="${h * sz + 8}">${N.map(([x, y]) => `<rect x="${x * sz}" y="${y * sz}" width="${sz}" height="${sz}" rx="4" fill="${col}" stroke="#5a3b00" stroke-width="3"/>`).join('')}${extra}</svg>`;
+}
+const PCOL = ['#ffd83a', '#ff8a65', '#4fc3f7', '#aed581', '#ce93d8'];
+function shapeQ(kind, lvl, base, ansCs, distract, text, say, hint, vis, col) {
+  const c = mk([key(ansCs), ...distract.map(key)], { label: v => polySVG(dec(v), col, 26) });
+  return { track: 'spatial', lang: 'he', text, eq: '', vis, say, choices: c.choices, ans: c.ans, hint, meta: { kind, shape: key(base) }, key: 's' + kind + key(base) };
+}
+function otherShapes(n, k, base, bad) { const out = []; let g = 0; while (out.length < k && g++ < 600) { const p = poly(g < 150 ? n : n + pick([1, -1].filter(x => n + x >= 2))); if (!bad(p, base) && !out.some(o => sameAny(o, p))) out.push(p); } return out; }
+function sSame(lvl) {
+  const n = R(3, 4), b = poly(n), col = pick(PCOL);
+  const d = otherShapes(n, 3, b, (p, base) => sameAny(p, base));
+  return shapeQ('same', lvl, b, b, d, 'איזו צורה זהה בדיוק?', 'איזו צורה זהה בדיוק לצורה למעלה?', 'מחפשים צורה עם אותו מספר משבצות, באותו סידור.', polySVG(b, col), col);
+}
+function sRot(lvl, n, mirrorDistract) {
+  let b; do { b = poly(n); } while (!chiral(b) || uniqBy(rots(b)).length < 2);
+  const col = pick(PCOL);
+  const rr = rots(b).slice(1).filter(x => key(x) !== key(b)); const ansCs = pick(rr);
+  let d = [];
+  if (mirrorDistract) d = shuffle(uniqBy(rots(mir(b)))).slice(0, 2);
+  d = d.concat(otherShapes(n, 3 - d.length, b, (p, base) => sameAny(p, base)));
+  return shapeQ('rot', lvl, b, ansCs, d, 'איזו צורה היא אותה צורה – רק מסובבת?', 'איזו צורה היא אותה צורה, רק מסובבת? מותר לסובב, אסור להפוך.',
+    mirrorDistract ? 'זהירות: חלק מהצורות הן תמונת מראה (הפוכות) – הן לא אותה צורה! מסובבים בראש רבע סיבוב בכל פעם.' : 'מסובבים את הצורה בראש: רבע סיבוב בכל פעם.', polySVG(b, col) + '<div style="font-size:.7em">🔄</div>', col);
+}
+function sMirror(lvl, n) {
+  let b; do { b = poly(n); } while (key(mir(b)) === key(b)); const col = pick(PCOL); const m = mir(b);
+  const cand = uniqBy([b, norm(b.map(([x, y]) => [x, -y])), ...rots(m).slice(1), ...rots(b).slice(1)]).filter(x => key(x) !== key(m));
+  const d = shuffle(cand).slice(0, 3);
+  const N = norm(b); const w = Math.max(...N.map(c => c[0])) + 1, h = Math.max(...N.map(c => c[1])) + 1;
+  const line = `<line x1="${w * 30 + 4}" y1="-4" x2="${w * 30 + 4}" y2="${h * 30 + 4}" stroke="#3b4cca" stroke-width="4" stroke-dasharray="6 5"/>`;
+  const svg = polySVG(b, col, 30, line).replace(/viewBox="-4 -4 (\d+)/, (m0, W) => `viewBox="-4 -4 ${+W + 6}`).replace(/width="(\d+)"/, (m0, W) => `width="${+W + 6}"`);
+  return shapeQ('mirror', lvl, b, m, d, 'איך הצורה תיראה במראה?', 'הקו הכחול הוא מראה. איך הצורה תיראה במראה?', 'במראה ימין ושמאל מתחלפים: מה שהיה קרוב למראה נשאר קרוב אליה.', `<div>${svg} 🪞</div>`, col);
+}
+function sFit(lvl, W, n, rotate) {
+  for (let g = 0; g < 300; g++) {
+    const N = poly(n); const pw = Math.max(...N.map(c => c[0])) + 1, ph = Math.max(...N.map(c => c[1])) + 1;
+    if (pw > W || ph > W) continue; const ox = R(0, W - pw), oy = R(0, W - ph);
+    const holeSet = new Set(N.map(([x, y]) => (x + ox) + ',' + (y + oy)));
+    const sz = 30; let svg = `<svg viewBox="-4 -4 ${W * sz + 8} ${W * sz + 8}" width="${W * sz + 8}" height="${W * sz + 8}">`;
+    for (let x = 0; x < W; x++) for (let y = 0; y < W; y++) { const isH = holeSet.has(x + ',' + y); svg += `<rect x="${x * sz}" y="${y * sz}" width="${sz}" height="${sz}" rx="3" fill="${isH ? '#fff' : '#7986cb'}" stroke="${isH ? '#e53935' : '#3949ab'}" stroke-width="${isH ? 2 : 3}" ${isH ? 'stroke-dasharray="4 3"' : ''}/>`; }
+    svg += '</svg>';
+    const shown = rotate ? pick(uniqBy(rots(N)).filter(x => key(x) !== key(N)).concat(uniqBy(rots(N)).length === 1 ? [N] : [])) : N; const col = pick(PCOL);
+    const d = otherShapes(n, 3, N, (p, base) => sameAny(p, base));
+    if (d.length < 3) continue;
+    const q = shapeQ('fit', lvl, N, shown, d, 'איזה חלק משלים את החור?', rotate ? 'איזה חלק ימלא בדיוק את החור הלבן? אפשר לסובב את החלק.' : 'איזה חלק ימלא בדיוק את החור הלבן?',
+      'סופרים את המשבצות בחור ומסתכלים על הצורה שלו' + (rotate ? ', ומסובבים בראש.' : '.'), svg, col);
+    q.meta.rotate = rotate; q.key += ox + '' + oy; return q;
+  }
+}
+function isoSVG(H) {
+  const a = 22, c30 = 0.866; const cubes = [];
+  H.forEach((row, j) => row.forEach((h, i) => { for (let k = 0; k < h; k++) cubes.push([i, j, k]); }));
+  cubes.sort((p, q) => (p[0] + p[1] + p[2]) - (q[0] + q[1] + q[2]) || p[2] - q[2]);
+  const pr = (x, y, z) => [(x - y) * a * c30, (x + y) * a * .5 - z * a];
+  const pts = []; let s = '';
+  const face = (ps, f) => { ps.forEach(p => pts.push(p)); s += `<polygon points="${ps.map(p => p.map(v => v.toFixed(1)).join(',')).join(' ')}" fill="${f}" stroke="#3e2723" stroke-width="2" stroke-linejoin="round"/>`; };
+  for (const [i, j, k] of cubes) {
+    face([pr(i, j, k + 1), pr(i + 1, j, k + 1), pr(i + 1, j + 1, k + 1), pr(i, j + 1, k + 1)], '#ffe066');
+    face([pr(i + 1, j, k), pr(i + 1, j + 1, k), pr(i + 1, j + 1, k + 1), pr(i + 1, j, k + 1)], '#f4a300');
+    face([pr(i, j + 1, k), pr(i + 1, j + 1, k), pr(i + 1, j + 1, k + 1), pr(i, j + 1, k + 1)], '#ffc61a');
+  }
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); const x0 = Math.min(...xs) - 4, y0 = Math.min(...ys) - 4, w = Math.max(...xs) - x0 + 4, h = Math.max(...ys) - y0 + 4;
+  return `<svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" width="${Math.min(280, w * 1.6).toFixed(0)}">${s}</svg>`;
+}
+function sCubes(lvl, rows, cols, maxH) {
+  const H = Array.from({ length: rows }, () => Array.from({ length: cols }, () => R(1, maxH)));
+  // towers never get taller toward the viewer, so every tower top is visible
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) { if (i > 0) H[j][i] = Math.min(H[j][i], H[j][i - 1]); if (j > 0) H[j][i] = Math.min(H[j][i], H[j - 1][i]); }
+  const total = H.flat().reduce((a, b) => a + b, 0); if (total < 3) return sCubes(lvl, rows, cols, maxH);
+  const tops = H.flat().length; const c = mk(near(total, [total - 1, total + 1, tops + rows + cols, total + 2]), { sort: true });
+  return { track: 'spatial', lang: 'he', text: 'כמה קוביות יש בבניין?', eq: '', vis: isoSVG(H), say: 'כמה קוביות יש בבניין? זכרו שיש קוביות מוסתרות מאחור ומתחת.', choices: c.choices, ans: c.ans,
+    hint: 'סופרים כל מגדל מלמעלה עד הרצפה – גם קוביות שמסתתרות מתחת.' + '\n' + H.flat().join(' + ') + ' = ' + total, meta: { kind: 'cubes', H }, key: 'sc' + JSON.stringify(H) };
+}
+function genSpatial(lvl) {
+  switch (lvl) {
+    case 1: return sSame(lvl);
+    case 2: return mix(() => sRot(lvl, 4, false), () => sSame(lvl));
+    case 3: return mix(() => sMirror(lvl, 4), () => sRot(lvl, 4, false));
+    case 4: return mix(() => sCubes(lvl, 1, R(2, 4), 3), () => sMirror(lvl, 4));
+    case 5: return mix(() => sFit(lvl, 3, 3, false), () => sCubes(lvl, 1, 4, 3));
+    case 6: return mix(() => sRot(lvl, 5, true), () => sFit(lvl, 3, 4, false));
+    case 7: return mix(() => sCubes(lvl, 2, 2, 3), () => sRot(lvl, 5, true));
+    case 8: return mix(() => sMirror(lvl, 5), () => sCubes(lvl, 2, 2, 4));
+    case 9: return mix(() => sFit(lvl, 4, 4, true), () => sRot(lvl, 5, true));
+    case 10: return mix(() => sCubes(lvl, 2, 3, 4), () => sFit(lvl, 4, 5, true));
+    case 11: return mix(() => sRot(lvl, 6, true), () => sMirror(lvl, 6), () => sCubes(lvl, 3, 3, 3));
+    default: return mix(() => sCubes(lvl, 3, 3, 4), () => sFit(lvl, 4, 5, true), () => sRot(lvl, 6, true), () => sCubes(lvl, 3, 4, 4));
+  }
+}
+
+/* ===== READING ===== */
+const LETTERS = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+const LNAME = { 'א': 'אָלֶף', 'ב': 'בֵּית', 'ג': 'גִּימֶל', 'ד': 'דָּלֶת', 'ה': 'הֵא', 'ו': 'וָו', 'ז': 'זַיִן', 'ח': 'חֵית', 'ט': 'טֵית', 'י': 'יוּד', 'כ': 'כַּף', 'ל': 'לָמֶד', 'מ': 'מֵם', 'נ': 'נוּן', 'ס': 'סָמֶךְ', 'ע': 'עַיִן', 'פ': 'פֵּא', 'צ': 'צָדִי', 'ק': 'קוּף', 'ר': 'רֵישׁ', 'ש': 'שִׁין', 'ת': 'תָּו' };
+const LOOK = [['ב', 'כ', 'פ'], ['ד', 'ר'], ['ו', 'ז'], ['ח', 'ה', 'ת'], ['ס', 'ט', 'מ'], ['ע', 'צ'], ['ג', 'נ']];
+const SOUND = [['א', 'ע', 'ה'], ['כ', 'ק', 'ח'], ['ת', 'ט'], ['ס', 'ש'], ['ב', 'ו'], ['צ', 'ז']];
+const WS = [['דָּג', '🐟'], ['סוּס', '🐴'], ['יָד', '✋'], ['לֵב', '❤️'], ['עֵץ', '🌳'], ['צָב', '🐢'], ['הַר', '⛰️'], ['יָם', '🌊'], ['פִּיל', '🐘'], ['דֹּב', '🐻'], ['קוֹף', '🐒'], ['נֵר', '🕯️']];
+const WM = [['כֶּלֶב', '🐶'], ['חָתוּל', '🐱'], ['שֶׁמֶשׁ', '☀️'], ['יָרֵחַ', '🌙'], ['פֶּרַח', '🌸'], ['כַּדּוּר', '⚽'], ['סֵפֶר', '📖'], ['מָטוֹס', '✈️'], ['נָחָשׁ', '🐍'], ['אַרְיֵה', '🦁'], ['רֶגֶל', '🦵'], ['עַיִן', '👁️'], ['אֹזֶן', '👂'], ['גֶּשֶׁם', '🌧️'], ['כּוֹכָב', '⭐'], ['שָׁעוֹן', '⏰'], ['כּוֹבַע', '🧢'], ['נַעַל', '👟'], ['חָלָב', '🥛'], ['לֶחֶם', '🍞'], ['גֶּזֶר', '🥕'], ['עוּגָה', '🎂'], ['בַּיִת', '🏠'], ['שׁוּעָל', '🦊']];
+const WL = [['תַּפּוּחַ', '🍎'], ['בָּנָנָה', '🍌'], ['מְכוֹנִית', '🚗'], ['אֳנִיָּה', '🚢'], ['מַפְתֵּחַ', '🔑'], ['גְּבִינָה', '🧀'], ['בֵּיצָה', '🥚'], ['דְּבוֹרָה', '🐝'], ['פַּרְפַּר', '🦋'], ['צְפַרְדֵּעַ', '🐸'], ['תַּרְנְגוֹל', '🐓'], ['עֲנָבִים', '🍇'], ['אֲבַטִּיחַ', '🍉'], ['אוֹפַנַּיִם', '🚲'], ['רַכֶּבֶת', '🚂'], ['מַטְרִיָּה', '☂️'], ['שׁוֹקוֹלָד', '🍫']];
+const WALL = [...WS, ...WM, ...WL];
+const EMO = Object.fromEntries(WALL);
+const plain = w => w.replace(/[\u0591-\u05C7]/g, '');
+const first = w => plain(w)[0];
+function syl1(w) { let i = 1; while (i < w.length && /[\u0591-\u05C7]/.test(w[i])) i++; if (w[i] === 'ו' && /[\u05B9\u05BC]/.test(w[i + 1] || '')) i += 2; return w.slice(0, i); }
+function rq(lvl, text, vis, say, c, hint, meta, k) { return { track: 'read', lang: 'he', text, eq: '', vis, say, choices: c.choices, ans: c.ans, hint, meta, key: 'r' + k }; }
+const letterChoices = c => { c.choices.forEach(ch => { ch.say = null; ch.rtl = true; }); return c; };
+function rLetter(lvl, set, look) {
+  const L0 = pick(set); let d = look ? (LOOK.find(g => g.includes(L0)) || []).filter(x => x !== L0) : [];
+  d = d.concat(shuffle(set.filter(x => x !== L0 && !d.includes(x)))).slice(0, 3);
+  const c = letterChoices(mk([L0, ...d], {}));
+  return rq(lvl, 'איפה האות?', `<div style="font-size:.8em">🔊 ${LNAME[L0]}</div>`, `איפה האות ${LNAME[L0]}?`, c, `זו האות ${LNAME[L0]}:  ${L0}`, { kind: 'letter', target: L0 }, 'l' + L0);
+}
+function rFirst(lvl) {
+  const [w, e] = pick(WALL.filter(x => !'אעה'.includes(first(x[0])))); const f = first(w); const grp = SOUND.find(g => g.includes(f)) || [f];
+  const c = letterChoices(mk([f, ...shuffle(LETTERS.filter(x => !grp.includes(x)))], {}));
+  return rq(lvl, 'באיזו אות מתחילה המילה?', `<div>${e}</div>`, `באיזו אות מתחילה המילה ${w}?`, c, `${w} מתחילה באות ${LNAME[f]}:  ${f}`, { kind: 'first', word: w }, 'f' + w);
+}
+function rSyl(lvl) {
+  const [w, e] = pick(WALL); const s = syl1(w); const f = first(w); const grp = SOUND.find(g => g.includes(f)) || [f];
+  const pickD = []; for (const o of shuffle(WALL)) { if (pickD.length >= 3) break; const fo = first(o[0]); if (!grp.includes(fo) && fo !== f && !pickD.some(p => first(p[0]) === fo)) pickD.push(o); }
+  const c = mk([e, ...pickD.map(x => x[1])], {});
+  return rq(lvl, 'איזו תמונה מתחילה ב...', `<div class="qtext readq">${s}</div>`, 'קראו את ההברה. איזו תמונה מתחילה בצליל הזה?', c, `${s} – כמו בהתחלה של ${w} ${e}`, { kind: 'syl', word: w }, 's' + w);
+}
+function rWord(lvl, list, sameFirst) {
+  const [w, e] = pick(list); const pool = WALL.filter(x => x[0] !== w);
+  let d = sameFirst ? shuffle(pool.filter(x => first(x[0]) === first(w))).slice(0, 2) : []; d = d.concat(shuffle(pool.filter(x => !d.includes(x))));
+  const c = mk([e, ...d.map(x => x[1])], {});
+  return rq(lvl, 'קראו ובחרו תמונה', `<div class="qtext readq">${w}</div>`, 'קראו את המילה ובחרו את התמונה המתאימה.', c, `כתוב: ${w}  ${e}`, { kind: 'word', word: w }, 'w' + w);
+}
+const NAMES = [['דָּנִי', 'm'], ['עוֹמֶר', 'm'], ['אַבָּא', 'm'], ['נוֹעָה', 'f'], ['תָּמָר', 'f'], ['סָבְתָא', 'f']];
+const VERBS = [{ m: 'אָכַל', f: 'אָכְלָה', objs: ['תַּפּוּחַ', 'בָּנָנָה', 'עוּגָה', 'לֶחֶם', 'גְּבִינָה', 'גֶּזֶר', 'עֲנָבִים', 'אֲבַטִּיחַ', 'בֵּיצָה', 'שׁוֹקוֹלָד'] },
+  { m: 'רָאָה', f: 'רָאֲתָה', objs: ['כֶּלֶב', 'חָתוּל', 'סוּס', 'פִּיל', 'אַרְיֵה', 'דֹּב', 'צָב', 'קוֹף', 'צְפַרְדֵּעַ', 'פַּרְפַּר', 'דָּג', 'נָחָשׁ', 'שׁוּעָל', 'דְּבוֹרָה'] },
+  { m: 'מָצָא', f: 'מָצְאָה', objs: ['כַּדּוּר', 'סֵפֶר', 'מַפְתֵּחַ', 'שָׁעוֹן', 'כּוֹבַע', 'נַעַל', 'מַטְרִיָּה'] }];
+function rSentence(lvl, two) {
+  const v = pick(VERBS); const ns = shuffle(NAMES).slice(0, 2); const os = shuffle(v.objs).slice(0, 2);
+  const s1 = `${ns[0][0]} ${v[ns[0][1]]} ${os[0]}.`, s2 = `${ns[1][0]} ${v[ns[1][1]]} ${os[1]}.`;
+  const ask = two ? R(0, 1) : 0; const qn = ns[ask];
+  const q = `מָה ${v[qn[1]]} ${qn[0]}?`; const ansE = EMO[os[ask]];
+  const d = two ? [EMO[os[1 - ask]]] : []; const c = mk([ansE, ...d, ...shuffle(v.objs.filter(o => !os.includes(o))).map(o => EMO[o])].slice(0, 4), {});
+  const txt = two ? `${s1}<br>${s2}` : s1;
+  return rq(lvl, 'קראו ובחרו תמונה', `<div class="qtext readq" style="font-size:clamp(26px,7vw,40px)">${txt}<br><span style="color:#3b4cca">${q}</span></div>`, 'קראו את המשפט ואת השאלה, ובחרו את התמונה הנכונה.', c,
+    `${two ? s1 + ' ' + s2 : s1}\n${q}  ${os[ask]} ${ansE}`, { kind: 'sent', obj: os[ask], names: ns.map(n => n[0]), objs: os, ask }, 'n' + txt + ask);
+}
+function genRead(lvl) {
+  switch (lvl) {
+    case 1: return rLetter(lvl, 'אבדהלמשת'.split(''), false);
+    case 2: return rLetter(lvl, LETTERS, true);
+    case 3: return mix(() => rFirst(lvl), () => rLetter(lvl, LETTERS, true));
+    case 4: return mix(() => rSyl(lvl), () => rFirst(lvl));
+    case 5: return mix(() => rWord(lvl, WS, false), () => rSyl(lvl));
+    case 6: return rWord(lvl, [...WS, ...WM], false);
+    case 7: return rWord(lvl, WM, false);
+    case 8: return mix(() => rWord(lvl, WL, false), () => rWord(lvl, WM, true));
+    case 9: return mix(() => rWord(lvl, WALL, true), () => rSentence(lvl, false));
+    case 10: return rSentence(lvl, false);
+    case 11: return mix(() => rSentence(lvl, false), () => rSentence(lvl, true));
+    default: return rSentence(lvl, true);
+  }
+}
+/* ===== SCIENCE ===== */
+const SCI = [
+  [1, '🧊☀️', 'מה יקרה לקרח שנשאר בשמש?', [['💧', 'יימס למים'], ['🧊', 'יגדל'], ['🔥', 'יהפוך לאש']], 'החום של השמש ממיס את הקרח והוא הופך למים.'],
+  [1, '⚽✋', 'מה יקרה לכדור אם נעזוב אותו באוויר?', [['⬇️', 'ייפול למטה'], ['⬆️', 'יעוף למעלה'], ['⏸️', 'יישאר באוויר']], 'כוח המשיכה של כדור הארץ מושך הכל למטה.'],
+  [1, '🌱🚱', 'מה יקרה לעציץ שלא משקים אותו הרבה ימים?', [['🥀', 'ייבול'], ['🌳', 'יגדל מהר'], ['🌸', 'יפרח']], 'צמחים צריכים מים כדי לחיות.'],
+  [1, '🎈💨', 'מה יקרה לבלון אם נמשיך לנפח ולנפח?', [['💥', 'יתפוצץ'], ['🤏', 'יתכווץ'], ['🪨', 'יהפוך לאבן']], 'הגומי נמתח עד שהוא לא יכול יותר – ופוף!'],
+  [1, '🔵🟡', 'מה נקבל אם נערבב צבע כחול וצבע צהוב?', [['🟢', 'ירוק'], ['🔴', 'אדום'], ['🟣', 'סגול']], 'כחול וצהוב יחד יוצרים ירוק.'],
+  [1, '💧❄️', 'מה יקרה למים שנשים במקפיא?', [['🧊', 'יהפכו לקרח'], ['♨️', 'ירתחו'], ['🌈', 'יהפכו לקשת']], 'בקור חזק מים קופאים והופכים לקרח.'],
+  [2, '🔴🔵', 'מה נקבל אם נערבב אדום וכחול?', [['🟣', 'סגול'], ['🟢', 'ירוק'], ['🟡', 'צהוב']], 'אדום וכחול יחד יוצרים סגול.'],
+  [2, '🔴🟡', 'מה נקבל אם נערבב אדום וצהוב?', [['🟠', 'כתום'], ['🟣', 'סגול'], ['🔵', 'כחול']], 'אדום וצהוב יחד יוצרים כתום.'],
+  [2, '🍫☀️', 'מה יקרה לשוקולד שנשאר בשמש חמה?', [['🫠', 'יימס'], ['🧊', 'יתקשה כמו קרח'], ['🍫', 'לא ישתנה כלום']], 'חום ממיס שוקולד.'],
+  [2, '🚗👉', 'אם נדחוף מכונית צעצוע חזק יותר – מה יקרה?', [['🏁', 'תיסע רחוק יותר'], ['🐌', 'תיסע פחות'], ['🛑', 'לא תזוז']], 'דחיפה חזקה יותר נותנת יותר תנועה.'],
+  [2, '🌰💧☀️', 'מה יקרה לזרע שנשתול באדמה ונשקה?', [['🌱', 'יצמח צמח'], ['🪨', 'יהפוך לאבן'], ['🐛', 'יהפוך לתולעת']], 'זרע עם מים, אדמה ואור צומח לצמח.'],
+  [2, '🧍☀️', 'השמש מאחוריך. איפה יהיה הצל שלך?', [['⬅️', 'לפניי'], ['➡️', 'מאחוריי'], ['🚫', 'לא יהיה צל']], 'הצל תמיד בצד שמול מקור האור.'],
+  [3, '⚽📐', 'אם המגלשה תלולה יותר – איך יתגלגל הכדור?', [['🚀', 'מהר יותר'], ['🐢', 'לאט יותר'], ['🛑', 'לא יזוז']], 'במדרון תלול כוח המשיכה מאיץ את הכדור יותר.'],
+  [3, '🍲🔥', 'מה יקרה למים בסיר שמחממים הרבה זמן?', [['♨️', 'ירתחו ויהפכו לאדים'], ['🧊', 'יקפאו'], ['🟢', 'יהפכו לירוקים']], 'במאה מעלות מים רותחים והופכים לאדים.'],
+  [3, '🥤🧊☀️', 'כוס עם קרח ביום חם. מה נראה על הכוס מבחוץ?', [['💦', 'טיפות מים'], ['🔥', 'אש'], ['❄️', 'שלג']], 'האוויר החם מתקרר ליד הכוס, והאדים שבו הופכים לטיפות.'],
+  [3, '🗣️⛰️', 'מה קורה כשצועקים חזק בתוך מערה גדולה?', [['🔁', 'שומעים הד'], ['🤫', 'אין קול'], ['💡', 'נדלק אור']], 'הקול פוגע בקירות וחוזר אלינו – זה הד.'],
+  [3, '💧🛢️', 'שופכים שמן לכוס מים. איפה יהיה השמן?', [['⬆️', 'יצוף למעלה'], ['⬇️', 'ישקע למטה'], ['🔀', 'יתערבב לגמרי']], 'שמן קל יותר ממים ולא מתערבב איתם, לכן הוא צף.'],
+  [3, '🧲🧲', 'מקרבים שני מגנטים, צפון מול צפון. מה יקרה?', [['↔️', 'ידחפו זה את זה'], ['🤝', 'יידבקו'], ['😴', 'כלום']], 'קטבים זהים דוחים, קטבים שונים מושכים.'],
+  [4, '🌙🦘', 'על הירח כוח המשיכה חלש יותר. מה יקרה כשנקפוץ שם?', [['🚀', 'נקפוץ הרבה יותר גבוה'], ['🪨', 'לא נוכל לקפוץ'], ['🔁', 'אותו דבר כמו בבית']], 'הירח מושך אותנו פחות חזק, אז קופצים גבוה ולאט.'],
+  [4, '🔋💡✂️', 'נורה, סוללה וחוטים במעגל. חותכים חוט אחד. מה יקרה לנורה?', [['🌑', 'תיכבה'], ['💡', 'תאיר חזק יותר'], ['🎨', 'תשנה צבע']], 'החשמל צריך מסלול סגור. חוט חתוך – אין זרם.'],
+  [4, '🧂💧', 'שמים כפית מלח בכוס מים ומערבבים. מה יקרה למלח?', [['🫥', 'יתמוסס ולא נראה אותו'], ['⬆️', 'יצוף'], ['🧊', 'יהפוך לקרח']], 'המלח מתפרק לחלקיקים קטנים מאוד בתוך המים – הוא עדיין שם! (טעמו ותגלו)'],
+  [4, '🌱🚪🌑', 'שמים צמח בארון חשוך כמה ימים. מה יקרה לו?', [['🟨', 'יצהיב ויחלש'], ['🟩', 'יהיה ירוק יותר'], ['🌸', 'יפרח']], 'צמחים צריכים אור כדי להכין לעצמם מזון.'],
+  [4, '🔦🧸', 'מקרבים פנס לצעצוע. מה יקרה לצל של הצעצוע על הקיר?', [['🔍', 'הצל יגדל'], ['🤏', 'הצל יקטן'], ['🚫', 'הצל ייעלם']], 'ככל שהאור קרוב יותר, הצעצוע מסתיר יותר אור – והצל גדל.'],
+  [4, '🪨🪶🌌', 'במקום בלי אוויר מפילים אבן ונוצה יחד. מה יקרה?', [['🤝', 'יגיעו יחד'], ['🪨', 'האבן תגיע קודם'], ['🪶', 'הנוצה תגיע קודם']], 'בלי אוויר אין התנגדות – הכל נופל באותה מהירות! אסטרונאוט עשה את הניסוי הזה על הירח.'],
+  [4, '🧊🧥', 'עוטפים קוביית קרח במעיל חם. היא תימס מהר יותר או לאט יותר?', [['🐢', 'לאט יותר'], ['🚀', 'מהר יותר'], ['🔁', 'אותו דבר']], 'מעיל לא מייצר חום – הוא רק שומר. הוא שומר על הקור של הקרח מהאוויר החם!'],
+  [4, '🏃‍♂️💓', 'מה קורה ללב שלך כשאתה רץ מהר?', [['💓', 'דופק מהר יותר'], ['😴', 'דופק לאט יותר'], ['⏸️', 'מפסיק']], 'השרירים צריכים יותר חמצן, אז הלב מזרים דם מהר יותר.'],
+  [4, '🌈☀️🌧️', 'מתי רואים קשת בענן?', [['🌦️', 'כשיש שמש וגם טיפות גשם'], ['🌑', 'בלילה חשוך'], ['❄️', 'רק כשיורד שלג']], 'אור השמש עובר דרך טיפות המים ומתפצל לצבעים.'],
+  [5, '⚡🌩️', 'רואים ברק ורק אחר כך שומעים רעם. למה?', [['💡', 'האור מהיר יותר מהקול'], ['🔊', 'הקול מהיר יותר מהאור'], ['🎲', 'סתם במקרה']], 'האור מגיע כמעט מיד, והקול איטי הרבה יותר – לכן הרעם מאחר.'],
+  [5, '🌍🌞', 'למה בקיץ חם יותר מבחורף?', [['📐', 'כדור הארץ נוטה והשמש מאירה עלינו ישר יותר'], ['🔥', 'השמש נדלקת חזק יותר בקיץ'], ['☁️', 'בחורף אין שמש בכלל']], 'הציר של כדור הארץ נוטה: בקיץ קרני השמש מגיעות אלינו ישר יותר ולאורך יותר שעות.'],
+  [5, '🧲🌍', 'למה מחט של מצפן מצביעה תמיד לצפון?', [['🧲', 'כדור הארץ הוא כמו מגנט ענק'], ['🌬️', 'הרוח דוחפת אותה'], ['🪄', 'קסם']], 'לכדור הארץ יש שדה מגנטי, והמחט היא מגנט קטן שמסתדר לפיו.'],
+  [5, '🌍🔄', 'למה יש יום ולילה?', [['🔄', 'כדור הארץ מסתובב'], ['☀️', 'השמש נכבית בלילה'], ['☁️', 'עננים מסתירים את השמש']], 'כדור הארץ מסתובב סביב עצמו: הצד שמול השמש – יום, הצד השני – לילה.'],
+  [5, '🪨🌊', 'זורקים אבן לבריכה שקטה. מה נראה?', [['⭕', 'גלים במעגלים'], ['🟥', 'גלים מרובעים'], ['🚫', 'כלום']], 'האנרגיה מתפשטת לכל הכיוונים באותה מהירות – ולכן מעגלים.'],
+  [5, '🎈🔥', 'מחממים את האוויר בתוך כדור פורח. מה יקרה?', [['⬆️', 'הכדור יעלה'], ['⬇️', 'הכדור ירד'], ['💥', 'הכדור יתפוצץ']], 'אוויר חם קל יותר מאוויר קר, ולכן הוא עולה.'],
+  [5, '🥚🧂💧', 'ביצה שוקעת במים רגילים. מה יקרה לה במים עם הרבה מלח?', [['⬆️', 'היא תצוף'], ['⬇️', 'תשקע מהר יותר'], ['🐣', 'תבקע']], 'מים מלוחים כבדים יותר ודוחפים חזק יותר למעלה.'],
+  [5, '🚀🔇', 'בחלל אין אוויר. אסטרונאוט צועק בלי רדיו – החבר שלו ישמע?', [['🔇', 'לא ישמע'], ['🔊', 'ישמע חזק'], ['🔁', 'ישמע הד']], 'קול צריך אוויר (או חומר אחר) כדי לעבור.'],
+  [5, '🧪🫧', 'מערבבים חומץ עם סודה לשתייה. מה יקרה?', [['🫧', 'יבעבע ויעשה קצף'], ['🧊', 'יקפא'], ['💡', 'יאיר']], 'נוצר גז (פחמן דו-חמצני) – והבועות הן הגז!'],
+  [5, '🌞🌍🌙', 'למה הירח נראה כל לילה בצורה אחרת?', [['🌗', 'רואים חלק אחר מהצד המואר שלו'], ['✂️', 'הירח נשבר'], ['☁️', 'עננים אוכלים אותו']], 'השמש מאירה חצי מהירח, ואנחנו רואים כל לילה חלק אחר מהחצי המואר.']
+];
+const FLOAT = [['🪵', 'בול עץ', 1], ['🦆', 'ברווז גומי', 1], ['🍃', 'עלה', 1], ['🍎', 'תפוח', 1], ['🧽', 'ספוג', 1], ['🎈', 'בלון', 1], ['🪨', 'אבן', 0], ['🔑', 'מפתח', 0], ['🪙', 'מטבע', 0], ['🔩', 'בורג', 0], ['⚓', 'עוגן', 0], ['💍', 'טבעת', 0]];
+const MAG = [['🔩', 'בורג ברזל', 1], ['📎', 'אטב מתכת', 1], ['🧷', 'סיכת ביטחון', 1], ['🔧', 'מפתח ברגים', 1], ['✏️', 'עיפרון', 0], ['🍃', 'עלה', 0], ['📖', 'ספר', 0], ['🧶', 'כדור צמר', 0], ['🍌', 'בננה', 0], ['🪵', 'עץ', 0]];
+const sciLabel = v => `<span class="em">${v.split('|')[0]}</span><span class="tx">${v.split('|')[1]}</span>`;
+function sciQ(item) {
+  const [, vis, q, opts, why] = item; const c = mk(opts.map(o => o[0] + '|' + o[1]), { label: sciLabel, say: v => v.split('|')[1], rtl: true });
+  return { track: 'sci', lang: 'he', text: q, eq: '', vis: `<div>${vis}</div>`, say: q + ' ' + c.choices.map(x => x.say).join(', או ') + '?', choices: c.choices, ans: c.ans, hint: why + '\n' + opts[0][0] + ' ' + opts[0][1], meta: { kind: 'bank', correct: opts[0][1] }, key: 'c' + q };
+}
+function twoOpt(vals, right, kind, obj, text, vis, say, hint) {
+  const choices = vals.map(v => ({ v, t: sciLabel(v), say: v.split('|')[1], rtl: true }));
+  return { track: 'sci', lang: 'he', text, eq: '', vis, say, choices, ans: right, hint, meta: { kind, obj }, key: 'c' + kind + obj };
+}
+function sciFloat() {
+  const [e, n, f] = pick(FLOAT);
+  return twoOpt(['🛟|צף', '⬇️|שוקע'], f ? 0 : 1, 'float', n, `${n} במים: צף או שוקע?`, `<div>${e} ➜ 🌊</div>`, `מה יקרה ל${n} במים? יצוף או ישקע?`,
+    f ? `${n} קל ביחס לגודל שלו (יש בו אוויר או עץ), לכן הוא צף.` : `${n} כבד ודחוס ביחס לגודל שלו, לכן הוא שוקע.`);
+}
+function sciMag() {
+  const [e, n, f] = pick(MAG);
+  return twoOpt(['🧲|נמשך למגנט', '🚫|לא נמשך'], f ? 0 : 1, 'mag', n, `האם המגנט ימשוך ${n}?`, `<div>🧲 ➜ ${e}</div>`, `האם המגנט ימשוך ${n}? נמשך, או לא נמשך?`,
+    f ? `${n} עשוי ברזל או פלדה – ומגנט מושך ברזל.` : `${n} לא עשוי ברזל, לכן המגנט לא מושך אותו.`);
+}
+function genSci(lvl) {
+  const tier = Math.min(5, Math.ceil(lvl / 2)); const bank = SCI.filter(x => x[0] <= tier && x[0] >= tier - 1);
+  if (tier <= 3 && Math.random() < .3) return Math.random() < .5 ? sciFloat() : sciMag();
+  return sciQ(pick(bank));
+}
+
+/* ===== ENGLISH ===== */
+const EN = { animal: [['cat', '🐱'], ['dog', '🐶'], ['fish', '🐟'], ['bird', '🐦'], ['cow', '🐄'], ['horse', '🐴'], ['pig', '🐷'], ['lion', '🦁'], ['monkey', '🐒'], ['elephant', '🐘'], ['frog', '🐸'], ['rabbit', '🐰'], ['bear', '🐻'], ['duck', '🦆']],
+  color: [['red', '🔴'], ['blue', '🔵'], ['green', '🟢'], ['yellow', '🟡'], ['purple', '🟣'], ['orange', '🟠'], ['black', '⚫'], ['white', '⚪'], ['brown', '🟤']],
+  food: [['apple', '🍎'], ['banana', '🍌'], ['bread', '🍞'], ['milk', '🥛'], ['egg', '🥚'], ['cheese', '🧀'], ['cake', '🎂'], ['pizza', '🍕'], ['grapes', '🍇'], ['carrot', '🥕']],
+  thing: [['ball', '⚽'], ['book', '📖'], ['car', '🚗'], ['house', '🏠'], ['tree', '🌳'], ['sun', '☀️'], ['moon', '🌙'], ['star', '⭐'], ['hat', '🎩'], ['shoe', '👟'], ['key', '🔑'], ['clock', '⏰'], ['chair', '🪑'], ['bed', '🛏️']],
+  body: [['hand', '✋'], ['eye', '👁️'], ['ear', '👂'], ['nose', '👃'], ['foot', '🦶'], ['mouth', '👄']] };
+const COLOR_OF = [['banana', '🍌', 'yellow'], ['apple', '🍎', 'red'], ['frog', '🐸', 'green'], ['carrot', '🥕', 'orange'], ['grapes', '🍇', 'purple'], ['milk', '🥛', 'white'], ['bear', '🐻', 'brown'], ['sea', '🌊', 'blue'], ['strawberry', '🍓', 'red'], ['leaf', '🍃', 'green'], ['sun', '☀️', 'yellow']];
+const EN_ALL = Object.values(EN).flat();
+function eQ(text, vis, say, c, hint, meta, k) { return { track: 'eng', lang: 'en', text, eq: '', vis, say, choices: c.choices, ans: c.ans, hint, meta, key: 'e' + k }; }
+function eHear(lvl, cats, sameCat, n) {
+  const cat = pick(cats); const [w, e] = pick(EN[cat]); const pool = sameCat ? EN[cat] : cats.flatMap(c => EN[c]);
+  const c = mk([e, ...shuffle(pool.filter(x => x[0] !== w)).map(x => x[1])], { n: n || 4 });
+  return eQ('Listen and find! 👂', '<div style="font-size:.8em">🔊</div>', `Where is the ${w}?`, c, `${w} = ${e}`, { kind: 'hear', w }, 'h' + w);
+}
+function eRead(lvl, cats, sameCat) {
+  const cat = pick(cats); const [w, e] = pick(EN[cat]); const pool = sameCat ? EN[cat] : cats.flatMap(c => EN[c]);
+  const c = mk([w, ...shuffle(pool.filter(x => x[0] !== w)).map(x => x[0])], { label: v => v, say: v => v });
+  return eQ('What is this?', `<div>${e}</div>`, 'What is this?', c, `${e} = ${w}`, { kind: 'read', e }, 'r' + w);
+}
+function eColor() {
+  const [w, e, col] = pick(COLOR_OF); const c = mk([EN.color.find(x => x[0] === col)[1], ...shuffle(EN.color.filter(x => x[0] !== col)).map(x => x[1])], { say: v => EN.color.find(x => x[1] === v)[0] });
+  return eQ(`What color is the ${w}?`, `<div>${e}</div>`, `What color is the ${w}?`, c, `The ${w} is ${col}.`, { kind: 'color', w, col }, 'c' + w);
+}
+function eNum(lvl, max, read) {
+  const n = R(1, max); const vals = near(n, [n + 10, n - 10]).filter(x => x > 0 && x <= 100);
+  const c = read ? mk(vals, { label: numWord, say: numWord }) : mk(vals, { sort: true });
+  return eQ(read ? 'Which word is this number?' : 'Find the number! 👂', read ? `<div class="eq" style="font-size:1.4em">${n}</div>` : '<div style="font-size:.8em">🔊</div>', read ? 'Which word is this number?' : `Where is the number ${numWord(n)}?`, c,
+    `${n} = ${numWord(n)}`, { kind: 'num', n }, 'n' + n + read);
+}
+function genEng(lvl) {
+  switch (lvl) {
+    case 1: return eHear(lvl, ['animal'], false, 3);
+    case 2: return mix(() => eHear(lvl, ['animal', 'color'], false), () => eNum(lvl, 10, false));
+    case 3: return eHear(lvl, ['food', 'thing'], false);
+    case 4: return mix(() => eHear(lvl, Object.keys(EN), false), () => eNum(lvl, 20, false));
+    case 5: return eHear(lvl, Object.keys(EN), true);
+    case 6: return mix(() => eNum(lvl, 100, false), () => eHear(lvl, Object.keys(EN), true), () => eColor());
+    case 7: return mix(() => eRead(lvl, ['animal', 'thing'], false), () => eColor());
+    case 8: return mix(() => eRead(lvl, Object.keys(EN), true), () => eNum(lvl, 20, true));
+    case 9: return mix(() => eColor(), () => eRead(lvl, Object.keys(EN), true));
+    default: return mix(() => eNum(lvl, 100, true), () => eRead(lvl, Object.keys(EN), true), () => eColor());
+  }
+}
+/* ===== APP ===== */
+const TR = {
+  math: { name: 'חשבון', icon: '🔢', max: 20, start: 5 },
+  logic: { name: 'דפוסים והיגיון', icon: '🧩', max: 15, start: 3 },
+  spatial: { name: 'חשיבה מרחבית', icon: '🧊', max: 12, start: 2 },
+  read: { name: 'קריאה', icon: '📖', max: 12, start: 1 },
+  sci: { name: 'מדע', icon: '🔬', max: 10, start: 2 },
+  eng: { name: 'English', icon: '🇬🇧', max: 10, start: 1 }
+};
+const SKEY = 'omerBrain';
+const GEN = { math: l => genMath(l, S.lang), logic: genLogic, spatial: genSpatial, read: genRead, sci: genSci, eng: genEng };
+const clampL = (t, l) => Math.max(1, Math.min(TR[t].max, l | 0 || TR[t].start));
+function fresh() { return { stars: 0, lang: 'he', autoRead: true, t: {} }; }
+function load() {
+  let s = null; try { s = JSON.parse(localStorage.getItem(SKEY)); } catch (e) {}
+  s = Object.assign(fresh(), s || {}); s.stars |= 0;
+  for (const t in TR) { const d = s.t[t] || {}; s.t[t] = { lvl: clampL(t, d.lvl), ok: d.ok | 0, tot: d.tot | 0, streak: d.streak | 0, wrong: d.wrong | 0, best: Math.max(d.best | 0, clampL(t, d.lvl)) }; }
+  return s;
+}
+let S = load();
+const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) {} };
+
+/* speech */
+let voices = [];
+const loadVoices = () => { try { voices = speechSynthesis.getVoices() || []; } catch (e) {} };
+if (window.speechSynthesis) { loadVoices(); try { speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {} }
+function speak(text, lang = 'he', queue = false) {
+  if (!window.speechSynthesis || !text || !window.SpeechSynthesisUtterance) return;
+  try {
+    if (!queue) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text).replace(/<[^>]+>/g, ' ').replace(/[☐❓]/g, ' '));
+    u.lang = lang === 'en' ? 'en-US' : 'he-IL';
+    const want = lang === 'en' ? ['en-us', 'en'] : ['he', 'iw'];
+    const v = voices.find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith(want[0])) || voices.find(v => v.lang && v.lang.toLowerCase().startsWith(want[1]));
+    if (v) u.voice = v;
+    u.rate = lang === 'en' ? 0.9 : 0.95; u.pitch = 1.1;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+/* bidi-safe hint lines: math runs stay left-to-right inside Hebrew text */
+const MATHRUN = /(\(?\d+(?:[,.]\d+)*\)?(?:\s*(?:[+\-−×÷=<>:➜]|,)\s*\(?(?:\d+(?:[,.]\d+)*|☐|\?)\)?)+)/g;
+function hintHTML(h) {
+  return String(h || '').split('\n').map(line => /[\u05D0-\u05EA]/.test(line) ? `<div>${line.replace(MATHRUN, m => `<span class="ltrm">${m}</span>`)}</div>` : `<div dir="ltr">${line}</div>`).join('');
+}
+const isEmo = t => /^\p{Extended_Pictographic}/u.test(t) && t.length <= 8;
+/* pikachu helpers */
+function drawPika(id, happy) { const cv = el(id); const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); drawMouse(c, cv.width * .52, cv.height * .64, cv.width * .62, { happy }); }
+
+/* home */
+function renderHome() {
+  el('starsH').textContent = '⭐ ' + S.stars; el('starsP').textContent = '⭐ ' + S.stars;
+  el('tracks').innerHTML = Object.entries(TR).map(([id, t]) => `<button class="track t-${id}" data-t="${id}"><span class="ic">${t.icon}</span><span class="nm">${t.name}</span><span class="lv">שלב ${S.t[id].lvl}</span></button>`).join('');
+  el('tracks').querySelectorAll('.track').forEach(b => b.addEventListener('click', () => startTrack(b.dataset.t)));
+}
+let curT = null, cur = null, locked = false, tStart = 0, quick = [], nextTimer = 0;
+const recent = {};
+function nextQ(t) {
+  const lvl = S.t[t].lvl; const r = recent[t] || (recent[t] = []); let q;
+  for (let i = 0; i < 40; i++) { q = GEN[t](lvl); if (!r.includes(q.key)) break; }
+  r.push(q.key); if (r.length > 30) r.shift(); q.level = lvl; return q;
+}
+function startTrack(t) {
+  curT = t; quick = []; el('home').classList.add('hide'); el('play').classList.remove('hide');
+  speak(TR[t].name === 'English' ? 'אנגלית' : TR[t].name);
+  show();
+}
+function goHome() { clearTimeout(nextTimer); curT = null; el('play').classList.add('hide'); el('home').classList.remove('hide'); el('hint').classList.add('hide'); renderHome(); drawPika('hero', 1); if (window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) {} }
+function header() {
+  const st = S.t[curT];
+  el('ptName').textContent = TR[curT].icon + ' ' + TR[curT].name; el('ptLv').textContent = 'שלב ' + st.lvl + ' / ' + TR[curT].max;
+  el('bar').style.width = Math.min(100, (st.streak % 3) / 3 * 100) + '%';
+  el('starsP').textContent = '⭐ ' + S.stars;
+  const lb = el('langBtn'); lb.classList.toggle('hide', curT !== 'math'); lb.textContent = S.lang === 'en' ? '🇬🇧' : '🇮🇱'; lb.classList.toggle('en', S.lang === 'en');
+}
+function sayQ() { if (cur) speak(cur.say || cur.text, cur.lang); }
+function show() {
+  clearTimeout(nextTimer);
+  cur = nextQ(curT); locked = false; tStart = Date.now(); render();
+  if (S.autoRead) setTimeout(sayQ, 250);
+}
+function render() {
+  const q = cur; header();
+  el('card').classList.toggle('ltr', q.lang === 'en');
+  el('qtext').textContent = q.text || '';
+  el('qtext').classList.toggle('hide', !q.text);
+  const eq = el('eq'); eq.innerHTML = q.eq ? q.eq.replace('☐', '<span style="color:#e53935">☐</span>') : '';
+  if (q.eq) { const len = q.eq.length; eq.style.fontSize = Math.max(24, Math.min(64, Math.floor(Math.min(innerWidth * .86, 760) / (len * .6)))) + 'px'; }
+  el('vis').innerHTML = q.vis || '';
+  const ch = el('choices'); ch.className = 'choices' + (q.choices.length === 3 ? ' c3' : '');
+  ch.innerHTML = q.choices.map((c, i) => `<button class="ch${c.rtl ? ' rtl' : ''}${isEmo(String(c.t)) ? ' emo' : ''}" data-i="${i}">${c.say ? '<span class="spk" data-s="' + i + '">🔈</span>' : ''}${c.t}</button>`).join('');
+  ch.querySelectorAll('.ch').forEach(b => b.addEventListener('click', e => {
+    if (e.target.closest('.spk')) { e.stopPropagation(); speak(q.choices[+b.dataset.i].say, q.lang); return; }
+    choose(+b.dataset.i);
+  }));
+  el('hint').classList.add('hide');
+  drawPika('guide', 0);
+}
+const PRAISE_HE = ['יופי!', 'מעולה!', 'אלוף!', 'גאון!', 'כל הכבוד!', 'וואו!', 'מדויק!', 'פיקה פיקה!'];
+const PRAISE_EN = ['Great!', 'Awesome!', 'Super!', 'Well done!', 'Perfect!', 'Yes!'];
+function toast(t) { const x = el('toast'); x.textContent = t; x.classList.add('on'); setTimeout(() => x.classList.remove('on'), 700); }
+function choose(i) {
+  if (locked || !cur) return; locked = true;
+  const st = S.t[curT], ok = i === cur.ans, btns = el('choices').querySelectorAll('.ch');
+  st.tot++;
+  if (ok) {
+    st.ok++; st.streak++; S.stars++; quick.push(Date.now() - tStart < 9000);
+    btns[i].classList.add('ok'); btns.forEach((b, j) => j !== i && b.classList.add('dim'));
+    drawPika('guide', 1); toast('⭐'); speak(cur.lang === 'en' ? pick(PRAISE_EN) : pick(PRAISE_HE), cur.lang);
+    let up = 0;
+    if (st.streak >= 3) { up = 1; if (curT === 'math' && quick.slice(-3).length === 3 && quick.slice(-3).every(Boolean)) up = 2; st.streak = 0; }
+    if (up && st.lvl < TR[curT].max) {
+      const nl = Math.min(TR[curT].max, st.lvl + up); st.lvl = nl; st.wrong = 0; quick = []; st.best = Math.max(st.best, nl); S.stars += 3; save(); header();
+      nextTimer = setTimeout(() => levelUp(nl), 800);
+    } else { save(); header(); nextTimer = setTimeout(show, 1100); }
+  } else {
+    st.streak = 0; quick = []; st.wrong++;
+    btns[i].classList.add('bad'); btns[cur.ans].classList.add('ok');
+    let down = '';
+    if (st.wrong >= 2) { st.wrong = 0; if (st.lvl > 1) { st.lvl--; down = 'נתאמן רגע בשלב ' + st.lvl + ' ואז נעלה שוב 💪'; } }
+    save(); header();
+    el('hintTx').innerHTML = `<div>💡 לא נורא! בואו נבין:</div><div class="hx">${hintHTML(cur.hint)}</div>${down ? `<div style="margin-top:6px">${down}</div>` : ''}`;
+    el('hint').classList.remove('hide');
+    speak((cur.lang === 'en' ? 'Good try! ' : 'לא נורא! ') + String(cur.hint || '').replace(/\n/g, '. ').replace(/×/g, cur.lang === 'en' ? ' times ' : ' כפול ').replace(/÷/g, cur.lang === 'en' ? ' divided by ' : ' חלקי ').replace(/−/g, cur.lang === 'en' ? ' minus ' : ' פחות ').replace(/ = /g, cur.lang === 'en' ? ' equals ' : ' שווה ').replace(/,(?=\d{3})/g, ''), cur.lang);
+    setTimeout(() => el('hint').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  }
+}
+function levelUp(n) {
+  el('upTx').textContent = `עלית לשלב ${n}! ⚡`; drawPika('upHero', 1); el('upOv').classList.remove('hide');
+  speak(`כל הכבוד! עלית לשלב ${n}!`);
+}
+el('upGo').addEventListener('click', () => { el('upOv').classList.add('hide'); show(); });
+el('gotIt').addEventListener('click', show);
+el('backBtn').addEventListener('click', goHome);
+el('homeBtn').addEventListener('click', () => { location.href = '../index.html'; });
+el('sayBtn').addEventListener('click', sayQ);
+el('sayHome').addEventListener('click', () => speak('חדר כושר למוח! בחרו אימון: ' + Object.values(TR).map(t => t.name === 'English' ? 'אנגלית' : t.name).join(', ')));
+el('langBtn').addEventListener('click', () => { S.lang = S.lang === 'en' ? 'he' : 'en'; save(); speak(S.lang === 'en' ? 'English' : 'עברית', S.lang); show(); });
+
+/* parent panel: long-press the title */
+let lp = 0;
+const t0 = el('title');
+t0.addEventListener('pointerdown', () => { clearTimeout(lp); lp = setTimeout(openParent, 800); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => t0.addEventListener(ev, () => clearTimeout(lp)));
+t0.addEventListener('contextmenu', e => e.preventDefault());
+function openParent() {
+  const rows = Object.entries(TR).map(([id, t]) => {
+    const st = S.t[id]; const acc = st.tot ? Math.round(st.ok / st.tot * 100) + '%' : '–';
+    const opts = Array.from({ length: t.max }, (_, i) => i + 1).map(l => `<option value="${l}" ${l === st.lvl ? 'selected' : ''}>${l}${id === 'math' ? ' – ' + MATH_DESC[l] : ''}</option>`).join('');
+    return `<tr><td>${t.icon} ${t.name}</td><td>${st.lvl}<br><small>שיא ${st.best}</small></td><td>${acc}<br><small>${st.ok}/${st.tot}</small></td><td><select data-t="${id}">${opts}</select></td></tr>`;
+  }).join('');
+  el('ptab').innerHTML = `<tr><th>מסלול</th><th>שלב</th><th>דיוק</th><th>קבע שלב</th></tr>` + rows;
+  el('ptab').querySelectorAll('select').forEach(s => s.addEventListener('change', () => { const st = S.t[s.dataset.t]; st.lvl = clampL(s.dataset.t, +s.value); st.best = Math.max(st.best, st.lvl); st.streak = 0; st.wrong = 0; save(); renderHome(); openParent(); }));
+  el('autoRead').checked = !!S.autoRead;
+  el('parent').classList.remove('hide');
+}
+el('autoRead').addEventListener('change', e => { S.autoRead = e.target.checked; save(); });
+el('closeParent').addEventListener('click', () => { el('parent').classList.add('hide'); renderHome(); });
+el('resetBtn').addEventListener('click', () => { if (confirm('לאפס את כל ההתקדמות?')) { S = fresh(); save(); S = load(); save(); openParent(); renderHome(); } });
+
+renderHome(); drawPika('hero', 1);
+window.__brain = { hintHTML, get S() { return S; }, get cur() { return cur; }, get curT() { return curT; }, TR, GEN, gens: { genMath, genLogic, genSpatial, genRead, genSci, genEng }, numWord, choose, startTrack, goHome, openParent, nextQ, show,
+  setLevel(t, l) { S.t[t].lvl = clampL(t, l); S.t[t].streak = 0; S.t[t].wrong = 0; save(); } };
+})();
+</script>
+</body>
+</html>

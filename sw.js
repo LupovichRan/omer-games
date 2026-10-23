@@ -2,7 +2,7 @@
    Cache-first for this app's files, versioned cache name so updates roll out; page navigations are
    served from cache and refreshed in the background. Only deletes its own old caches. */
 const APP = 'menu';
-const VERSION = '7cf9c45a7e';
+const VERSION = 'e38d0bb2d5';
 const PREFIX = 'omer-' + APP + '-';
 const CACHE = PREFIX + VERSION;
 const FILES = [
@@ -14,6 +14,13 @@ const FILES = [
   "index.html",
   "manifest.webmanifest",
   "pwa.js",
+  "brain/icons/apple-touch-icon.png",
+  "brain/icons/icon-192.png",
+  "brain/icons/icon-512.png",
+  "brain/icons/icon-maskable-512.png",
+  "brain/index.html",
+  "brain/manifest.webmanifest",
+  "brain/pwa.js",
   "gifted/icons/apple-touch-icon.png",
   "gifted/icons/icon-192.png",
   "gifted/icons/icon-512.png",
