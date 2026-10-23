@@ -1,0 +1,8 @@
+# Static HTML site: no application manifests (npm, pip, etc.).
+# github-actions covers any workflows added later.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
