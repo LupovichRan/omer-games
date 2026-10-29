@@ -4,31 +4,57 @@
 <title>הגינה של פיקאצ'ו</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:system-ui,Arial,sans-serif;background:linear-gradient(#bfe9ff,#e8ffd8);min-height:100vh;color:#333;user-select:none;overflow-x:hidden}
-.scr{display:none;flex-direction:column;align-items:center;padding:12px;gap:12px;min-height:100vh}
+body{margin:0;background:linear-gradient(#8fd3ff,#cdeeff 45%,#e8ffd8);min-height:100vh;color:#2b2d42;user-select:none;-webkit-user-select:none;overflow-x:hidden}
+.scr{display:none;flex-direction:column;align-items:center;padding:12px 12px 70px;gap:12px;min-height:100vh}
 .scr.on{display:flex}
-h1{margin:6px 0;font-size:34px;color:#e67e00;text-shadow:2px 2px #fff}
-.big{font-size:28px;padding:16px 34px;border:none;border-radius:24px;background:#ffd400;box-shadow:0 6px #c9a400;color:#333;font-weight:bold;cursor:pointer}
-.big:active{transform:translateY(4px);box-shadow:0 2px #c9a400}
-.top{width:100%;display:flex;justify-content:space-between;align-items:center}
-.ico{font-size:30px;background:#fff;border:none;border-radius:16px;padding:6px 12px;box-shadow:0 3px #aaa;cursor:pointer;text-decoration:none}
-.ask{background:#fff;border-radius:20px;padding:12px 18px;font-size:26px;text-align:center;box-shadow:0 4px #ccc;max-width:560px}
-.row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:600px}
-.berry{width:56px;height:56px;border-radius:50%;border:3px solid #fff;cursor:pointer;box-shadow:inset -6px -6px 0 rgba(0,0,0,.15),0 3px 4px rgba(0,0,0,.2)}
-.basket{min-height:70px;width:100%;max-width:560px;background:#d9a066;border-radius:0 0 40px 40px;display:flex;flex-wrap:wrap;gap:4px;padding:8px;justify-content:center;align-items:center}
-.basket .berry{width:34px;height:34px;border-width:2px}
-.opt{font-size:34px;min-width:90px;padding:14px;border:none;border-radius:20px;background:#fff;box-shadow:0 5px #bbb;cursor:pointer;font-weight:bold}
-.opt.no{opacity:.4}
-.garden{width:100%;max-width:600px;height:240px;background:#8fd16a;border-radius:24px;position:relative;overflow:hidden;box-shadow:inset 0 -20px 0 #6fb34a}
-.garden span{position:absolute;font-size:34px}
-.tasks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:600px}
-.task{font-size:44px;padding:14px 4px;border:none;border-radius:22px;background:#fff;box-shadow:0 5px #bbb;cursor:pointer}
-.task small{display:block;font-size:18px;font-weight:bold}
-.flower{font-size:48px;cursor:pointer;filter:grayscale(1);transition:.3s}
+h1{margin:6px 0 0;font-size:clamp(34px,9vw,52px);font-weight:800;color:#ff7a00;text-shadow:0 3px 0 #fff,0 6px 0 rgba(0,0,0,.12)}
+.big{font-size:clamp(30px,8vw,40px);padding:16px 46px;border:5px solid #fff;border-radius:999px;background:linear-gradient(#ffe066,#ffc400);box-shadow:0 7px 0 #c98f00,0 12px 20px rgba(0,0,0,.18);color:#5a3b00;font-weight:800;cursor:pointer;min-height:70px}
+.big.go{animation:gbounce 1.2s infinite alternate}@keyframes gbounce{to{translate:0 -6px}}
+.top{width:100%;max-width:640px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ico{font-size:30px;width:60px;height:60px;background:linear-gradient(#fff,#eef4ff);border:4px solid #fff;border-radius:20px;box-shadow:0 4px 0 #a9b8d8,0 6px 10px rgba(0,0,0,.12);cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;padding:0}
+.pill{font-size:26px;font-weight:800;background:#fff;border-radius:999px;padding:6px 16px;box-shadow:0 4px 0 #e0c060;border:4px solid #ffd43b;color:#7a5000}
+.ask{background:#fff;border-radius:26px;padding:12px 20px;font-size:clamp(24px,6vw,30px);font-weight:700;text-align:center;box-shadow:0 6px 0 #d6e4f0,0 10px 18px rgba(0,0,0,.08);max-width:580px;position:relative}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:620px}
+.berry{width:58px;height:58px;border-radius:50% 50% 46% 46%;border:3px solid rgba(255,255,255,.9);cursor:pointer;box-shadow:inset -7px -8px 0 rgba(0,0,0,.16),inset 6px 6px 0 rgba(255,255,255,.35),0 4px 6px rgba(0,0,0,.2);position:relative;transition:transform .2s}
+.berry:after{content:"";position:absolute;top:-9px;left:50%;width:18px;height:12px;margin-left:-9px;background:#3cb043;border-radius:50% 50% 30% 30%}
+.basket{min-height:84px;width:100%;max-width:560px;background:repeating-linear-gradient(45deg,#d9a066 0 12px,#c98d50 12px 24px);border:5px solid #a0652d;border-top:10px solid #8b5420;border-radius:0 0 46px 46px;display:flex;flex-wrap:wrap;gap:6px;padding:12px;justify-content:center;align-items:center;box-shadow:0 8px 14px rgba(0,0,0,.18)}
+.basket .berry{width:38px;height:38px;border-width:2px}
+.cnt{font-size:40px;font-weight:800;color:#a0652d;background:#fff;border-radius:50%;width:70px;height:70px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #e0c9a6}
+.opt{font-size:42px;min-width:100px;min-height:92px;padding:12px;border:5px solid #fff;border-radius:26px;background:linear-gradient(#fff,#eef6ff);box-shadow:0 6px 0 #9fb6d6,0 10px 16px rgba(0,0,0,.12);cursor:pointer;font-weight:800;color:#3b4cca}
+.opt.no{opacity:.35;filter:grayscale(1)}
+.opt.yes{background:linear-gradient(#b9f6ca,#5be38c);color:#fff;text-shadow:0 2px 0 #1b7a3d}
+.scene{width:100%;max-width:640px;height:min(300px,46vh);border-radius:30px;position:relative;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.18),inset 0 0 0 5px rgba(255,255,255,.7);background:linear-gradient(#7ccfff,#c8f0ff 55%)}
+.scene .sun{position:absolute;top:12px;right:18px;width:64px;height:64px;border-radius:50%;background:radial-gradient(#fff59d,#ffd43b);box-shadow:0 0 0 10px rgba(255,235,59,.3),0 0 40px #ffe082;animation:spin 20s linear infinite}
+@keyframes spin{to{rotate:360deg}}
+.scene .cl{position:absolute;width:90px;height:30px;background:#fff;border-radius:30px;opacity:.9;animation:drift 38s linear infinite}
+.scene .cl:before,.scene .cl:after{content:"";position:absolute;background:#fff;border-radius:50%}
+.scene .cl:before{width:40px;height:40px;top:-20px;left:14px}.scene .cl:after{width:30px;height:30px;top:-14px;left:46px}
+@keyframes drift{from{left:-110px}to{left:110%}}
+.scene .hill{position:absolute;left:-10%;right:-10%;bottom:-40%;height:80%;border-radius:50% 50% 0 0;background:linear-gradient(#a5e36b,#6fbf3b)}
+.scene .hill2{left:30%;right:-30%;bottom:-48%;background:linear-gradient(#8fd95a,#5aa82c)}
+.scene .fence{position:absolute;left:0;right:0;bottom:38%;height:34px;background:repeating-linear-gradient(90deg,transparent 0 10px,#fff 10px 24px,transparent 24px 34px);opacity:.8}
+.scene .fence:after{content:"";position:absolute;left:0;right:0;top:12px;height:6px;background:#fff}
+.scene .pk{position:absolute;left:50%;bottom:6%;translate:-50% 0;z-index:2}
+.scene span.d{position:absolute;font-size:34px;z-index:1;filter:drop-shadow(0 3px 2px rgba(0,0,0,.2));animation:sway 3s ease-in-out infinite}
+.scene span.d.new{animation:dropIn .8s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes sway{50%{rotate:6deg}}@keyframes dropIn{from{translate:0 -200px;scale:2}to{translate:0;scale:1}}
+.lv{width:100%;max-width:640px;display:flex;align-items:center;gap:8px;direction:rtl}
+.lv b{font-size:22px;white-space:nowrap}
+.bar{flex:1;height:22px;border-radius:12px;background:rgba(255,255,255,.7);overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#5be38c,#ffd43b);border-radius:12px;transition:width .6s}
+.tasks{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:640px}
+.task{font-size:58px;padding:12px 4px 10px;border:5px solid #fff;border-radius:28px;cursor:pointer;color:#fff;box-shadow:0 7px 0 rgba(0,0,0,.22),0 12px 18px rgba(0,0,0,.12);min-height:130px;line-height:1.1}
+.task small{display:block;font-size:24px;font-weight:800;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.t1{background:linear-gradient(135deg,#ff8a80,#ff5252)}.t2{background:linear-gradient(135deg,#81d4fa,#29b6f6)}.t3{background:linear-gradient(135deg,#ffcc80,#ff9800)}.t4{background:linear-gradient(135deg,#ce93d8,#ab47bc)}
+.who{display:flex;align-items:flex-end;gap:6px}
+.who .fr{font-size:84px;filter:drop-shadow(0 6px 4px rgba(0,0,0,.2));animation:gbounce 1.4s infinite alternate}
+.flower{font-size:52px;cursor:pointer;filter:grayscale(1);transition:.3s}
 .flower.w{filter:none;transform:scale(1.15)}
-#pop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.7);font-size:90px;flex-direction:column}
-#pop.on{display:flex}#pop div{font-size:30px;font-weight:bold;color:#e67e00}
-.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pat{font-size:46px;direction:rtl;background:#fff;border-radius:22px;padding:8px 14px;box-shadow:0 5px 0 #d6e4f0;letter-spacing:2px}
+.cmp{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;width:100%;max-width:640px}
+.cmp button{flex:1;min-width:150px;max-width:300px;border:5px solid #fff;border-radius:28px;background:linear-gradient(#fff,#f3ecff);box-shadow:0 7px 0 #b39ddb,0 10px 16px rgba(0,0,0,.12);cursor:pointer;padding:10px;font-size:34px;line-height:1.25}
+.cmp button .f{font-size:64px;display:block}
+.cmp button.no{opacity:.35}
 </style><!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2e7d32">
@@ -39,108 +65,113 @@ h1{margin:6px 0;font-size:34px;color:#e67e00;text-shadow:2px 2px #fff}
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="הגינה">
 <script src="pwa.js" defer></script>
+<script src="../shared/juice.js"></script>
 <script src="../shared/parental.js" defer></script>
 <!-- /PWA -->
 </head><body>
 
-<svg width="0" height="0" style="position:absolute"><defs>
-<symbol id="mouse" viewBox="0 0 200 200">
-<polygon points="40,80 20,10 70,60" fill="#ffd400" stroke="#333" stroke-width="3"/><polygon points="20,10 30,40 42,32" fill="#333"/>
-<polygon points="160,80 180,10 130,60" fill="#ffd400" stroke="#333" stroke-width="3"/><polygon points="180,10 170,40 158,32" fill="#333"/>
-<path d="M165 140 L195 110 L180 105 L198 75 L170 100 L182 106 Z" fill="#ffd400" stroke="#a07800" stroke-width="3"/>
-<ellipse cx="100" cy="115" rx="70" ry="65" fill="#ffd400" stroke="#333" stroke-width="3"/>
-<circle cx="75" cy="100" r="10" fill="#222"/><circle cx="125" cy="100" r="10" fill="#222"/><circle cx="78" cy="96" r="3.5" fill="#fff"/><circle cx="128" cy="96" r="3.5" fill="#fff"/>
-<circle cx="55" cy="130" r="13" fill="#ff5a5a"/><circle cx="145" cy="130" r="13" fill="#ff5a5a"/>
-<path d="M88 125 Q100 140 112 125" fill="#c0392b" stroke="#333" stroke-width="2"/></symbol>
-</defs></svg>
-
 <section id="start" class="scr on">
 <h1>🌸 הגינה של פיקאצ'ו 🌸</h1>
-<svg width="200" height="200"><use href="#mouse"/></svg>
-<div class="ask">נעזור לחברים בגינה! 🍓💧🏠</div>
-<button class="big" onclick="go()">▶ שחק</button>
+<div id="startPk"></div>
+<div class="ask">נעזור לחברים בגינה! 🍓💧🏠🍎</div>
+<button class="big go" id="playBtn">▶ שחק</button>
 <div data-pwa-slot></div>
-<a class="ico" href="../index.html">🏠</a>
+<div style="display:flex;gap:10px"><a class="ico" href="../index.html" aria-label="בית">🏠</a><button class="ico" onclick="OJ.album()" aria-label="אלבום">📒</button></div>
 </section>
 
 <section id="hub" class="scr">
-<div class="top"><a class="ico" href="../index.html">🏠</a><b style="font-size:24px">⭐ <span id="stars">0</span></b><button class="ico" onclick="say(T.hub)">🔊</button></div>
-<div class="garden" id="gardenView"></div>
+<div class="top"><a class="ico" href="../index.html" aria-label="בית">🏠</a><span class="pill">⭐ <span id="stars">0</span></span><button class="ico" onclick="OJ.album()" aria-label="אלבום">📒</button><button class="ico" onclick="say(T.hub)" aria-label="הקראה">🔊</button></div>
+<div class="scene" id="gardenView"></div>
+<div class="lv"><b id="lvName">🌱 שלב 1</b><div class="bar"><i id="lvBar"></i></div><b>🎁</b></div>
 <div class="tasks">
-<button class="task" onclick="feed()">🍓<small>להאכיל</small></button>
-<button class="task" onclick="water()">💧<small>להשקות</small></button>
-<button class="task" onclick="build()">🏠<small>לבנות</small></button>
+<button class="task t1" onclick="feed()">🍓<small>להאכיל</small></button>
+<button class="task t2" onclick="water()">💧<small>להשקות</small></button>
+<button class="task t3" onclick="build()">🧱<small>לבנות</small></button>
+<button class="task t4" onclick="compare()">🍎<small>למי יותר?</small></button>
 </div>
 </section>
 
 <section id="play" class="scr">
-<div class="top"><button class="ico" onclick="show('hub')">🌳</button><b style="font-size:24px">⭐ <span id="stars2">0</span></b><button class="ico" onclick="say(cur.say)">🔊</button></div>
-<div id="who" style="font-size:80px"></div>
+<div class="top"><button class="ico" onclick="show('hub')" aria-label="לגינה">🌳</button><span class="pill">⭐ <span id="stars2">0</span></span><button class="ico" onclick="say(cur.say)" aria-label="הקראה">🔊</button></div>
+<div class="who" id="who"></div>
 <div class="ask" id="ask"></div>
-<div id="area" class="row"></div>
+<div id="area" class="row" style="flex-direction:column;align-items:center"></div>
 </section>
 
-<div id="pop"></div>
-
 <script>
-const T={hub:"בחר משימה: להאכיל, להשקות או לבנות"};
-const COLORS=[["אדום","אדומים","#e53935"],["כחול","כחולים","#1e88e5"],["צהוב","צהובים","#fdd835"],["סגול","סגולים","#8e24aa"]];
-const FRIENDS=["🐰","🐿️","🐢","🦔","🐥","🐸","🐻","🦊"];
-const DECOR=["🌷","🌻","🦋","🍄","🌈","🐞","🌼","🪺","🎈","⭐","🌳","🐝"];
+const T={hub:"בחר משימה: להאכיל, להשקות, לבנות, או למי יש יותר"};
+const COLORS=[["אדום","אדומים","#ff3b3b"],["כחול","כחולים","#2f80ed"],["צהוב","צהובים","#ffd60a"],["סגול","סגולים","#9b51e0"]];
+const FRIENDS=["🐰","🐿️","🐢","🦔","🐥","🐸","🐻","🦊","🐨","🐹"];
+const DECOR=["🌷","🌻","🦋","🍄","🌈","🐞","🌼","🪺","🎈","⭐","🌳","🐝","🪻","🐌","🏮","⛲"];
+const LVNAMES=["🌱","🌿","🌷","🌻","🌳"];
 let S=JSON.parse(localStorage.getItem("omerGarden")||'{"stars":0,"lvl":1,"decor":[]}');
-let cur={},streak=0;
+S.lvl=Math.max(1,Math.min(5,S.lvl||1));S.decor=S.decor||[];S.streak=S.streak||0;
+let cur={},newDecor=-1;
 const save=()=>localStorage.setItem("omerGarden",JSON.stringify(S));
 const $=id=>document.getElementById(id);
 const rnd=n=>Math.floor(Math.random()*n);
-let AC;function snd(f,d=.15,t="sine"){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.2,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
-function yay(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.2),i*110))}
-function say(t){try{if(!window.speechSynthesis||!t)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="he-IL";u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
-function show(id){document.querySelectorAll(".scr").forEach(s=>s.classList.toggle("on",s.id==id));if(id=="hub")drawGarden()}
-function go(){snd(600);show("hub");say("שלום! בוא נעזור לחברים בגינה. "+T.hub)}
-function drawGarden(){$("stars").textContent=$("stars2").textContent=S.stars;const g=$("gardenView");g.innerHTML='<svg width="110" height="110" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"><use href="#mouse"/></svg>';
-S.decor.forEach((d,i)=>{const e=document.createElement("span");e.textContent=d.e;e.style.left=d.x+"%";e.style.top=d.y+"%";g.appendChild(e)})}
+function snd(f,d=.15,t="sine"){/* small counting blip */try{const A=OJ.ac();if(!A||!OJ.sfxOn)return;const o=A.createOscillator(),g=A.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.16,A.currentTime);g.gain.exponentialRampToValueAtTime(.001,A.currentTime+d);o.connect(g).connect(A.destination);o.start();o.stop(A.currentTime+d)}catch(e){}}
+function say(t){OJ.say(t)}
+function show(id){document.querySelectorAll(".scr").forEach(s=>s.classList.toggle("on",s.id==id));OJ.enter($(id));if(id=="hub")drawGarden();scrollTo(0,0)}
+const INTRO=[{pic:"🌸🐰🌻",text:"שלום! זו הגינה של פיקאצ'ו. החברים צריכים את העזרה שלך!"},{pic:"🍓 💧 🧱 🍎",text:"בוחרים משימה: להאכיל, להשקות, לבנות, או למצוא למי יש יותר."},{pic:"⭐ 🦋 📒",text:"על כל משימה מקבלים כוכב וקישוט לגינה. כל שלושה כוכבים מקבלים מדבקה לאלבום!",expr:"cheer"}];
+$("playBtn").onclick=()=>{OJ.sfx("pop");OJ.intro("garden",INTRO).then(shown=>{show("hub");if(!shown)say("שלום! בוא נעזור לחברים בגינה. "+T.hub)})};
+function drawGarden(){$("stars").textContent=$("stars2").textContent=S.stars;const g=$("gardenView");
+g.innerHTML='<div class="sun"></div><div class="cl" style="top:30px;animation-delay:-8s"></div><div class="cl" style="top:70px;animation-delay:-25s;scale:.7"></div><div class="hill"></div><div class="hill hill2"></div><div class="fence"></div><div class="pk">'+OJ.pika(S.stars?"happy":"wow",110)+'</div>';
+S.decor.forEach((d,i)=>{const e=document.createElement("span");e.className="d"+(i==newDecor?" new":"");e.textContent=d.e;e.style.left=d.x+"%";e.style.top=(30+d.y*.62)+"%";e.style.animationDelay=(-i*.37)+"s";g.appendChild(e)});newDecor=-1;
+$("lvName").textContent=LVNAMES[S.lvl-1]+" שלב "+S.lvl;$("lvBar").style.width=(S.lvl>=5?100:(S.streak/3*100))+"%"}
 function max(){return S.lvl<3?10:20}
-function start(o){cur=o;show("play");$("stars2").textContent=S.stars;$("who").textContent=o.who;$("ask").textContent=o.text;$("area").innerHTML="";o.draw($("area"));say(o.say)}
-function win(){yay();S.stars++;streak++;if(streak>=3&&S.lvl<5){S.lvl++;streak=0}
-const d=DECOR[rnd(DECOR.length)];let dx=5+rnd(85),dy=5+rnd(70);if(dx>33&&dx<62&&dy>20)dx=rnd(2)?5+rnd(25):65+rnd(25);S.decor.push({e:d,x:dx,y:dy});if(S.decor.length>40)S.decor.shift();save();
-$("pop").innerHTML=d+"<div>כל הכבוד! קיבלת "+d+" לגינה</div>";$("pop").classList.add("on");say("כל הכבוד! קיבלת קישוט חדש לגינה");
-setTimeout(()=>{$("pop").classList.remove("on");show("hub")},2200)}
-function oops(el,msg){snd(220,.2,"triangle");streak=0;if(el){el.classList.add("shake");setTimeout(()=>el.classList.remove("shake"),400)}say(msg||"כמעט! נסה שוב")}
+function start(o){cur=o;show("play");$("stars2").textContent=S.stars;$("who").innerHTML='<span class="fr">'+o.who+'</span>'+OJ.pika("think",80);$("ask").textContent=o.text;$("ask").dir=o.ltr?"ltr":"rtl";$("area").innerHTML="";o.draw($("area"));say(o.say)}
+function win(btn){OJ.sfx("great");if(btn&&btn.classList)btn.classList.add("yes");OJ.sparkle(btn&&btn.getBoundingClientRect?btn:null,{n:26});OJ.confetti({n:60,x:innerWidth/2,y:innerHeight*.4});
+S.stars++;let up=false;S.streak++;if(S.streak>=3&&S.lvl<5){S.lvl++;S.streak=0;up=true}else if(S.streak>=3)S.streak=0;
+const d=DECOR[rnd(DECOR.length)];let dx=5+rnd(85),dy=5+rnd(70);if(dx>36&&dx<60)dx=rnd(2)?5+rnd(28):62+rnd(30);S.decor.push({e:d,x:dx,y:dy});if(S.decor.length>40)S.decor.shift();newDecor=S.decor.length-1;save();
+$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("cheer",90);
+const sticker=S.stars%3==0;
+setTimeout(()=>{if(up||sticker){OJ.celebrate({title:up?"עלית לשלב "+S.lvl+"!":"כל הכבוד!",sub:"קיבלת "+d+" לגינה",stars:3,sticker:sticker,game:"garden",onDone:()=>show("hub")})}
+else{say("כל הכבוד! קיבלת קישוט חדש לגינה");OJ.mascot("cheer","כל הכבוד! "+d,{say:false});setTimeout(()=>show("hub"),1300)}},900)}
+function oops(el,msg){OJ.sfx("bad");OJ.shake(el);$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("oops",80);setTimeout(()=>{if($("who").querySelector(".oops"))$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("think",80)},1600);say(msg||"כמעט! נסה שוב")}
 function opts(ans,area,lo=0){let s=new Set([ans]);while(s.size<3){let v=ans+rnd(5)-2;if(v>=lo&&v<=20)s.add(v)}
-[...s].sort(()=>Math.random()-.5).forEach(v=>{const b=document.createElement("button");b.className="opt";b.textContent=v;b.onclick=()=>v==ans?win():(b.classList.add("no"),oops(b));area.appendChild(b)})}
+const r=document.createElement("div");r.className="row";[...s].sort(()=>Math.random()-.5).forEach(v=>{const b=document.createElement("button");b.className="opt";b.textContent=v;b.onclick=()=>v==ans?win(b):(b.classList.add("no"),oops(b));r.appendChild(b)});area.appendChild(r)}
 /* 1. feed berries */
 function feed(){const n=1+rnd(max()),c=S.lvl>=2?COLORS[rnd(4)]:COLORS[0],f=FRIENDS[rnd(FRIENDS.length)];
 const word=n==1?"תות "+c[0]+" אחד":n+" תותים "+c[1];
-start({who:f,text:"תן לי "+n+" "+(S.lvl>=2?"🍓 "+c[1]:"🍓")+" בבקשה",say:"אני רעב! תן לי "+word+" בבקשה",draw(a){
+start({who:f,text:"תן לי "+n+" "+(S.lvl>=2?"🍓 "+c[1]:"🍓")+" בבקשה",say:"אני רעב! תן לי "+word+" בבקשה. לוחצים על התותים, ואז על תן",draw(a){
 let basket=[];const bk=document.createElement("div");bk.className="basket";
-const cnt=document.createElement("div");cnt.style.fontSize="30px";cnt.textContent="0";
+const cnt=document.createElement("div");cnt.className="cnt";cnt.textContent="0";
 const bush=document.createElement("div");bush.className="row";
 const cols=S.lvl>=2?COLORS:[COLORS[0]];const total=Math.min(24,n+4+rnd(4));
-for(let i=0;i<total;i++){const col=i<n?c:cols[rnd(cols.length)];const b=document.createElement("div");b.className="berry";b.style.background=col[2];
-b.onclick=()=>{if(basket.length>=20)return;basket.push(col);snd(400+basket.length*30,.1);bk.appendChild(b);cnt.textContent=basket.length;
-b.onclick=()=>{basket.splice(basket.indexOf(col),1);bush.appendChild(b);cnt.textContent=basket.length;b.onclick=null;setTimeout(()=>feed.rebind(b,col),0)}};bush.appendChild(b)}
-feed.rebind=(b,col)=>{b.onclick=()=>{basket.push(col);bk.appendChild(b);cnt.textContent=basket.length;b.onclick=()=>{basket.splice(basket.indexOf(col),1);bush.appendChild(b);cnt.textContent=basket.length;feed.rebind(b,col)}}};
+const toBasket=(b,col)=>{if(basket.length>=20)return;basket.push(col);snd(400+basket.length*35,.1);bk.appendChild(b);OJ.bounce(b);cnt.textContent=basket.length;OJ.bounce(cnt);say(String(basket.length));b.onclick=()=>{basket.splice(basket.indexOf(col),1);bush.appendChild(b);cnt.textContent=basket.length;snd(300,.08);b.onclick=()=>toBasket(b,col)}};
+for(let i=0;i<total;i++){const col=i<n?c:cols[rnd(cols.length)];const b=document.createElement("div");b.className="berry";b.style.background=col[2];b.onclick=()=>toBasket(b,col);bush.appendChild(b)}
 [...bush.children].sort(()=>Math.random()-.5).forEach(x=>bush.appendChild(x));
 const give=document.createElement("button");give.className="big";give.textContent="🧺 תן";
-give.onclick=()=>{if(basket.length==n&&basket.every(x=>x==c))win();else if(basket.some(x=>x!=c))oops(bk,"יש בסל צבע אחר. אני רוצה רק "+c[1]);else oops(bk,basket.length<n?"צריך עוד! ספרנו "+basket.length:"יותר מדי! ספרנו "+basket.length)};
+give.onclick=()=>{if(basket.length==n&&basket.every(x=>x==c))win(bk);else if(basket.some(x=>x!=c))oops(bk,"יש בסל צבע אחר. אני רוצה רק "+c[1]);else oops(bk,basket.length<n?"צריך עוד! ספרנו "+basket.length:"יותר מדי! ספרנו "+basket.length)};
 a.append(bush,bk,cnt,give)}})}
 /* 2. water flowers: + / - */
 function water(){const M=max();let x,y,plus=S.lvl<2||rnd(2),ans;
 if(plus){x=1+rnd(M-1);y=1+rnd(M-x);ans=x+y}else{x=2+rnd(M-1);y=1+rnd(x-1);ans=x-y}
 if(S.lvl==1){x=1+rnd(5);y=1+rnd(5-x+1);ans=x+y;plus=1}
-start({who:"💧",text:plus?"🌷 "+x+" + "+y+" = ?":"🌷 "+x+" − "+y+" = ?",
+start({who:"💧",ltr:1,text:plus?"🌷 "+x+" + "+y+" = ?":"🌷 "+x+" − "+y+" = ?",
 say:plus?"יש "+x+" פרחים, ועוד "+y+" פרחים צמחו. כמה פרחים יש? השקה אותם וספור":"היו "+x+" פרחים, ו"+y+" נקטפו. כמה נשארו?",
-draw(a){const fl=document.createElement("div");fl.className="row";
+draw(a){const fl=document.createElement("div");fl.className="row";let k=0;
 for(let i=0;i<x+(plus?y:0);i++){const s=document.createElement("span");s.className="flower";s.textContent=plus&&i>=x?"🌼":"🌷";if(!plus&&i>=x-y)s.style.opacity=.25;
-s.onclick=()=>{if(!s.classList.contains("w")){s.classList.add("w");snd(500+i*40,.1)}};fl.appendChild(s)}
-const o=document.createElement("div");o.className="row";a.append(fl,o);opts(ans,o)}})}
-/* 3. build house: pattern */
+s.onclick=()=>{if(!s.classList.contains("w")){s.classList.add("w");k++;snd(500+i*40,.1);OJ.sparkle(s,{n:6,emoji:"💧"});say(String(k))}};fl.appendChild(s)}
+a.append(fl);opts(ans,a)}})}
+/* 3. build: pattern */
 const SH=[["🟥","אדום"],["🟦","כחול"],["🟨","צהוב"],["🟩","ירוק"],["🔺","משולש"],["⚪","עיגול"]];
 function build(){const k=S.lvl<3?2:3;let base=[];while(base.length<k){const s=SH[rnd(SH.length)];if(!base.includes(s))base.push(s)}
 const len=S.lvl<2?5:7,seq=[];for(let i=0;i<len;i++)seq.push(base[i%k]);const ans=base[len%k];
 start({who:"🏠",text:"איזו לבנה באה עכשיו?",say:"נבנה בית! תסתכל על הדפוס. איזו לבנה באה עכשיו?",draw(a){
-const w=document.createElement("div");w.style.fontSize="40px";w.style.direction="rtl";w.textContent=seq.map(s=>s[0]).join("")+"❓";
+const w=document.createElement("div");w.className="pat";w.textContent=seq.map(s=>s[0]).join("")+"❓";
 const o=document.createElement("div");o.className="row";let ch=[...base];while(ch.length<3){const s=SH[rnd(SH.length)];if(!ch.includes(s))ch.push(s)}
 ch.sort(()=>Math.random()-.5).forEach(s=>{const b=document.createElement("button");b.className="opt";b.textContent=s[0];
-b.onclick=()=>{if(s==ans){w.textContent=seq.map(s=>s[0]).join("")+s[0]+" 🏡";win()}else{b.classList.add("no");oops(b,"זה "+s[1]+". נסה לבנה אחרת")}};o.appendChild(b)});a.append(w,o)}})}
+b.onclick=()=>{if(s==ans){w.textContent=seq.map(s=>s[0]).join("")+s[0]+" 🏡";win(b)}else{b.classList.add("no");oops(b,"זה "+s[1]+". נסה לבנה אחרת")}};o.appendChild(b)});a.append(w,o)}})}
+/* 4. compare: who has more / fewer apples (grade 1: compare numbers) */
+function compare(){const M=max();let a1=1+rnd(M),a2;do{a2=1+rnd(M)}while(a2==a1||(S.lvl<3&&Math.abs(a2-a1)<1));
+const more=S.lvl<2||rnd(2),f1=FRIENDS[rnd(FRIENDS.length)];let f2;do{f2=FRIENDS[rnd(FRIENDS.length)]}while(f2==f1);
+const ans=more?(a1>a2?0:1):(a1<a2?0:1),fruit=["🍎","🍐","🍊","🍌"][rnd(4)];
+start({who:"🍎",text:more?"למי יש יותר?":"למי יש פחות?",say:more?"לשני חברים יש פירות. למי יש יותר? אפשר לספור":"לשני חברים יש פירות. למי יש פחות? אפשר לספור",draw(a){
+const c=document.createElement("div");c.className="cmp";[[f1,a1],[f2,a2]].forEach(([f,n],i)=>{const b=document.createElement("button");
+b.innerHTML='<span class="f">'+f+'</span>'+(S.lvl>=4&&n>10?'<b style="font-size:46px;color:#7b1fa2">'+n+'</b><br>'+fruit:fruit.repeat(n));
+b.onclick=()=>i==ans?win(b):(b.classList.add("no"),oops(b,more?"לחבר השני יש יותר. נסה לספור שוב":"לחבר השני יש פחות. נסה לספור שוב"));c.appendChild(b)});a.append(c)}})}
+$("startPk").innerHTML=OJ.pika("happy",170);
+window.__garden={get S(){return S},get cur(){return cur}};
 </script></body></html>
