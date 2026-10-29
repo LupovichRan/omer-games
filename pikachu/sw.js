@@ -2,7 +2,7 @@
    Cache-first for this app's files, versioned cache name so updates roll out; page navigations are
    served from cache and refreshed in the background. Only deletes its own old caches. */
 const APP = 'pikachu';
-const VERSION = 'f201d8b513';
+const VERSION = '2140db42b4';
 const PREFIX = 'omer-' + APP + '-';
 const CACHE = PREFIX + VERSION;
 const FILES = [

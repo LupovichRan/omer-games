@@ -343,6 +343,7 @@
     const catchY = pika.y - ps * 0.2, catchR = ps * 0.55;
     for (let i = items.length - 1; i >= 0; i--) {
       const it = items[i];
+      if (!it) break; // items can be cleared by stageWin() during this loop
       it.y += it.vy * dt; it.x += it.vx * dt; it.rot += it.vr * dt;
       if (it.x < it.r || it.x > W - it.r) it.vx *= -1;
       const dx = it.x - pika.x, dy = it.y - catchY;

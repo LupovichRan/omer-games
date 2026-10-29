@@ -2,7 +2,7 @@
    Cache-first for this app's files, versioned cache name so updates roll out; page navigations are
    served from cache and refreshed in the background. Only deletes its own old caches. */
 const APP = 'menu';
-const VERSION = 'bcfd71c912';
+const VERSION = '8b0a77a1a1';
 const PREFIX = 'omer-' + APP + '-';
 const CACHE = PREFIX + VERSION;
 const FILES = [
