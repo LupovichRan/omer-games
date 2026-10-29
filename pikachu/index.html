@@ -30,6 +30,16 @@
   #toast div { font-size: .45em; color: #fff; }
   @media (max-aspect-ratio: 1/1) { #boltBtn { width: 92px; height: 92px; font-size: 22px; } #boltBtn span { font-size: 32px; } }
   .hidden { display: none !important; }
+  .screen { justify-content: flex-start; overflow-y: auto; padding-top: 18px; gap: 10px; }
+  #startPika { width: min(190px, 40vw); height: min(190px, 40vw); }
+  #mapBox { width: min(560px, 96vw); }
+  .goal { pointer-events:none; position: fixed; top: 76px; left: 50%; translate: -50% 0; z-index: 5; width: min(420px, 58vw); height: 26px; border-radius: 14px; background: rgba(255,255,255,.75); border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,.15); overflow: hidden; }
+  .goal i { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#ffe066,#ff9f1c); transition: width .3s; }
+  .goal b { position: absolute; inset: 0; text-align: center; font-size: 17px; line-height: 18px; color: #3b4cca; }
+  .stagename { font-size: clamp(22px,5vw,30px); color:#5a3d00; font-weight:800; }
+  .row2 { display:flex; gap:10px; }
+  .row2 .btn { width:62px; height:62px; border-radius:20px; font-size:30px; background:#fff; border:4px solid #3b4cca; box-shadow:0 4px 0 #23308a; text-decoration:none; display:flex; align-items:center; justify-content:center; }
+  #boltBtn { top: 112px; }
 </style>
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -50,20 +60,23 @@
 
 <div class="hud" id="hud">
   <div class="pill">⭐ <span id="score">0</span></div>
-  <div class="pill"><small>שלב</small> <span id="level">1</span></div>
+  <div class="pill"><span id="stIcon">🌼</span> <span id="level">1</span></div>
   <div class="right">
     <button class="btn" id="muteBtn" aria-label="קול">🔊</button>
     <button class="btn" id="homeBtn" aria-label="בית">🏠</button>
   </div>
 </div>
+<div class="goal" id="goal" dir="ltr"><i id="goalBar"></i><b id="goalTxt"></b></div>
 <button class="btn" id="boltBtn"><span>⚡</span>ברק!</button>
 <div id="toast"></div>
 
 <div class="screen" id="startScreen">
   <h1>פיקאצ'ו תופס כדורים</h1>
   <canvas id="startPika" width="260" height="260"></canvas>
+  <div class="stagename" id="stageName"></div>
   <button class="btn bigbtn" id="playBtn">▶ שחק!</button>
-  <div class="hint">⬅️ ➡️ &nbsp; 👆 &nbsp; ⚡</div>
+  <div id="mapBox"></div>
+  <div class="row2"><a class="btn" href="../index.html" aria-label="בית">🏠</a><button class="btn" id="albumBtn" aria-label="אלבום">📒</button><button class="btn" id="helpBtn" aria-label="הסבר">❓</button></div>
   <div data-pwa-slot></div>
 </div>
 
@@ -86,7 +99,7 @@
   let actx = null, muted = false;
   function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
   function tone(freq, dur, type = 'sine', vol = 0.2, delay = 0, slideTo = null) {
-    if (muted) return; const a = ac(); if (!a) return;
+    if (muted || (window.OJ && !OJ.sfxOn)) return; const a = ac(); if (!a) return;
     const t = a.currentTime + delay; const o = a.createOscillator(); const g = a.createGain();
     o.type = type; o.frequency.setValueAtTime(freq, t);
     if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
@@ -222,20 +235,35 @@
     c.restore();
   }
 
+  // ---------- Stages (8 worlds) ----------
+  const STAGES = [
+    { name: 'האחו', icon: '🌼', sky: ['#6ec6ff', '#d6f3ff'], hill: '#9ccc65', ground: '#7cb342', dot: '#ffeb3b', sun: '#fff59d', deco: 'flowers' },
+    { name: 'חוף הים', icon: '🏖️', sky: ['#4fc3f7', '#e1f5fe'], hill: '#4dd0e1', ground: '#ffe0a3', dot: '#ffab91', sun: '#fff176', deco: 'palms' },
+    { name: 'היער', icon: '🌲', sky: ['#81d4fa', '#e8f5e9'], hill: '#66bb6a', ground: '#558b2f', dot: '#ff8a65', sun: '#fff59d', deco: 'pines' },
+    { name: 'שקיעה', icon: '🌅', sky: ['#ff8a65', '#ffe0b2'], hill: '#c0ca33', ground: '#9e9d24', dot: '#ffcc80', sun: '#ffab40', deco: 'flowers' },
+    { name: 'השלג', icon: '⛄', sky: ['#90caf9', '#f3f8ff'], hill: '#e3f2fd', ground: '#ffffff', dot: '#90caf9', sun: '#fffde7', deco: 'snow' },
+    { name: 'הלילה', icon: '🌙', sky: ['#1a237e', '#5c6bc0'], hill: '#3949ab', ground: '#283593', dot: '#fff59d', sun: '#fffde7', deco: 'stars', moon: true },
+    { name: 'ארץ הממתקים', icon: '🍭', sky: ['#f8bbd0', '#fff3e0'], hill: '#f48fb1', ground: '#ce93d8', dot: '#fff', sun: '#fff59d', deco: 'candy' },
+    { name: 'הקשת בענן', icon: '🌈', sky: ['#b39ddb', '#e1f5fe'], hill: '#81c784', ground: '#4db6ac', dot: '#fff59d', sun: '#fff59d', deco: 'rainbow' }
+  ];
+  const goalOf = i => 12 + i * 3;
+  let stage = 0, hits = 0, won = false;
+  const unlocked = () => { let u = 1; for (let i = 0; i < STAGES.length; i++) if (OJ.getStars('pikachu', i) > 0) u = i + 2; return Math.min(u, STAGES.length); };
+
   // ---------- State ----------
   let pika = null, items = [], parts = [], floats = [], score = 0, level = 1, running = false;
-  let spawnT = 0, charge = 0, last = 0, T = 0, keys = {}, targetX = null, flash = 0, toastT = null;
+  let shakeT = 0, spawnT = 0, charge = 0, last = 0, T = 0, keys = {}, targetX = null, flash = 0, toastT = null;
   const CHARGE_TIME = 15; // seconds to full
   const el = id => document.getElementById(id);
   const boltBtn = el('boltBtn');
 
   function reset() {
-    score = 0; level = 1; items = []; parts = []; floats = []; charge = 0.5; spawnT = 0.5;
+    score = 0; level = 1; hits = 0; won = false; items = []; parts = []; floats = []; charge = 0.5; spawnT = 0.5;
     pika = { x: W / 2, y: 0, vx: 0, dizzy: 0, happy: 0, facing: 1 };
     resize(); updateHud();
   }
-  function updateHud() { el('score').textContent = score; el('level').textContent = level; }
-  const speedMul = () => 1 + (level - 1) * 0.12;
+  function updateHud() { el('score').textContent = score; el('level').textContent = stage + 1; el('stIcon').textContent = STAGES[stage].icon; const g = goalOf(stage); el('goalBar').style.width = Math.min(100, score / g * 100) + '%'; el('goalTxt').textContent = Math.min(score, g) + ' / ' + g; }
+  const speedMul = () => 1 + stage * 0.09 + (score / goalOf(stage)) * 0.12;
 
   function pick() {
     let tot = 0; for (const k in ITEMS) tot += ITEMS[k].w;
@@ -243,7 +271,7 @@
   }
   function spawn() {
     let type = pick();
-    if (level === 1 && !ITEMS[type].good && Math.random() < 0.5) type = 'ball';
+    if (!ITEMS[type].good && Math.random() < (stage === 0 ? 0.6 : stage < 3 ? 0.3 : 0.1)) type = 'ball';
     const r = Math.max(20, Math.min(34, W * 0.045));
     items.push({ type, x: r + Math.random() * (W - r * 2), y: -r, r, vy: (110 + Math.random() * 60) * speedMul() * Math.max(0.8, H / 800), vx: (Math.random() - 0.5) * 20, rot: 0, vr: (Math.random() - 0.5) * 3 });
   }
@@ -260,8 +288,19 @@
     floatText(it.x, it.y - 20, '+' + d.pts, col);
     if (!viaBolt) { (sfx[it.type] || sfx.catch)(); pika.happy = 0.4; }
     charge = Math.min(1, charge + (it.type === 'bolt' ? 0.12 : 0.03));
-    const newLevel = Math.floor(score / 10) + 1;
-    if (newLevel > level) { level = newLevel; updateHud(); levelUp(); }
+    const g = goalOf(stage);
+    if (!won && score >= g) { won = true; stageWin(); }
+    else if (!won && score >= Math.ceil(g / 2) && score - d.pts < Math.ceil(g / 2)) { showToast('חצי דרך!', '⭐'); sfx.star(); }
+  }
+  function stageWin() {
+    running = false; items = []; sfx.level(); pika.happy = 3;
+    const stars = hits === 0 ? 3 : hits <= 2 ? 2 : 1;
+    OJ.setStars('pikachu', stage, stars);
+    for (let i = 0; i < 6; i++) setTimeout(() => sparkle(Math.random() * W, Math.random() * H * 0.6, ['#ff5252', '#ffeb3b', '#69f0ae', '#40c4ff', '#e040fb'][i % 5], 20), i * 120);
+    const last = stage === STAGES.length - 1;
+    setTimeout(() => OJ.celebrate({ title: last ? 'סיימת את כל העולמות!' : 'סיימת את ' + STAGES[stage].name + '!', sub: stars === 3 ? 'בלי אף טעות!' : 'כל הכבוד!', stars, sticker: true, game: 'pikachu',
+      button: last ? 'למפה ▶' : 'לשלב הבא ▶', onDone: () => { if (!last) { stage++; startGame(); } else showStart(); },
+      again: { label: '🗺️ מפה', fn: () => showStart() } }), 900);
   }
   function levelUp() {
     sfx.level(); pika.happy = 1.5;
@@ -310,7 +349,7 @@
       if (Math.hypot(dx, dy) < catchR + it.r * 0.6) {
         items.splice(i, 1);
         if (ITEMS[it.type].good) collect(it);
-        else if (pika.dizzy <= 0) { pika.dizzy = 1.3; sfx.dizzy(); floatText(pika.x, pika.y - ps, '😵‍💫'); sparkle(it.x, it.y, it.type === 'cloud' ? '#4fc3f7' : '#a1887f', 10); }
+        else if (pika.dizzy <= 0) { pika.dizzy = 1.3; hits++; shakeT = 0.35; sfx.dizzy(); floatText(pika.x, pika.y - ps, '😵‍💫'); sparkle(it.x, it.y, it.type === 'cloud' ? '#4fc3f7' : '#a1887f', 10); }
         continue;
       }
       if (it.y > H + it.r) items.splice(i, 1);
@@ -318,24 +357,43 @@
     for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; if (p.life <= 0) parts.splice(i, 1); }
     for (let i = floats.length - 1; i >= 0; i--) { const f = floats[i]; f.life -= dt; f.y -= 60 * dt; if (f.life <= 0) floats.splice(i, 1); }
     if (flash > 0) flash -= dt;
+    if (shakeT > 0) shakeT -= dt;
     boltBtn.style.setProperty('--p', Math.round(charge * 100) + '%');
     boltBtn.classList.toggle('ready', charge >= 1);
   }
 
   const clouds = Array.from({ length: 5 }, (_, i) => ({ x: Math.random(), y: 0.08 + Math.random() * 0.3, s: 0.6 + Math.random() * 0.8, v: 0.005 + Math.random() * 0.01 }));
   function drawBg() {
-    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#6ec6ff'); g.addColorStop(1, '#d6f3ff');
+    const S = STAGES[stage];
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, S.sky[0]); g.addColorStop(1, S.sky[1]);
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    // sun
-    ctx.fillStyle = '#fff59d'; ctx.beginPath(); ctx.arc(W * 0.12, H * 0.12, Math.min(W, H) * 0.07, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    const sr = Math.min(W, H) * 0.07, sx = W * 0.12, sy = H * 0.14;
+    if (S.deco === 'stars') { ctx.fillStyle = '#fff'; for (let i = 0; i < 40; i++) { const x = (i * 97.3 % 1) * W, y = ((i * 61.7) % 100) / 100 * H * 0.6; ctx.globalAlpha = 0.4 + 0.6 * Math.abs(Math.sin(T * 2 + i)); ctx.beginPath(); ctx.arc((i * 137) % W, y, 1.5 + (i % 3), 0, 7); ctx.fill(); } ctx.globalAlpha = 1; }
+    if (S.deco === 'rainbow') { ['#ef5350', '#ffa726', '#ffee58', '#66bb6a', '#42a5f5', '#7e57c2'].forEach((c, i) => { ctx.strokeStyle = c; ctx.globalAlpha = .55; ctx.lineWidth = Math.max(10, W * 0.018); ctx.beginPath(); ctx.arc(W / 2, H * 0.85, Math.min(W, H) * 0.62 - i * ctx.lineWidth, Math.PI, 0); ctx.stroke(); }); ctx.globalAlpha = 1; }
+    const sg = ctx.createRadialGradient(sx, sy, sr * .2, sx, sy, sr * 2.2); sg.addColorStop(0, S.sun); sg.addColorStop(.45, S.sun); sg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(sx, sy, sr * 2.2, 0, 7); ctx.fill();
+    if (S.moon) { ctx.fillStyle = S.sky[0]; ctx.beginPath(); ctx.arc(sx + sr * .45, sy - sr * .2, sr * .8, 0, 7); ctx.fill(); }
+    ctx.fillStyle = S.moon ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.85)';
     clouds.forEach(c => { c.x += c.v / 60; if (c.x > 1.2) c.x = -0.2; const x = c.x * W, y = c.y * H, s = 40 * c.s; ctx.beginPath(); ctx.arc(x, y, s, 0, 7); ctx.arc(x + s, y + 5, s * 0.8, 0, 7); ctx.arc(x - s, y + 5, s * 0.8, 0, 7); ctx.fill(); });
     // hills
-    ctx.fillStyle = '#9ccc65'; ctx.beginPath(); ctx.moveTo(0, H); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, H - groundH() - 40 - Math.sin(x / 140) * 30); ctx.lineTo(W, H); ctx.fill();
-    ctx.fillStyle = '#7cb342'; ctx.fillRect(0, H - groundH(), W, groundH());
-    ctx.fillStyle = '#ffeb3b'; for (let x = 30; x < W; x += 90) { ctx.beginPath(); ctx.arc(x, H - groundH() + 15 + (x % 3) * 6, 5, 0, 7); ctx.fill(); }
+    const GY = H - groundH();
+    ctx.fillStyle = S.hill; ctx.globalAlpha = .6; ctx.beginPath(); ctx.moveTo(0, H); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, GY - 80 - Math.sin(x / 210 + 1) * 45); ctx.lineTo(W, H); ctx.fill(); ctx.globalAlpha = 1;
+    // decorations on the far hill
+    for (let i = 0, n = Math.ceil(W / 160); i < n; i++) {
+      const x = 60 + i * 160 + (i % 2) * 40, y = GY - 40 - Math.sin(x / 140) * 30;
+      if (S.deco === 'pines') { ctx.fillStyle = '#2e7d32'; for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.moveTo(x, y - 90 + k * 22); ctx.lineTo(x - 30 + k * 2, y - 30 + k * 18); ctx.lineTo(x + 30 - k * 2, y - 30 + k * 18); ctx.fill(); } ctx.fillStyle = '#6d4c41'; ctx.fillRect(x - 5, y + 10, 10, 18); }
+      else if (S.deco === 'palms') { ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(x, y + 20); ctx.quadraticCurveTo(x + 14, y - 30, x + 4, y - 70); ctx.stroke(); ctx.fillStyle = '#43a047'; for (let k = 0; k < 5; k++) { ctx.save(); ctx.translate(x + 4, y - 70); ctx.rotate(-2.6 + k * 0.9 + Math.sin(T * 1.5) * 0.05); ctx.beginPath(); ctx.ellipse(24, 0, 26, 7, 0, 0, 7); ctx.fill(); ctx.restore(); } }
+      else if (S.deco === 'candy') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x, y + 20); ctx.lineTo(x, y - 40); ctx.stroke(); ['#ff4081', '#ffeb3b', '#40c4ff'].forEach((c, k) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y - 52, 22 - k * 7, 0, 7); ctx.fill(); }); }
+      else if (S.deco === 'snow') { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y + 6, 18, 0, 7); ctx.arc(x, y - 20, 13, 0, 7); ctx.fill(); ctx.fillStyle = '#ff7043'; ctx.beginPath(); ctx.moveTo(x, y - 20); ctx.lineTo(x + 12, y - 18); ctx.lineTo(x, y - 16); ctx.fill(); ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(x - 4, y - 24, 2, 0, 7); ctx.arc(x + 4, y - 24, 2, 0, 7); ctx.fill(); }
+    }
+    ctx.fillStyle = S.hill; ctx.beginPath(); ctx.moveTo(0, H); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, GY - 40 - Math.sin(x / 140) * 30); ctx.lineTo(W, H); ctx.fill();
+    const gg = ctx.createLinearGradient(0, GY, 0, H); gg.addColorStop(0, S.ground); gg.addColorStop(1, 'rgba(0,0,0,.15)');
+    ctx.fillStyle = S.ground; ctx.fillRect(0, GY, W, groundH()); ctx.fillStyle = gg; ctx.globalAlpha = .5; ctx.fillRect(0, GY, W, groundH()); ctx.globalAlpha = 1;
+    ctx.fillStyle = S.dot; for (let x = 30; x < W; x += 90) { ctx.beginPath(); ctx.arc(x, GY + 15 + (x % 3) * 6, 5, 0, 7); ctx.fill(); }
+    if (S.deco === 'snow') { ctx.fillStyle = 'rgba(255,255,255,.9)'; for (let i = 0; i < 40; i++) { const x = ((i * 53 + T * 20 * (1 + i % 3)) % W), y = ((i * 89 + T * 50 * (1 + i % 2)) % H); ctx.beginPath(); ctx.arc(x, y, 2 + i % 3, 0, 7); ctx.fill(); } }
   }
   function draw() {
+    ctx.save(); if (shakeT > 0) ctx.translate((Math.random() - .5) * 14 * shakeT * 3, 0);
     drawBg();
     items.forEach(it => drawItem(ctx, it, T));
     const ps = pikaSize();
@@ -344,7 +402,7 @@
     drawMouse(ctx, pika.x, pika.y - bob, ps, { dizzy: pika.dizzy > 0 ? 1 : 0, happy: pika.happy > 0 ? 1 : 0, t: T, facing: pika.facing });
     parts.forEach(p => { ctx.globalAlpha = Math.max(0, Math.min(1, p.life)); if (p.star) drawStar(ctx, p.x, p.y, p.r * 1.4, p.col); else { ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); } });
     ctx.globalAlpha = 1;
-    floats.forEach(f => { ctx.globalAlpha = Math.max(0, f.life); ctx.font = 'bold 34px Arial'; ctx.textAlign = 'center'; ctx.direction = 'ltr'; ctx.lineWidth = 5; ctx.strokeStyle = '#3b4cca'; ctx.strokeText(f.txt, f.x, f.y); ctx.fillStyle = f.col; ctx.fillText(f.txt, f.x, f.y); });
+    floats.forEach(f => { ctx.globalAlpha = Math.max(0, f.life); ctx.font = '800 34px "OJ Rubik", Arial'; ctx.textAlign = 'center'; ctx.direction = 'ltr'; ctx.lineWidth = 5; ctx.strokeStyle = '#3b4cca'; ctx.strokeText(f.txt, f.x, f.y); ctx.fillStyle = f.col; ctx.fillText(f.txt, f.x, f.y); });
     ctx.globalAlpha = 1;
     if (flash > 0) {
       ctx.fillStyle = `rgba(255,255,200,${flash})`; ctx.fillRect(0, 0, W, H);
@@ -352,6 +410,7 @@
       for (let b = 0; b < 4; b++) { ctx.beginPath(); let x = pika.x, y = pika.y - ps * 0.6; ctx.moveTo(x, y); const tx = W * (b + 0.5) / 4; while (y > 0) { y -= 40; x += (tx - x) * 0.25 + (Math.random() - 0.5) * 50; ctx.lineTo(x, y); } ctx.stroke(); }
       ctx.shadowBlur = 0;
     }
+    ctx.restore();
   }
   function loop(ts) {
     const dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts;
@@ -372,20 +431,35 @@
   cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.buttons || e.pressure > 0) pointer(e); });
   cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') {/* keep target so tap = walk there */} });
   boltBtn.addEventListener('pointerdown', e => { e.stopPropagation(); ac(); thunder(); });
-  el('muteBtn').addEventListener('click', () => { muted = !muted; el('muteBtn').textContent = muted ? '🔇' : '🔊'; });
-  el('homeBtn').addEventListener('click', () => { running = false; showStart(); });
-  el('playBtn').addEventListener('click', startGame);
+  const paintMute = () => { el('muteBtn').textContent = OJ.sfxOn ? '🔊' : '🔇'; }; paintMute();
+  el('muteBtn').addEventListener('click', () => { OJ.sfxOn = !OJ.sfxOn; paintMute(); });
+  el('homeBtn').addEventListener('click', () => { running = false; score = 0; showStart(); });
+  const INTRO = [
+    { pic: '🔴⚪ 🍇 ⚡ ⭐', text: 'פיקאצ׳ו אוסף כדורים, פירות, ברקים וכוכבים!' },
+    { pic: '👆 ⬅️ ➡️', text: 'נוגעים במסך, ופיקאצ׳ו רץ לשם. במחשב אפשר גם עם החצים.' },
+    { pic: '🌧️ 🪨', text: 'שימו לב! עננים וסלעים עושים סחרחורת. מתחמקים מהם!', expr: 'oops' },
+    { pic: '⚡', text: 'כשהכפתור ברק מלא, לוחצים עליו ואוספים הכול בבת אחת!', expr: 'cheer' }
+  ];
+  el('playBtn').addEventListener('click', () => { ac(); OJ.intro('pikachu', INTRO).then(() => startGame()); });
+  el('albumBtn').addEventListener('click', () => OJ.album());
+  el('helpBtn').addEventListener('click', () => OJ.intro('pikachu', INTRO, { force: true }));
 
   function startGame() {
     ac(); reset(); running = true; sfx.start();
     el('startScreen').classList.add('hidden');
-    showToast('יאללה!', '⬅️ ➡️');
+    showToast(STAGES[stage].icon + ' ' + STAGES[stage].name, 'שלב ' + (stage + 1));
+    OJ.say('שלב ' + (stage + 1) + ', ' + STAGES[stage].name + '. אסוף ' + goalOf(stage) + ' כוכבים!');
   }
   let startAnim = null;
+  function showStartMapOnly() { OJ.levelMap(el('mapBox'), { count: STAGES.length, unlocked: unlocked(), current: stage, stars: i => OJ.getStars('pikachu', i), icon: i => STAGES[i].icon, cols: 4, onPick: i => { stage = i; el('playBtn').textContent = '▶ שלב ' + (i + 1); el('stageName').textContent = STAGES[i].icon + ' ' + STAGES[i].name; showStartMapOnly(); } }); }
   function showStart() {
     const s = el('startScreen'); s.classList.remove('hidden');
-    el('playBtn').textContent = score > 0 ? '▶ עוד פעם!' : '▶ שחק!';
-    if (score > 0) el('playBtn').insertAdjacentHTML('beforebegin', '');
+    running = false; if (stage >= unlocked()) stage = unlocked() - 1;
+    if (!won && score === 0) stage = unlocked() - 1;
+    el('playBtn').textContent = '▶ שלב ' + (stage + 1);
+    el('stageName').textContent = STAGES[stage].icon + ' ' + STAGES[stage].name;
+    OJ.levelMap(el('mapBox'), { count: STAGES.length, unlocked: unlocked(), current: stage, stars: i => OJ.getStars('pikachu', i), icon: i => STAGES[i].icon, cols: 4,
+      onPick: i => { stage = i; el('playBtn').textContent = '▶ שלב ' + (i + 1); el('stageName').textContent = STAGES[i].icon + ' ' + STAGES[i].name; OJ.levelMap && showStartMapOnly(); } });
     const sc = el('startPika').getContext('2d');
     cancelAnimationFrame(startAnim);
     const anim = ts => { sc.clearRect(0, 0, 260, 260); drawMouse(sc, 140, 165 + Math.sin(ts / 300) * 6, 150, { happy: 1, t: ts / 1000 }); if (!s.classList.contains('hidden')) startAnim = requestAnimationFrame(anim); };
@@ -395,7 +469,7 @@
 
   window.addEventListener('resize', resize);
   reset(); showStart(); requestAnimationFrame(loop);
-  window.__game = { get score() { return score; }, get level() { return level; }, get charge() { return charge; }, get running() { return running; }, get items() { return items.length; }, get dizzy() { return pika.dizzy; }, setCharge(v) { charge = v; } };
+  window.__game = { get score() { return score; }, get level() { return level; }, get charge() { return charge; }, get running() { return running; }, get stage() { return stage; }, setStage(i) { stage = i; }, get hits() { return hits; }, addScore(n) { for (let i = 0; i < n; i++) collect({ type: 'ball', x: W / 2, y: H / 2 }, true); }, get items() { return items.length; }, get dizzy() { return pika.dizzy; }, setCharge(v) { charge = v; } };
 })();
 </script>
 </body>
