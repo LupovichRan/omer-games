@@ -46,7 +46,7 @@ Loaded (not deferred) in every page's `<!-- PWA -->` block and precached by ever
 - **Sound:** `OJ.sfx('tap|pop|good|great|bad|star|whoosh|sticker|levelup|cheer')` (WebAudio, no files) + background music
   with the 🎵 button bottom-right; mute is remembered (`OJ.sfxOn` getter/setter). `OJ.say(text)` speaks he-IL (silent if unsupported).
 - **Progression:** `OJ.setStars(game,key,n)` / `getStars` / `totalStars(game?)` (stored in `omerJ_prog`, best score kept),
-  stickers album (`OJ.award(game)`, `OJ.album()`, 48 stickers, `omerJ_stk`).
+  stickers album (`OJ.award(game)`, `OJ.album()`, 48 stickers, `omerJ_stickers`).
 - **Screens:** `OJ.celebrate({title,sub,stars,sticker,game,button,onDone,again})` level-up/win overlay;
   `OJ.intro(game,steps)` spoken 4-step how-to (shown once per game, replay with `OJ.helpButton`).
 - Games' own save keys (`omerMemory`, brain/gifted state, etc.) are untouched, so old progress still loads.
