@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>הגינה של פיקאצ'ו</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:linear-gradient(#bfe9ff,#e8ffd8);min-height:100vh;color:#333;user-select:none;overflow-x:hidden}
+.scr{display:none;flex-direction:column;align-items:center;padding:12px;gap:12px;min-height:100vh}
+.scr.on{display:flex}
+h1{margin:6px 0;font-size:34px;color:#e67e00;text-shadow:2px 2px #fff}
+.big{font-size:28px;padding:16px 34px;border:none;border-radius:24px;background:#ffd400;box-shadow:0 6px #c9a400;color:#333;font-weight:bold;cursor:pointer}
+.big:active{transform:translateY(4px);box-shadow:0 2px #c9a400}
+.top{width:100%;display:flex;justify-content:space-between;align-items:center}
+.ico{font-size:30px;background:#fff;border:none;border-radius:16px;padding:6px 12px;box-shadow:0 3px #aaa;cursor:pointer;text-decoration:none}
+.ask{background:#fff;border-radius:20px;padding:12px 18px;font-size:26px;text-align:center;box-shadow:0 4px #ccc;max-width:560px}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:600px}
+.berry{width:56px;height:56px;border-radius:50%;border:3px solid #fff;cursor:pointer;box-shadow:inset -6px -6px 0 rgba(0,0,0,.15),0 3px 4px rgba(0,0,0,.2)}
+.basket{min-height:70px;width:100%;max-width:560px;background:#d9a066;border-radius:0 0 40px 40px;display:flex;flex-wrap:wrap;gap:4px;padding:8px;justify-content:center;align-items:center}
+.basket .berry{width:34px;height:34px;border-width:2px}
+.opt{font-size:34px;min-width:90px;padding:14px;border:none;border-radius:20px;background:#fff;box-shadow:0 5px #bbb;cursor:pointer;font-weight:bold}
+.opt.no{opacity:.4}
+.garden{width:100%;max-width:600px;height:240px;background:#8fd16a;border-radius:24px;position:relative;overflow:hidden;box-shadow:inset 0 -20px 0 #6fb34a}
+.garden span{position:absolute;font-size:34px}
+.tasks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:600px}
+.task{font-size:44px;padding:14px 4px;border:none;border-radius:22px;background:#fff;box-shadow:0 5px #bbb;cursor:pointer}
+.task small{display:block;font-size:18px;font-weight:bold}
+.flower{font-size:48px;cursor:pointer;filter:grayscale(1);transition:.3s}
+.flower.w{filter:none;transform:scale(1.15)}
+#pop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.7);font-size:90px;flex-direction:column}
+#pop.on{display:flex}#pop div{font-size:30px;font-weight:bold;color:#e67e00}
+.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style><!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2e7d32">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="הגינה">
+<script src="pwa.js" defer></script>
+<script src="../shared/parental.js" defer></script>
+<!-- /PWA -->
+</head><body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="mouse" viewBox="0 0 200 200">
+<polygon points="40,80 20,10 70,60" fill="#ffd400" stroke="#333" stroke-width="3"/><polygon points="20,10 30,40 42,32" fill="#333"/>
+<polygon points="160,80 180,10 130,60" fill="#ffd400" stroke="#333" stroke-width="3"/><polygon points="180,10 170,40 158,32" fill="#333"/>
+<path d="M165 140 L195 110 L180 105 L198 75 L170 100 L182 106 Z" fill="#ffd400" stroke="#a07800" stroke-width="3"/>
+<ellipse cx="100" cy="115" rx="70" ry="65" fill="#ffd400" stroke="#333" stroke-width="3"/>
+<circle cx="75" cy="100" r="10" fill="#222"/><circle cx="125" cy="100" r="10" fill="#222"/><circle cx="78" cy="96" r="3.5" fill="#fff"/><circle cx="128" cy="96" r="3.5" fill="#fff"/>
+<circle cx="55" cy="130" r="13" fill="#ff5a5a"/><circle cx="145" cy="130" r="13" fill="#ff5a5a"/>
+<path d="M88 125 Q100 140 112 125" fill="#c0392b" stroke="#333" stroke-width="2"/></symbol>
+</defs></svg>
+
+<section id="start" class="scr on">
+<h1>🌸 הגינה של פיקאצ'ו 🌸</h1>
+<svg width="200" height="200"><use href="#mouse"/></svg>
+<div class="ask">נעזור לחברים בגינה! 🍓💧🏠</div>
+<button class="big" onclick="go()">▶ שחק</button>
+<div data-pwa-slot></div>
+<a class="ico" href="../index.html">🏠</a>
+</section>
+
+<section id="hub" class="scr">
+<div class="top"><a class="ico" href="../index.html">🏠</a><b style="font-size:24px">⭐ <span id="stars">0</span></b><button class="ico" onclick="say(T.hub)">🔊</button></div>
+<div class="garden" id="gardenView"></div>
+<div class="tasks">
+<button class="task" onclick="feed()">🍓<small>להאכיל</small></button>
+<button class="task" onclick="water()">💧<small>להשקות</small></button>
+<button class="task" onclick="build()">🏠<small>לבנות</small></button>
+</div>
+</section>
+
+<section id="play" class="scr">
+<div class="top"><button class="ico" onclick="show('hub')">🌳</button><b style="font-size:24px">⭐ <span id="stars2">0</span></b><button class="ico" onclick="say(cur.say)">🔊</button></div>
+<div id="who" style="font-size:80px"></div>
+<div class="ask" id="ask"></div>
+<div id="area" class="row"></div>
+</section>
+
+<div id="pop"></div>
+
+<script>
+const T={hub:"בחר משימה: להאכיל, להשקות או לבנות"};
+const COLORS=[["אדום","אדומים","#e53935"],["כחול","כחולים","#1e88e5"],["צהוב","צהובים","#fdd835"],["סגול","סגולים","#8e24aa"]];
+const FRIENDS=["🐰","🐿️","🐢","🦔","🐥","🐸","🐻","🦊"];
+const DECOR=["🌷","🌻","🦋","🍄","🌈","🐞","🌼","🪺","🎈","⭐","🌳","🐝"];
+let S=JSON.parse(localStorage.getItem("omerGarden")||'{"stars":0,"lvl":1,"decor":[]}');
+let cur={},streak=0;
+const save=()=>localStorage.setItem("omerGarden",JSON.stringify(S));
+const $=id=>document.getElementById(id);
+const rnd=n=>Math.floor(Math.random()*n);
+let AC;function snd(f,d=.15,t="sine"){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.2,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function yay(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.2),i*110))}
+function say(t){try{if(!window.speechSynthesis||!t)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="he-IL";u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+function show(id){document.querySelectorAll(".scr").forEach(s=>s.classList.toggle("on",s.id==id));if(id=="hub")drawGarden()}
+function go(){snd(600);show("hub");say("שלום! בוא נעזור לחברים בגינה. "+T.hub)}
+function drawGarden(){$("stars").textContent=$("stars2").textContent=S.stars;const g=$("gardenView");g.innerHTML='<svg width="110" height="110" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"><use href="#mouse"/></svg>';
+S.decor.forEach((d,i)=>{const e=document.createElement("span");e.textContent=d.e;e.style.left=d.x+"%";e.style.top=d.y+"%";g.appendChild(e)})}
+function max(){return S.lvl<3?10:20}
+function start(o){cur=o;show("play");$("stars2").textContent=S.stars;$("who").textContent=o.who;$("ask").textContent=o.text;$("area").innerHTML="";o.draw($("area"));say(o.say)}
+function win(){yay();S.stars++;streak++;if(streak>=3&&S.lvl<5){S.lvl++;streak=0}
+const d=DECOR[rnd(DECOR.length)];S.decor.push({e:d,x:5+rnd(85),y:5+rnd(70)});if(S.decor.length>40)S.decor.shift();save();
+$("pop").innerHTML=d+"<div>כל הכבוד! קיבלת "+d+" לגינה</div>";$("pop").classList.add("on");say("כל הכבוד! קיבלת קישוט חדש לגינה");
+setTimeout(()=>{$("pop").classList.remove("on");show("hub")},2200)}
+function oops(el,msg){snd(220,.2,"triangle");streak=0;if(el){el.classList.add("shake");setTimeout(()=>el.classList.remove("shake"),400)}say(msg||"כמעט! נסה שוב")}
+function opts(ans,area,lo=0){let s=new Set([ans]);while(s.size<3){let v=ans+rnd(5)-2;if(v>=lo&&v<=20)s.add(v)}
+[...s].sort(()=>Math.random()-.5).forEach(v=>{const b=document.createElement("button");b.className="opt";b.textContent=v;b.onclick=()=>v==ans?win():(b.classList.add("no"),oops(b));area.appendChild(b)})}
+/* 1. feed berries */
+function feed(){const n=1+rnd(max()),c=S.lvl>=2?COLORS[rnd(4)]:COLORS[0],f=FRIENDS[rnd(FRIENDS.length)];
+const word=n==1?"תות "+c[0]+" אחד":n+" תותים "+c[1];
+start({who:f,text:"תן לי "+n+" "+(S.lvl>=2?"🍓 "+c[1]:"🍓")+" בבקשה",say:"אני רעב! תן לי "+word+" בבקשה",draw(a){
+let basket=[];const bk=document.createElement("div");bk.className="basket";
+const cnt=document.createElement("div");cnt.style.fontSize="30px";cnt.textContent="0";
+const bush=document.createElement("div");bush.className="row";
+const cols=S.lvl>=2?COLORS:[COLORS[0]];const total=Math.min(24,n+4+rnd(4));
+for(let i=0;i<total;i++){const col=i<n?c:cols[rnd(cols.length)];const b=document.createElement("div");b.className="berry";b.style.background=col[2];
+b.onclick=()=>{if(basket.length>=20)return;basket.push(col);snd(400+basket.length*30,.1);bk.appendChild(b);cnt.textContent=basket.length;
+b.onclick=()=>{basket.splice(basket.indexOf(col),1);bush.appendChild(b);cnt.textContent=basket.length;b.onclick=null;setTimeout(()=>feed.rebind(b,col),0)}};bush.appendChild(b)}
+feed.rebind=(b,col)=>{b.onclick=()=>{basket.push(col);bk.appendChild(b);cnt.textContent=basket.length;b.onclick=()=>{basket.splice(basket.indexOf(col),1);bush.appendChild(b);cnt.textContent=basket.length;feed.rebind(b,col)}}};
+[...bush.children].sort(()=>Math.random()-.5).forEach(x=>bush.appendChild(x));
+const give=document.createElement("button");give.className="big";give.textContent="🧺 תן";
+give.onclick=()=>{if(basket.length==n&&basket.every(x=>x==c))win();else if(basket.some(x=>x!=c))oops(bk,"יש בסל צבע אחר. אני רוצה רק "+c[1]);else oops(bk,basket.length<n?"צריך עוד! ספרנו "+basket.length:"יותר מדי! ספרנו "+basket.length)};
+a.append(bush,bk,cnt,give)}})}
+/* 2. water flowers: + / - */
+function water(){const M=max();let x,y,plus=S.lvl<2||rnd(2),ans;
+if(plus){x=1+rnd(M-1);y=1+rnd(M-x);ans=x+y}else{x=2+rnd(M-1);y=1+rnd(x-1);ans=x-y}
+if(S.lvl==1){x=1+rnd(5);y=1+rnd(5-x+1);ans=x+y;plus=1}
+start({who:"💧",text:plus?"🌷 "+x+" + "+y+" = ?":"🌷 "+x+" − "+y+" = ?",
+say:plus?"יש "+x+" פרחים, ועוד "+y+" פרחים צמחו. כמה פרחים יש? השקה אותם וספור":"היו "+x+" פרחים, ו"+y+" נקטפו. כמה נשארו?",
+draw(a){const fl=document.createElement("div");fl.className="row";
+for(let i=0;i<x+(plus?y:0);i++){const s=document.createElement("span");s.className="flower";s.textContent=plus&&i>=x?"🌼":"🌷";if(!plus&&i>=x-y)s.style.opacity=.25;
+s.onclick=()=>{if(!s.classList.contains("w")){s.classList.add("w");snd(500+i*40,.1)}};fl.appendChild(s)}
+const o=document.createElement("div");o.className="row";a.append(fl,o);opts(ans,o)}})}
+/* 3. build house: pattern */
+const SH=[["🟥","אדום"],["🟦","כחול"],["🟨","צהוב"],["🟩","ירוק"],["🔺","משולש"],["⚪","עיגול"]];
+function build(){const k=S.lvl<3?2:3;let base=[];while(base.length<k){const s=SH[rnd(SH.length)];if(!base.includes(s))base.push(s)}
+const len=S.lvl<2?5:7,seq=[];for(let i=0;i<len;i++)seq.push(base[i%k]);const ans=base[len%k];
+start({who:"🏠",text:"איזו לבנה באה עכשיו?",say:"נבנה בית! תסתכל על הדפוס. איזו לבנה באה עכשיו?",draw(a){
+const w=document.createElement("div");w.style.fontSize="40px";w.style.direction="rtl";w.textContent=seq.map(s=>s[0]).join("")+"❓";
+const o=document.createElement("div");o.className="row";let ch=[...base];while(ch.length<3){const s=SH[rnd(SH.length)];if(!ch.includes(s))ch.push(s)}
+ch.sort(()=>Math.random()-.5).forEach(s=>{const b=document.createElement("button");b.className="opt";b.textContent=s[0];
+b.onclick=()=>{if(s==ans){w.textContent=seq.map(s=>s[0]).join("")+s[0]+" 🏡";win()}else{b.classList.add("no");oops(b,"זה "+s[1]+". נסה לבנה אחרת")}};o.appendChild(b)});a.append(w,o)}})}
+</script></body></html>

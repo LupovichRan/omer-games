@@ -69,8 +69,6 @@
   .ch.bad { background: linear-gradient(180deg, #ffcdd2, #ef9a9a); box-shadow: 0 7px 0 #c62828; animation: shake .4s; }
   .ch.dim { opacity: .45; }
   .ch .spk { position: absolute; top: 4px; left: 6px; font-size: 18px; background: #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 #9fa8da; }
-  .frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; vertical-align: middle; }
-  .frac b { border-bottom: 4px solid currentColor; padding: 0 4px; }
   @keyframes pop { 50% { transform: scale(1.08); } }
   @keyframes shake { 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
   .hint { width: 100%; margin-top: 14px; background: #fff8e1; border: 5px solid #ffb300; border-radius: 24px; padding: 10px 14px; font-size: clamp(20px, 5vw, 26px); color: #5d4037; text-align: center; }
@@ -254,7 +252,6 @@ function near(ans, extra = []) {
   const pool = shuffle(st.flatMap(s => [ans + s, ans - s])).filter(ok);
   return [ans, ...out, ...pool];
 }
-function fracHTML(k, d) { return `<span class="frac"><b>${k}</b><span>${d}</span></span>`; }
 /* ===== MATH ===== */
 const OPS = { '+': ['+', 'ועוד', 'plus', (a, b) => a + b], '-': ['−', 'פחות', 'minus', (a, b) => a - b], '*': ['×', 'כפול', 'times', (a, b) => a * b], '/': ['÷', 'חלקי', 'divided by', (a, b) => a / b] };
 const ITEMS = [{ he: 'תותים', en: 'strawberries', e: '🍓' }, { he: 'כדורים', en: 'balls', e: '⚽' }, { he: 'מדבקות', en: 'stickers', e: '⭐' }, { he: 'עוגיות', en: 'cookies', e: '🍪' }, { he: 'קלפים', en: 'cards', e: '🃏' }, { he: 'בלונים', en: 'balloons', e: '🎈' }, { he: 'תפוחים', en: 'apples', e: '🍎' }];
@@ -263,7 +260,6 @@ const PLACE_HE = ['אחדות', 'עשרות', 'מאות', 'אלפים', 'עשר�
 const PLACE_EN = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands', 'hundred-thousands'];
 const ROUND_HE = ['', 'לעשרת הקרובה', 'למאה הקרובה', 'לאלף הקרוב', 'לעשרת האלפים הקרובה', 'למאת האלפים הקרובה'];
 const ROUND_EN = ['', 'the nearest ten', 'the nearest hundred', 'the nearest thousand', 'the nearest ten thousand', 'the nearest hundred thousand'];
-const FNAME = { '1/2': ['חצי', 'one half'], '1/3': ['שליש', 'one third'], '1/4': ['רבע', 'one quarter'], '1/5': ['חמישית', 'one fifth'], '1/10': ['עשירית', 'one tenth'], '3/4': ['שלושה רבעים', 'three quarters'], '2/3': ['שני שלישים', 'two thirds'], '2/5': ['שתי חמישיות', 'two fifths'] };
 
 function mathQ(L, lvl, o) {
   let c;
@@ -377,21 +373,6 @@ function pieSVG(k, d) {
   }
   return s + '</svg>';
 }
-function fracPic(L, lvl) {
-  const d = pick([2, 3, 4, 5, 6, 8]), k = R(1, d - 1); const ansV = `${k}/${d}`;
-  const cands = [[d - k, d], [k + 1, d], [k, d + 1], [k - 1, d], [k, d - 1], [k + 1, d + 1], [1, d + 2]].filter(([a, b]) => a >= 1 && b >= 2 && a < b && b <= 10 && a * d !== k * b).map(([a, b]) => `${a}/${b}`);
-  const c = mk([ansV, ...cands], { label: v => fracHTML(...v.split('/')), say: v => P(L, v.replace('/', ' מתוך '), v.replace('/', ' out of ')) });
-  return { track: 'math', lang: L, text: P(L, 'איזה חלק מהעיגול צבוע?', 'What part of the circle is colored?'), eq: '', vis: pieSVG(k, d), choices: c.choices, ans: c.ans,
-    say: P(L, 'איזה חלק מהעיגול צבוע בצהוב?', 'What part of the circle is colored yellow?'),
-    hint: P(L, `סופרים: ${k} חלקים צבועים מתוך ${d} חלקים שווים.`, `Count: ${k} colored parts out of ${d} equal parts.`) + `\n${k}/${d}`, meta: { check: `?==${k}/${d}`, kind: 'frac' }, key: 'mf' + ansV };
-}
-function fracOf(L, lvl, adv) {
-  const f = adv ? pick(['3/4', '2/3', '2/5', '1/10', '1/4', '1/3']) : pick(['1/2', '1/4', '1/3', '1/5', '1/10']);
-  const [k, d] = f.split('/').map(Number); const N = d * R(adv ? 4 : 2, adv ? 60 : 25) * (Math.random() < .5 ? 1 : 2); const ans = N * k / d;
-  return mathQ(L, lvl, { eq: '', vis: `<div style="font-size:.9em;direction:ltr">${fracHTML(k, d)} × ${fmt(N)} = ☐</div>`, ans, extra: [N / d, N - ans, ans * 2], kind: 'fracof', check: `${N}*${k}/${d}==?`,
-    text: P(L, `כמה זה ${FNAME[f][0]} מ-${fmt(N)}?`, `What is ${FNAME[f][1]} of ${fmt(N)}?`), say: P(L, `כמה זה ${FNAME[f][0]} מ-${N}?`, `What is ${FNAME[f][1]} of ${N}?`),
-    hint: P(L, `מחלקים ${fmt(N)} ל-${d} חלקים שווים: כל חלק ${fmt(N / d)}. לוקחים ${k}.`, `Split ${fmt(N)} into ${d} equal parts: each is ${fmt(N / d)}. Take ${k}.`) + `\n= ${fmt(ans)}` });
-}
 function word(L, lvl, kind, big) {
   const it = pick(ITEMS), h = pick(HEROES); const nm = P(L, h[0], h[1]); let a, b, c, ans, he, en, chk;
   if (kind === 'add') { a = big ? R(120, 900) : R(12, 60); b = big ? R(120, 900) : R(11, 39); ans = a + b; chk = `${a}+${b}==?`;
@@ -438,30 +419,26 @@ function regroup(L, lvl) {
   else { const o1 = R(0, 8), o2 = R(o1 + 1, 9); a = R(3, 9) * 10 + o1; b = R(1, Math.floor(a / 10) - 1) * 10 + o2; }
   return bin(L, lvl, a, op, b);
 }
-const MATH_DESC = ['', 'חיבור עד 10 בתמונות', 'חיבור וחיסור עד 20', 'מספר חסר, השוואה', 'דו-ספרתי בלי המרה, קבוצות', 'דו-ספרתי עם המרה', 'מספר חסר, כפל עד 5, חלוקה', 'לוח הכפל, שברים, בעיות מילוליות', 'תלת-ספרתי עגול, ערך המקום', 'תלת-ספרתי, עיגול, בעיות כפל/חילוק', 'דו-ספרתי × חד-ספרתי, חילוק', 'ארבע ספרות עגול, פירוק מספר', 'ארבע ספרות, עיגול, חלק ממספר', '×10/100/1000, תלת × חד', 'חמש ספרות, השוואה וערך מקום עד 6 ספרות', 'דו × דו, חילוק תלת-ספרתי', 'מאות אלפים, עיגול', 'סדר פעולות, שברים, בעיות רב-שלביות', 'טריקים: +999, ×25, מספר חסר גדול', 'כפל דו×דו, חילוק 4 ספרות, 6 ספרות', 'אלופים: ריבועים, כפל עגול גדול'];
+const MATH_DESC = ['', 'חיבור וחיסור עד 10 בתמונות', 'חיבור וחיסור עד 20', 'מספר חסר, השוואה עד 100', 'דו-ספרתי בלי המרה, קבוצות של 2', 'דו-ספרתי עם המרה, קבוצות של 2/5/10', 'מספר חסר עד 100, בעיות מילוליות', 'מאות עגולות, ×2 ×5 ×10', 'תלת-ספרתי חיבור וחיסור', 'אלפים עגולים, השוואה', 'ארבע ספרות חיבור וחיסור', 'עשרות אלפים', 'מספרי ענק: מאות אלפים, +999'];
+function grpK(L, lvl, ks) { const it = pick(ITEMS); const g = R(2, 5), n = pick(ks);
+  const vis = Array.from({ length: g }, () => `<span class="grp">${it.e.repeat(n)}</span>`).join('');
+  const q = bin(L, lvl, g, '*', n, vis);
+  q.say = P(L, `יש ${g} קבוצות, ובכל קבוצה ${n} ${it.he}. כמה ${it.he} יש בסך הכול?`, `${g} groups with ${n} ${it.en} in each. How many ${it.en} in all?`);
+  q.text = P(L, `${g} קבוצות של ${n}`, `${g} groups of ${n}`); return q; }
 function genMath(lvl, L) {
   switch (lvl) {
     case 1: return mix(() => addPics(L, lvl), () => addPics(L, lvl), () => subPics(L, lvl));
     case 2: return mix(() => addSub(L, lvl, 3, 15), () => { const a = R(6, 9), b = R(11 - a, 9); return bin(L, lvl, a, '+', b); }, () => { const a = R(11, 19), b = R(2, 9); return bin(L, lvl, a, '-', b); });
-    case 3: return mix(() => missing(L, lvl, 20), () => compare(L, lvl, 2), () => bin(L, lvl, R(2, 8) * 10 + R(5, 9), '+', R(3, 9)));
-    case 4: return mix(() => noRegroup(L, lvl), () => noRegroup(L, lvl), () => groups(L, lvl, 4, 5), () => missing(L, lvl, 30));
-    case 5: return mix(() => regroup(L, lvl), () => regroup(L, lvl), () => compare(L, lvl, 3), () => groups(L, lvl, 5, 5));
-    case 6: return mix(() => missing(L, lvl, 100), () => bin(L, lvl, R(2, 5), '*', R(2, 10)), () => share(L, lvl), () => regroup(L, lvl));
-    case 7: return mix(() => bin(L, lvl, R(2, 10), '*', R(2, 10)), () => fracPic(L, lvl), () => word(L, lvl, pick(['add', 'sub'])), () => missing(L, lvl, 100));
-    case 8: return mix(() => addSub(L, lvl, 100, 900, 10), () => placeValue(L, lvl, 3), () => compare(L, lvl, 4), () => bin(L, lvl, R(3, 10), '*', R(3, 10)));
-    case 9: return mix(() => addSub(L, lvl, 100, 999), () => rounding(L, lvl, 3, pick([1, 2])), () => word(L, lvl, pick(['mul', 'div'])), () => fracPic(L, lvl));
-    case 10: return mix(() => bin(L, lvl, R(12, 99), '*', R(2, 9)), () => { const b = R(2, 9), q = R(3, Math.floor(99 / b)); return bin(L, lvl, b * q, '/', b); }, () => missing(L, lvl, 100, 'x'), () => word(L, lvl, pick(['add', 'sub', 'mul', 'div'])));
-    case 11: return mix(() => addSub(L, lvl, 1000, 9000, 100), () => placeValue(L, lvl, 4), () => expanded(L, lvl, 4), () => addSub(L, lvl, 100, 999));
-    case 12: return mix(() => addSub(L, lvl, 1000, 9999, 1, { unitB: 10 }), () => rounding(L, lvl, 4, pick([2, 3])), () => fracOf(L, lvl, false), () => word(L, lvl, pick(['add', 'sub']), true));
-    case 13: return mix(() => bin(L, lvl, R(2, 999), '*', pick([10, 100, 1000])), () => { const u = pick([10, 100]); return bin(L, lvl, R(2, 999) * u, '/', u); }, () => bin(L, lvl, R(101, 999), '*', R(2, 9)), () => expanded(L, lvl, 5));
-    case 14: return mix(() => addSub(L, lvl, 10000, 99000, 1000), () => compare(L, lvl, pick([5, 6])), () => placeValue(L, lvl, 6), () => addSub(L, lvl, 1000, 9999));
-    case 15: return mix(() => bin(L, lvl, R(11, 99), '*', pick([10, 20, 30, 40, 50, 11, R(12, 19)])), () => { const b = R(2, 9), q = R(12, Math.floor(999 / b)); return bin(L, lvl, b * q, '/', b); }, () => word(L, lvl, pick(['mul', 'div', 'multi'])), () => missing(L, lvl, 1000));
-    case 16: return mix(() => addSub(L, lvl, 100000, 900000, 1000), () => addSub(L, lvl, 100000, 900000, 10000), () => rounding(L, lvl, pick([5, 6]), pick([3, 4, 5])), () => placeValue(L, lvl, 6));
-    case 17: return mix(() => orderOps(L, lvl), () => fracOf(L, lvl, true), () => word(L, lvl, pick(['multi', 'share']), true), () => addSub(L, lvl, 10000, 99999, 100));
-    case 18: return mix(() => { const a = R(10000, 999999); const t = pick([999, 998, 99, 9999, 1001]); return Math.random() < .5 ? bin(L, lvl, a, '+', t) : bin(L, lvl, a, '-', t); }, () => bin(L, lvl, R(2, 48), '*', pick([25, 50])),
-      () => { const b = rnd(1000, 9000, 100), c = rnd(1000, 9000, 100); return mathQ(L, lvl, { eq: `☐ − ${fmt(b)} = ${fmt(c)}`, ans: b + c, kind: 'missing', check: `?-${b}==${c}`, text: P(L, 'איזה מספר חסר?', 'What number is missing?'), say: P(L, `איזה מספר חסר? מאיזה מספר מורידים ${b} ומקבלים ${c}?`, `What number is missing? What number minus ${b} equals ${c}?`), hint: P(L, 'מחברים בחזרה:', 'Add it back:') + `\n${fmt(c)} + ${fmt(b)} = ${fmt(b + c)}` }); }, () => orderOps(L, lvl));
-    case 19: return mix(() => bin(L, lvl, R(12, 35), '*', R(12, 35)), () => { const b = R(2, 9), q = R(100, Math.floor(9999 / b)); return bin(L, lvl, b * q, '/', b); }, () => addSub(L, lvl, 100000, 999999, 1, { unitB: 100 }), () => fracOf(L, lvl, true));
-    default: return mix(() => { const n = R(11, 25); return bin(L, lvl, n, '*', n); }, () => bin(L, lvl, R(11, 99) * 10, '*', R(2, 9) * 10), () => word(L, lvl, pick(['multi', 'share', 'mul']), true), () => missing(L, lvl, 1000, 'x'), () => addSub(L, lvl, 100000, 999999));
+    case 3: return mix(() => missing(L, lvl, 20, pick(['a+', '+b', '-b'])), () => compare(L, lvl, 2), () => bin(L, lvl, R(2, 8) * 10 + R(5, 9), '+', R(3, 9)));
+    case 4: return mix(() => noRegroup(L, lvl), () => noRegroup(L, lvl), () => grpK(L, lvl, [2]), () => missing(L, lvl, 30, pick(['a+', '+b', '-b'])));
+    case 5: return mix(() => regroup(L, lvl), () => regroup(L, lvl), () => compare(L, lvl, 2), () => grpK(L, lvl, [2, 5, 10]));
+    case 6: return mix(() => missing(L, lvl, 100, pick(['a+', '+b', '-b'])), () => word(L, lvl, pick(['add', 'sub'])), () => regroup(L, lvl), () => compare(L, lvl, 3));
+    case 7: return mix(() => addSub(L, lvl, 100, 900, 100), () => bin(L, lvl, R(2, 10), '*', pick([2, 5, 10])), () => compare(L, lvl, 3), () => grpK(L, lvl, [2, 5, 10]));
+    case 8: return mix(() => addSub(L, lvl, 100, 900, 10), () => addSub(L, lvl, 100, 999), () => compare(L, lvl, 3), () => bin(L, lvl, R(2, 10), '*', pick([2, 5, 10])));
+    case 9: return mix(() => addSub(L, lvl, 1000, 9000, 1000), () => addSub(L, lvl, 1000, 9000, 100), () => compare(L, lvl, 4));
+    case 10: return mix(() => addSub(L, lvl, 1000, 9999, 1, { unitB: 10 }), () => addSub(L, lvl, 1000, 9999), () => compare(L, lvl, 4));
+    case 11: return mix(() => addSub(L, lvl, 10000, 99000, 1000), () => addSub(L, lvl, 10000, 99999, 100), () => compare(L, lvl, 5));
+    default: return mix(() => addSub(L, lvl, 100000, 900000, 10000), () => addSub(L, lvl, 100000, 900000, 1000), () => compare(L, lvl, 6), () => { const a = R(10000, 999999); const t = pick([999, 99, 1001]); return Math.random() < .5 ? bin(L, lvl, a, '+', t) : bin(L, lvl, a, '-', t); });
   }
 }
 
@@ -846,10 +823,10 @@ function genEng(lvl) {
 }
 /* ===== APP ===== */
 const TR = {
-  math: { name: 'חשבון', icon: '🔢', max: 20, start: 5 },
-  logic: { name: 'דפוסים והיגיון', icon: '🧩', max: 15, start: 3 },
-  spatial: { name: 'חשיבה מרחבית', icon: '🧊', max: 12, start: 2 },
-  read: { name: 'קריאה', icon: '📖', max: 12, start: 1 },
+  math: { name: 'חשבון', icon: '🔢', max: 12, start: 1 },
+  logic: { name: 'דפוסים והיגיון', icon: '🧩', max: 10, start: 1 },
+  spatial: { name: 'חשיבה מרחבית', icon: '🧊', max: 12, start: 1 },
+  read: { name: 'קריאה', icon: '📖', max: 10, start: 1 },
   sci: { name: 'מדע', icon: '🔬', max: 10, start: 2 },
   eng: { name: 'English', icon: '🇬🇧', max: 10, start: 1 }
 };
@@ -860,7 +837,7 @@ function fresh() { return { stars: 0, lang: 'he', autoRead: true, t: {} }; }
 function load() {
   let s = null; try { s = JSON.parse(localStorage.getItem(SKEY)); } catch (e) {}
   s = Object.assign(fresh(), s || {}); s.stars |= 0;
-  for (const t in TR) { const d = s.t[t] || {}; s.t[t] = { lvl: clampL(t, d.lvl), ok: d.ok | 0, tot: d.tot | 0, streak: d.streak | 0, wrong: d.wrong | 0, best: Math.max(d.best | 0, clampL(t, d.lvl)) }; }
+  for (const t in TR) { const d = s.t[t] || {}; s.t[t] = { lvl: clampL(t, d.lvl), ok: d.ok | 0, tot: d.tot | 0, streak: d.streak | 0, wrong: d.wrong | 0, best: Math.min(TR[t].max, Math.max(d.best | 0, clampL(t, d.lvl))) }; }
   return s;
 }
 let S = load();

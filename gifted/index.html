@@ -501,14 +501,14 @@
   function genNumSeq(L) {
     let t = [], why = '', n = 5;
     const ar = (s, d, k) => Array.from({ length: k }, (_, i) => s + d * i);
-    const kind = pick({ 1: ['ar'], 2: ['ar'], 3: ['ar', 'ar', 'geo'], 4: ['ar', 'geo'], 5: ['alt', 'geo', 'ar'], 6: ['inc', 'alt', 'geo'], 7: ['fib', 'inter', 'geo', 'inc'], 8: ['inc2', 'fib', 'inter', 'bigar'] }[L]);
+    const kind = pick({ 1: ['ar'], 2: ['ar'], 3: ['ar'], 4: ['ar', 'geo'], 5: ['alt', 'geo', 'ar'], 6: ['inc', 'alt', 'geo'], 7: ['fib', 'inter', 'geo', 'inc'], 8: ['inc2', 'fib', 'inter', 'bigar'] }[L]);
     if (kind === 'ar') {
       const d = pick({ 1: [1, 2], 2: [2, 3, 5, 10], 3: [4, 5, 10, 20, 25, -2, -5], 4: [25, 50, 100, 11, -10, -25] }[Math.min(L, 4)]);
       const s = d > 0 ? rr(0, L >= 3 ? 50 : 10) * (Math.abs(d) >= 25 ? Math.abs(d) / 25 : 1) : rr(Math.abs(d) * 6, Math.abs(d) * 6 + (L >= 3 ? 60 : 10));
       t = ar(Math.round(s), d, n + 1); why = d > 0 ? `בכל פעם מוסיפים ${d}.` : `בכל פעם מורידים ${-d}.`;
     } else if (kind === 'bigar') { const d = pick([125, 250, 150, 99, 101, -75]); const s = rr(10, 40) * 100; t = ar(s, d, n + 1); why = d > 0 ? `בכל פעם מוסיפים ${d}.` : `בכל פעם מורידים ${-d}.`; }
     else if (kind === 'geo') {
-      const r = pick(L >= 7 ? [3, 10, 2] : L >= 5 ? [2, 3] : [2]); const down = L >= 5 && Math.random() < 0.3;
+      const r = pick(L >= 7 ? [10, 2] : [2]); const down = false;
       let s = r === 10 ? rr(1, 3) : r === 3 ? rr(1, 2) : rr(1, L >= 5 ? 5 : 3); n = r === 10 ? 4 : 5;
       t = Array.from({ length: n + 1 }, (_, i) => s * r ** i); if (down) t.reverse(); n = t.length - 1;
       why = down ? `בכל פעם מחלקים ב־${r}.` : `בכל פעם כופלים ב־${r}${r === 2 ? ', כלומר מכפילים' : ''}.`;
@@ -854,19 +854,14 @@
     let a, b, op, ans, expr, say, why = '';
     const two = (x, o, y) => { a = x; op = o; b = y; ans = calc(x, o, y); };
     switch (L) {
-      case 1: two(rr(10, 79), '+', pick([rr(1, 9), rr(1, 5) * 10])); break;
-      case 2: if (Math.random() < 0.5) two(rr(21, 89), '+', rr(11, 59)); else { const x = rr(40, 99); two(x, '-', rr(11, x - 10)); } break;
-      case 3: { const x = rr(1, 8) * 100 + rr(0, 9) * 10; if (Math.random() < 0.5) two(x, '+', pick([rr(1, 9) * 10, rr(1, 5) * 100])); else two(x + 200, '-', pick([rr(1, 9) * 10, rr(1, 2) * 100])); break; }
-      case 4: { const k = rnd(3); if (k === 0) { const x = rr(120, 580); two(x, '+', rr(110, 400)); } else if (k === 1) { const x = rr(400, 950); two(x, '-', rr(120, x - 100)); } else two(rr(12, 95), '×', pick([10, 100])); break; }
-      case 5: { const k = rnd(3); if (k === 0) two(rr(11, 49) * 100, '+', rr(5, 39) * 100); else if (k === 1) { const x = rr(30, 90) * 100; two(x, '-', rr(5, 25) * 100); } else two(rr(3, 9), '×', rr(3, 9)); break; }
-      case 6: { const k = rnd(3); if (k === 0) two(rr(12, 49), '×', rr(2, 9)); else if (k === 1) two(1000, '-', rr(101, 899)); else two(rr(1001, 4999), '+', rr(101, 999)); break; }
-      case 7: { const k = rnd(3); if (k === 0) two(rr(101, 250), '×', rr(2, 4)); else if (k === 1) { const y = rr(3, 9), q = rr(11, 30); two(y * q, ':', y); } else { const x = rr(3000, 9000); two(x, '-', rr(1001, x - 500)); } break; }
-      default: {
-        const k = rnd(3);
-        if (k === 0) { const x = rr(12, 25), y = rr(3, 6), z = rr(10, 90) * 10; ans = x * y + z; expr = `${x} × ${y} + ${z}`; say = `כמה זה ${x} כפול ${y}, ועוד ${z}?`; why = `קודם כפל: ${x} × ${y} = ${x * y}, ואז ${x * y} + ${z} = ${ans}.`; }
-        else if (k === 1) { const x = rr(11, 45) * 5, y = rr(11, 45) * 5; ans = 1000 - (x + y); expr = `1000 - (${x} + ${y})`; say = `כמה זה 1000 פחות, ${x} ועוד ${y}?`; why = `קודם מה שבסוגריים: ${x} + ${y} = ${x + y}, ואז 1000 - ${x + y} = ${ans}.`; }
-        else { const x = rr(2, 9), y = rr(11, 30), z = rr(2, 5); ans = (x + y) * z; expr = `(${x} + ${y}) × ${z}`; say = `כמה זה ${x} ועוד ${y}, והכל כפול ${z}?`; why = `קודם מה שבסוגריים: ${x + y}, ואז כפול ${z} = ${ans}.`; }
-      }
+      case 1: if (Math.random() < 0.5) two(rr(2, 9), '+', rr(1, 9)); else { const x = rr(8, 20); two(x, '-', rr(1, x - 2)); } break;
+      case 2: two(rr(10, 79), '+', pick([rr(1, 9), rr(1, 2) * 10])); break;
+      case 3: if (Math.random() < 0.5) two(rr(21, 89), '+', rr(11, 59)); else { const x = rr(40, 99); two(x, '-', rr(11, x - 10)); } break;
+      case 4: { const x = rr(1, 8) * 100 + rr(0, 9) * 10; if (Math.random() < 0.5) two(x, '+', pick([rr(1, 9) * 10, rr(1, 5) * 100])); else two(x + 200, '-', pick([rr(1, 9) * 10, rr(1, 2) * 100])); break; }
+      case 5: { const k = rnd(3); if (k === 0) two(rr(11, 49) * 100, '+', rr(5, 39) * 100); else if (k === 1) { const x = rr(30, 90) * 100; two(x, '-', rr(5, 25) * 100); } else two(rr(2, 10), '×', pick([2, 5, 10])); break; }
+      case 6: { const k = rnd(3); if (k === 0) { const x = rr(120, 580); two(x, '+', rr(110, 400)); } else if (k === 1) { const x = rr(400, 950); two(x, '-', rr(120, x - 100)); } else two(1000, '-', rr(1, 9) * 100); break; }
+      case 7: { const k = rnd(2); if (k === 0) two(1000, '-', rr(101, 899)); else two(rr(1001, 4999), '+', rr(101, 999)); break; }
+      default: { const k = rnd(2); if (k === 0) { const x = rr(3000, 9000); two(x, '-', rr(1001, x - 500)); } else two(rr(10, 90) * 1000, '+', rr(10, 90) * 1000); }
     }
     if (!expr) { expr = `${a} ${op} ${b}`; say = `כמה זה ${a} ${OPW[op]} ${b}?`; why = `${a} ${op} ${b} = ${ans}.`; if (op === '+' || op === '-') { const nc = noCarry(a, b, op); if (nc !== ans) why += ' שים לב לעבור על המאות והעשרות בזהירות.'; } }
     if (!Number.isInteger(ans) || ans < 0) return null;
@@ -992,7 +987,7 @@
       <circle cx="50" cy="60" r="13" fill="${mid === '?' ? '#fff3e0' : '#e8eaf6'}" stroke="${mid === '?' ? '#ff9800' : '#7986cb'}" stroke-width="2"/><text x="50" y="65.5" font-size="14" text-anchor="middle" font-weight="bold" fill="${mid === '?' ? '#ff9800' : '#222'}">${mid}</text></svg>`;
   }
   function genShapeNum(L) {
-    const pool = L <= 4 ? ['sum'] : L <= 5 ? ['sum', 'prod', 'ab+c'] : ['prod', 'ab+c', 'ab-c', '(a+b)c', 'a+b-c'];
+    const pool = L <= 5 ? ['sum'] : ['sum', 'a+b-c'];
     const rk = pick(pool); const [, f, why] = TRI_RULES.find(r => r[0] === rk);
     const nEx = L >= 7 ? 3 : 2;
     const ex = []; for (let i = 0; i <= nEx; i++) { const t = [rr(1, L <= 4 ? 9 : 6), rr(1, L <= 4 ? 9 : 6), rr(1, L <= 4 ? 9 : 5)]; ex.push(t); }
@@ -1014,8 +1009,8 @@
     };
   }
   function genMachine(L) {
-    const sq = L >= 8 && Math.random() < 0.4;
-    const a = rr(2, L >= 7 ? 5 : 3), b = rr(-3, 9);
+    const sq = false;
+    const a = L >= 6 ? 2 : 1, b = a === 1 ? pick([1, 2, 3, 4, 5, 10, -1, -2]) : rr(0, 5);
     const f = x => sq ? x * x + b : a * x + b;
     const xs = sample([1, 2, 3, 4, 5, 6, 7, 8, 10], 4);
     if (xs.some(x => f(x) < 0)) return null;
@@ -1041,17 +1036,17 @@
   function genWord(L) {
     const T = [];
     const add = (lv, fn) => { if (L >= lv[0] && L <= lv[1]) T.push(fn); };
-    add([1, 3], () => { const a = rr(3, L > 1 ? 40 : 9), b = rr(2, L > 1 ? 30 : 8); return { text: `לפיקאצ'ו יש <b>${a}</b> כדורים. הוא מצא עוד <b>${b}</b> כדורים. כמה כדורים יש לו עכשיו?`, pics: a + b <= 18 ? rep('🔴', a) + ' ➕ ' + rep('🔴', b) : '🔴 ➕ 🔴', ans: a + b, sim: () => { let s = 0; for (let i = 0; i < a; i++) s++; for (let i = 0; i < b; i++) s++; return s; }, wrong: [a - b, a + b + 1, a + b - 10], why: `${a} + ${b} = ${a + b}.` }; });
-    add([1, 3], () => { const a = rr(8, L > 1 ? 60 : 12), b = rr(2, a - 2); return { text: `היו <b>${a}</b> בלונים. <b>${b}</b> בלונים עפו. כמה בלונים נשארו?`, pics: a <= 14 ? rep('🎈', a) : '🎈🎈🎈', ans: a - b, sim: () => { let s = a; for (let i = 0; i < b; i++) s--; return s; }, wrong: [a + b, a - b + 1, a - b - 1], why: `${a} - ${b} = ${a - b}.` }; });
-    add([3, 5], () => { const n = rr(3, 6), k = rr(3, L >= 5 ? 12 : 6); return { text: `יש <b>${n}</b> חברים, ולכל אחד <b>${k}</b> מדבקות. כמה מדבקות יש לכולם ביחד?`, pics: rep('🧒', n), ans: n * k, sim: () => { let s = 0; for (let i = 0; i < n; i++) for (let j = 0; j < k; j++) s++; return s; }, wrong: [n + k, n * k + k, n * k - n], why: `${n} פעמים ${k}: ${n} × ${k} = ${n * k}.` }; });
-    add([4, 6], () => { const n = rr(2, 6), q = rr(3, 12); return { text: `<b>${n * q}</b> תותים מתחלקים שווה בשווה בין <b>${n}</b> ילדים. כמה תותים יקבל כל ילד?`, pics: rep('🍓', Math.min(n * q, 12)) + (n * q > 12 ? '…' : ''), ans: q, sim: () => { let left = n * q, each = 0; while (left >= n) { left -= n; each++; } return each; }, wrong: [n * q - n, q + 1, n], why: `${n * q} לחלק ל־${n} = ${q}.` }; });
+    add([1, 3], () => { const a = rr(3, L > 2 ? 40 : 9), b = rr(2, L > 2 ? 30 : 8); return { text: `לפיקאצ'ו יש <b>${a}</b> כדורים. הוא מצא עוד <b>${b}</b> כדורים. כמה כדורים יש לו עכשיו?`, pics: a + b <= 18 ? rep('🔴', a) + ' ➕ ' + rep('🔴', b) : '🔴 ➕ 🔴', ans: a + b, sim: () => { let s = 0; for (let i = 0; i < a; i++) s++; for (let i = 0; i < b; i++) s++; return s; }, wrong: [a - b, a + b + 1, a + b - 10], why: `${a} + ${b} = ${a + b}.` }; });
+    add([1, 3], () => { const a = rr(8, L > 2 ? 60 : 12), b = rr(2, a - 2); return { text: `היו <b>${a}</b> בלונים. <b>${b}</b> בלונים עפו. כמה בלונים נשארו?`, pics: a <= 14 ? rep('🎈', a) : '🎈🎈🎈', ans: a - b, sim: () => { let s = a; for (let i = 0; i < b; i++) s--; return s; }, wrong: [a + b, a - b + 1, a - b - 1], why: `${a} - ${b} = ${a - b}.` }; });
+    add([3, 5], () => { const n = rr(2, 5), k = pick([2, 5, 10]); return { text: `יש <b>${n}</b> חברים, ולכל אחד <b>${k}</b> מדבקות. כמה מדבקות יש לכולם ביחד?`, pics: rep('🧒', n), ans: n * k, sim: () => { let s = 0; for (let i = 0; i < n; i++) for (let j = 0; j < k; j++) s++; return s; }, wrong: [n + k, n * k + k, n * k - n], why: `${n} פעמים ${k}: ${n} × ${k} = ${n * k}.` }; });
+    add([99, 99], () => { const n = rr(2, 6), q = rr(3, 12); return { text: `<b>${n * q}</b> תותים מתחלקים שווה בשווה בין <b>${n}</b> ילדים. כמה תותים יקבל כל ילד?`, pics: rep('🍓', Math.min(n * q, 12)) + (n * q > 12 ? '…' : ''), ans: q, sim: () => { let left = n * q, each = 0; while (left >= n) { left -= n; each++; } return each; }, wrong: [n * q - n, q + 1, n], why: `${n * q} לחלק ל־${n} = ${q}.` }; });
     add([4, 7], () => { const h = rr(2, 7), d = rr(1, 5); return { text: `בחצר יש <b>${h}</b> תרנגולות ו־<b>${d}</b> כלבים. כמה רגליים יש לכולם ביחד?`, pics: rep('🐔', h) + ' ' + rep('🐕', d), ans: 2 * h + 4 * d, sim: () => { let s = 0; for (let i = 0; i < h; i++) s += 2; for (let i = 0; i < d; i++) s += 4; return s; }, wrong: [(h + d) * 2, (h + d) * 4, h + d, 2 * h + 2 * d + 2], why: `לתרנגולת 2 רגליים ולכלב 4: ${h} × 2 + ${d} × 4 = ${2 * h + 4 * d}.` }; });
-    add([5, 8], () => { const k = rr(6, 15), n = rr(3, 7), m = rr(2, 9); return { text: `בכל קופסה יש <b>${k}</b> עפרונות. יש <b>${n}</b> קופסות, ועוד <b>${m}</b> עפרונות מחוץ לקופסות. כמה עפרונות יש בסך הכול?`, pics: rep('📦', n) + ' ➕ ' + rep('✏️', m), ans: k * n + m, sim: () => { let s = 0; for (let i = 0; i < n; i++) s += k; return s + m; }, wrong: [k * n, k * (n + 1), k + n + m, k * n + m + 1], why: `${n} × ${k} = ${k * n}, ועוד ${m} = ${k * n + m}.` }; });
+    add([99, 99], () => { const k = rr(6, 15), n = rr(3, 7), m = rr(2, 9); return { text: `בכל קופסה יש <b>${k}</b> עפרונות. יש <b>${n}</b> קופסות, ועוד <b>${m}</b> עפרונות מחוץ לקופסות. כמה עפרונות יש בסך הכול?`, pics: rep('📦', n) + ' ➕ ' + rep('✏️', m), ans: k * n + m, sim: () => { let s = 0; for (let i = 0; i < n; i++) s += k; return s + m; }, wrong: [k * n, k * (n + 1), k + n + m, k * n + m + 1], why: `${n} × ${k} = ${k * n}, ועוד ${m} = ${k * n + m}.` }; });
     add([6, 8], () => { const o = rr(5, 8), d = rr(2, 6), f = rr(2, 9); return { text: `דני בן <b>${o}</b>. אחותו נועה גדולה ממנו ב־<b>${d}</b> שנים. בת כמה תהיה נועה בעוד <b>${f}</b> שנים?`, pics: '👦 👧 🎂', ans: o + d + f, sim: () => { let age = o; age += d; for (let i = 0; i < f; i++) age++; return age; }, wrong: [o + f, o + d, d + f, o + d + f - 1], why: `נועה עכשיו בת ${o} + ${d} = ${o + d}, ובעוד ${f} שנים: ${o + d + f}.` }; });
     add([6, 8], () => { const a = rr(8, 40), b = rr(3, 15); return { text: `לאש יש <b>${a}</b> קלפים. לפיקאצ'ו יש <b>${b}</b> קלפים יותר מלאש. כמה קלפים יש לשניהם ביחד?`, pics: '🃏 ⚡', ans: 2 * a + b, sim: () => { const p = a + b; return a + p; }, wrong: [a + b, 2 * a, a + 2 * b, 2 * (a + b)], why: `לפיקאצ'ו יש ${a} + ${b} = ${a + b}. ביחד: ${a} + ${a + b} = ${2 * a + b}.` }; });
     add([7, 8], () => { const p = rr(3, 9), q = rr(3, 9); return { text: `ילדים עומדים בשורה. עומר הוא ה־<b>${p}</b> מההתחלה וה־<b>${q}</b> מהסוף. כמה ילדים יש בשורה?`, pics: '🧒🧒🧒⚡🧒🧒', ans: p + q - 1, sim: () => { const line = []; for (let i = 0; i < p - 1; i++) line.push('x'); line.push('O'); for (let i = 0; i < q - 1; i++) line.push('x'); return line.length; }, wrong: [p + q, p + q - 2, p + q + 1], why: `לפני עומר יש ${p - 1} ילדים, אחריו ${q - 1}, ועוד עומר עצמו: ${p - 1} + ${q - 1} + 1 = ${p + q - 1}.` }; });
-    add([7, 8], () => { const x = rr(6, 15), y = rr(1, x - 2); return { text: `מחברת עולה <b>${x}</b> שקלים. עט עולה <b>${y}</b> שקלים פחות ממחברת. כמה עולות 2 מחברות ועט אחד?`, pics: '📒📒 🖊️', ans: 3 * x - y, sim: () => { const pen = x - y; return x + x + pen; }, wrong: [2 * x + y, 2 * x, 3 * x, x + y], why: `העט עולה ${x} - ${y} = ${x - y}. 2 מחברות = ${2 * x}. ביחד ${2 * x} + ${x - y} = ${3 * x - y}.` }; });
-    add([8, 8], () => { const d = rr(1, 5), h = rr(1, 6), n = h + d, legs = 2 * h + 4 * d; return { text: `בחצר יש <b>${n}</b> חיות: תרנגולות וכלבים. לכולן ביחד יש <b>${legs}</b> רגליים. כמה כלבים יש?`, pics: '🐔 🐕 ❓', ans: d, sim: () => { for (let dd = 0; dd <= n; dd++) if (2 * (n - dd) + 4 * dd === legs) return dd; return -1; }, wrong: [h, n - 1, Math.floor(legs / 4), d + 1], why: `אם כולן היו תרנגולות היו ${2 * n} רגליים. יש עוד ${legs - 2 * n}, ולכל כלב 2 רגליים נוספות: ${legs - 2 * n} לחלק ל־2 = ${d}.` }; });
+    add([99, 99], () => { const x = rr(6, 15), y = rr(1, x - 2); return { text: `מחברת עולה <b>${x}</b> שקלים. עט עולה <b>${y}</b> שקלים פחות ממחברת. כמה עולות 2 מחברות ועט אחד?`, pics: '📒📒 🖊️', ans: 3 * x - y, sim: () => { const pen = x - y; return x + x + pen; }, wrong: [2 * x + y, 2 * x, 3 * x, x + y], why: `העט עולה ${x} - ${y} = ${x - y}. 2 מחברות = ${2 * x}. ביחד ${2 * x} + ${x - y} = ${3 * x - y}.` }; });
+    add([99, 99], () => { const d = rr(1, 5), h = rr(1, 6), n = h + d, legs = 2 * h + 4 * d; return { text: `בחצר יש <b>${n}</b> חיות: תרנגולות וכלבים. לכולן ביחד יש <b>${legs}</b> רגליים. כמה כלבים יש?`, pics: '🐔 🐕 ❓', ans: d, sim: () => { for (let dd = 0; dd <= n; dd++) if (2 * (n - dd) + 4 * dd === legs) return dd; return -1; }, wrong: [h, n - 1, Math.floor(legs / 4), d + 1], why: `אם כולן היו תרנגולות היו ${2 * n} רגליים. יש עוד ${legs - 2 * n}, ולכל כלב 2 רגליים נוספות: ${legs - 2 * n} לחלק ל־2 = ${d}.` }; });
     const w = pick(T)(); const truth = w.sim();
     if (truth !== w.ans || w.ans < 0) return null;
     const vals = numOpts(w.ans, w.wrong.filter(v => v >= 0 && v !== w.ans), [1, 2, 10]);
