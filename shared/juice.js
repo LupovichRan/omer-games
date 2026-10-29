@@ -161,6 +161,9 @@ body{animation:ojIn .45s ease-out both}
     try {
       const sp = speechSynthesis.speak.bind(speechSynthesis);
       speechSynthesis.speak = function (u) {
+        try { if (!u._ojClean) { u._raw = u.text; u.text = speechText(u.text, u.lang); } } catch (e) {}
+        try { const he = !/^en/i.test(u.lang || 'he'); if (!u.voice) { voices(); const v = he ? heVoice : enVoice; if (v) { u.voice = v; u.lang = v.lang; } else if (!u.lang) u.lang = 'he-IL'; } if (he && u.rate > .9) u.rate = .9; } catch (e) {}
+        if (!u.text) { setTimeout(() => { try { u.onend && u.onend(); } catch (e) {} }, 0); return; }
         try { duck = .25; setMusicGain(); const end = () => { setTimeout(() => { if (!speechSynthesis.speaking) { duck = 1; setMusicGain(); } }, 200); }; u.addEventListener('end', end); u.addEventListener('error', end); } catch (e) {}
         return sp(u);
       };
@@ -186,17 +189,97 @@ body{animation:ojIn .45s ease-out both}
   }, true);
 
   /* ---------------- speech ---------------- */
+  /* OJ_SPEECH_BEGIN – every utterance on the site passes through speechText() (also hooked into
+     speechSynthesis.speak above, so even page-local say() helpers get cleaned). Device TTS reads
+     Hebrew without niqqud best; emoji/symbols/niqqud/geresh made Android & iOS spell words letter by letter. */
+  const HEB = '\u05D0-\u05EA';
+  const LNAMES = { 'א': 'אלף', 'ב': 'בית', 'ג': 'גימל', 'ד': 'דלת', 'ה': 'הא', 'ו': 'וו', 'ז': 'זין', 'ח': 'חית', 'ט': 'טית', 'י': 'יוד', 'כ': 'כף', 'ך': 'כף סופית', 'ל': 'למד', 'מ': 'מם', 'ם': 'מם סופית', 'נ': 'נון', 'ן': 'נון סופית', 'ס': 'סמך', 'ע': 'עין', 'פ': 'פא', 'ף': 'פא סופית', 'צ': 'צדי', 'ץ': 'צדי סופית', 'ק': 'קוף', 'ר': 'ריש', 'ש': 'שין', 'ת': 'תו' };
+  // Pronunciation dictionary: written word -> spelling device TTS reads correctly (plene, no niqqud).
+  // Matched as whole words, optionally after the prefixes ו/ה/ב/ל/מ/ש/כ.
+  const HE_FIX = {
+    "פיקאצ'ו": 'פיקאטשו', 'פיקאצ׳ו': 'פיקאטשו', 'פיקאצו': 'פיקאטשו',
+    'נשחק': 'נישחק', 'נשחקי': 'נישחקי', 'שחק': 'שחק', 'משחק': 'משחק',
+    'כל הכבוד': 'כל הכבוד',
+    'מטריה': 'מטרייה', 'אניה': 'אונייה', 'קוביה': 'קובייה', 'קוביות': 'קוביות', 'אזן': 'אוזן', 'דב': 'דוב', 'עגבניה': 'עגבנייה', 'סוכריה': 'סוכרייה'
+  };
+  // Imperatives are ambiguous without niqqud (נסה = nase / nisa); say the unambiguous spoken form. Whole word, no prefixes.
+  const IMPER = { 'נסה': 'תנסה', 'בדוק': 'תבדוק', 'זכור': 'תזכור', 'בחר': 'תבחר', 'אסוף': 'תאסוף', 'השקה': 'תשקה', 'ספור': 'תספור', 'הסתכל': 'תסתכל' };
+  const imperRe = new RegExp(`(^|[^${'\u05D0-\u05EA'}'׳-])(${Object.keys(IMPER).join('|')})(?![${'\u05D0-\u05EA'}'׳])`, 'g');
+  const ORD = ['', 'הראשון', 'השני', 'השלישי', 'הרביעי', 'החמישי', 'השישי', 'השביעי', 'השמיני', 'התשיעי', 'העשירי'];
+  const fixRe = (() => { const ks = Object.keys(HE_FIX).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\']/g, m => '\\' + m));
+    return new RegExp(`(^|[^${HEB}'׳])([ובלמשכה]{0,2})(${ks.join('|')})(?![${HEB}'׳])`, 'g'); })();
+  // Number + masculine plural noun: device TTS reads digits in the feminine ("שלוש בלונים") – say "שלושה בלונים".
+  const M_UNITS = ['', 'אחד', 'שניים', 'שלושה', 'ארבעה', 'חמישה', 'שישה', 'שבעה', 'שמונה', 'תשעה'];
+  const M_TEENS = ['עשרה', 'אחד עשר', 'שנים עשר', 'שלושה עשר', 'ארבעה עשר', 'חמישה עשר', 'שישה עשר', 'שבעה עשר', 'שמונה עשר', 'תשעה עשר'];
+  const TENS = ['', '', 'עשרים', 'שלושים', 'ארבעים', 'חמישים', 'שישים', 'שבעים', 'שמונים', 'תשעים'];
+  // Whitelists only: present-tense verbs also end in ים ("מוסיפים", "ומקבלים"), so no suffix guessing.
+  const MASC_N = new Set('בלונים תפוחים תותים קלפים כדורים חורים חברים כלבים ענבים ילדים כוכבים פרחים דגים חתולים ספרים עצים צעדים צבעים ממתקים צעצועים שקלים אבטיחים אננסים פוקימונים זוגות עפרונות כיסאות שולחנות חלונות קירות לילות ימים חודשים שבועות מטבעות ריבועים משולשים עיגולים מלבנים סיבובים שלבים אנשים גורים עלים זרעים קישוטים פרסים ארנבים סוסים פילים קופים ציורים גלגלים בתים מכנסיים משקפיים אופניים'.split(' '));
+  const FEM_N = new Set('מדבקות קבוצות תרנגולות רגליים פעמים שנים סוכריות עוגיות ביצים קוביות ידיים עיניים נקודות שורות צורות מילים אותיות בובות כפיות מכוניות פרות ציפורים דבורים נמלים צפרדעים אבנים שעות דקות קופסאות'.split(' '));
+  const mascNum = n => n < 10 ? M_UNITS[n] : n < 20 ? M_TEENS[n - 10] : TENS[Math.floor(n / 10)] + (n % 10 ? ' ו' + M_UNITS[n % 10] : '');
+  const heCounts = s => s.replace(new RegExp(`(^|[^\\d.,:\\-]|[${HEB}]-)(\\d{1,2})\\s+(?=([${HEB}]+))`, 'g'), (m, p, d, w) => {
+    const n = +d; p = p.replace(/-$/, ''); if (n < 2 || d[0] === '0') return m;
+    w = w.replace(/^ה(?=[\u05D0-\u05EA]{3})/, '');
+    if (MASC_N.has(w)) return p + (n === 2 ? 'שני' : mascNum(n)) + ' ';
+    if (n === 2 && FEM_N.has(w)) return p + 'שתי ';
+    return m; });
+  function speechText(t, lang) {
+    let s = String(t == null ? '' : t);
+    const en = /^en/i.test(lang || '');
+    s = s.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, ' ו ').replace(/&[a-z]+;/g, ' ');
+    // emoji & pictographs – never read aloud
+    s = s.replace(/[0-9#*]\uFE0F?\u20E3/gu, ' ')
+      .replace(/[\p{Extended_Pictographic}\p{Emoji_Presentation}\p{Regional_Indicator}\u{1F3FB}-\u{1F3FF}\uFE0E\uFE0F\u200D\u20E3\u{E0020}-\u{E007F}]/gu, ' ')
+      .replace(/[\p{So}\p{Co}]/gu, ' ');
+    // zero-width / bidi controls, soft hyphen
+    s = s.replace(/[\u00AD\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g, '');
+    // niqqud & cantillation (keep maqaf as a hyphen, sof-pasuq as a stop)
+    s = s.replace(/\u05BE/g, '-').replace(/\u05C3/g, '.').replace(/[\u0591-\u05BD\u05BF-\u05C2\u05C4-\u05C7]/g, '');
+    s = s.replace(new RegExp(`(^|\\s)[ובלמשהכ]['׳־-]?\\s*(?:…|\\.{2,})`, 'g'), '$1');
+    s = s.replace(/[′″‵]/g, ' ').replace(/…|\.{2,}/g, ', ').replace(/[“”„«»]/g, '"').replace(/[‘’]/g, "'").replace(/[–—]/g, ', ').replace(/[•·]/g, ', ');
+    if (!en) {
+      // spaced-out letters "נ ש ח ק" -> "נשחק"
+      s = s.replace(new RegExp(`(^|[^${HEB}])([${HEB}](?: [${HEB}]){2,})(?![${HEB}])`, 'g'), (m, p, w) => p + w.replace(/ /g, ''));
+      // whole-word pronunciation fixes
+      s = s.replace(fixRe, (m, pre, pfx, w) => pre + pfx + HE_FIX[w]).replace(imperRe, (m, p, w) => p + IMPER[w]);
+      s = s.replace(/(^|\s)([ו]?)ה[-־](10|[1-9])(?!\d)/g, (m, p, v, d) => p + v + ORD[+d]);
+      // geresh in borrowed sounds: צ' -> טש, ג' -> ג, ז' -> ז, ת' -> ת
+      s = s.replace(new RegExp(`([${HEB}])צ['׳](?=[${HEB}])`, 'g'), '$1טש').replace(new RegExp(`(^|[^${HEB}])צ['׳](?=[${HEB}])`, 'g'), '$1טש')
+        .replace(new RegExp(`ת['׳](?=[${HEB}])`, 'g'), 'ת').replace(new RegExp(`([גז])['׳](?=[${HEB}])`, 'g'), '$1\u0001');
+      // gershayim abbreviations: ש"ח -> שקל, otherwise drop the mark
+      s = s.replace(/ש["״]ח/g, 'שקלים').replace(new RegExp(`([${HEB}])["״]([${HEB}])`, 'g'), '$1$2');
+      s = s.replace(/(^|\s)כ-(?=\d)/g, '$1בערך ');
+      // a lone letter (with or without geresh), e.g. "האות ב" / "כיתה א'" -> letter name
+      s = s.replace(new RegExp(`(^|[\\s(,:"'])([${HEB}])['׳]?(?=$|[\\s.,!?:;)"'])`, 'g'), (m, p, l) => p + (LNAMES[l] || l));
+      s = s.replace(/['׳]/g, '').replace(/\u0001/g, "'");
+    }
+    // math symbols between numbers / blanks
+    const W = en ? { '+': ' plus ', '-': ' minus ', '×': ' times ', '÷': ' divided by ', '=': ' equals ', '<': ' is less than ', '>': ' is greater than ', '?': ' what ' }
+      : { '+': ' ועוד ', '-': ' פחות ', '×': ' כפול ', '÷': ' חלקי ', '=': ' שווה ', '<': ' קטן מ-', '>': ' גדול מ-', '?': ' כמה ' };
+    s = s.replace(/[−‒]/g, '-').replace(/[☐□▢]|_{1,}/g, ' ? ').replace(/(\d)\s*\*\s*(?=\d)/g, '$1×');
+    s = s.replace(/([+\-×÷=]\s*)\?/g, (m, a) => a + W['?']).replace(/\?(?=\s*[+\-×÷=])/g, W['?']);
+    s = s.replace(/([\d)]|כמה|what)\s*([+\-×÷])\s*(?=[\d(]|\s*(?:כמה|what))/g, (m, a, op) => a + W[op]);
+    s = s.replace(/([\d)]|כמה|what)\s*=\s*(?=\s*(?:[\d(]|כמה|what))/g, (m, a) => a + W['=']).replace(/(\d)\s*([<>])\s*(?=\d)/g, (m, a, op) => a + W[op]);
+    s = s.replace(/(^|[\s(,:])([+\-])\s?(?=\d)/g, (m, p, op) => p + W[op].trimStart());  // "+3, ואז -7" (step hints)
+    s = s.replace(/\s=\s/g, W['=']);
+    s = s.replace(/[=<>|\\/^~`{}\[\]@#$%]/g, ' ');
+    if (!en) s = heCounts(s.replace(new RegExp(`(^|\\s)([ובלמשה])(?=\\d)`, 'g'), '$1$2-'));
+    if (!en) s = s.replace(/(\d),(?=\d{3}\b)/g, '$1');
+    return s.replace(/\s+([,.!?:;])/g, '$1').replace(/[,.:;]\s*([!?])/g, '$1').replace(/([,.!?:;])(?:\s*[,.:;])+/g, '$1').replace(/\s+/g, ' ').replace(/^[\s,.:;!?]+/, '').trim();
+  }
+  /* OJ_SPEECH_END */
   let heVoice = null, enVoice = null;
-  function voices() { try { const v = speechSynthesis.getVoices(); heVoice = v.find(x => /^he|^iw/i.test(x.lang)) || null; enVoice = v.find(x => /^en[-_]US/i.test(x.lang)) || v.find(x => /^en/i.test(x.lang)) || null; } catch (e) {} }
+  function voices() { try { const v = speechSynthesis.getVoices(); heVoice = v.find(x => /^(he|iw)/i.test(x.lang)) || null; enVoice = v.find(x => /^en[-_]US/i.test(x.lang)) || v.find(x => /^en/i.test(x.lang)) || null; } catch (e) {} }
   if (window.speechSynthesis) { voices(); try { speechSynthesis.addEventListener('voiceschanged', voices); } catch (e) {} }
-  function say(t, lang = 'he-IL') {
+  // OJ.say(text, lang='he-IL', {queue}) – resolves when speech ends (or a fallback timeout).
+  function say(t, lang = 'he-IL', o = {}) {
+    if (lang === 'he') lang = 'he-IL'; if (lang === 'en') lang = 'en-US';
     return new Promise(res => {
-      if (!t || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return res();
+      const txt = speechText(t, lang);
+      if (!txt || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return res();
       try {
-        speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = lang;
-        const v = /^en/.test(lang) ? enVoice : heVoice; if (v) u.voice = v; u.rate = .92; u.pitch = 1.15;
+        if (!o.queue) speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang = lang; u._ojClean = 1; u._raw = String(t);
         let done = false; const fin = () => { if (!done) { done = true; res(); } };
-        u.onend = fin; u.onerror = fin; setTimeout(fin, 900 + t.length * 110); speechSynthesis.speak(u);
+        u.onend = fin; u.onerror = fin; setTimeout(fin, 1500 + txt.length * 120); speechSynthesis.speak(u);
       } catch (e) { res(); }
     });
   }
@@ -391,7 +474,7 @@ ${eyes}<circle cx="100" cy="104" r="2.6" fill="#1b1b1b"/>${mouth}${arms}
       <p style="font-size:18px;color:#555">מסיימים שלבים במשחקים ומקבלים מדבקות!</p></div>`;
     ov.querySelector('.oj-x').onclick = () => { sfx('tap'); close(ov); };
     ov.addEventListener('click', e => { const d = e.target.closest('.oj-album div'); if (d) { if (d.dataset.n) { say(d.dataset.n); bounce(d); sfx('pop'); } else { say('עוד לא אספת את המדבקה הזאת'); } } });
-    say('האלבום שלי. אספת ' + Object.keys(have).length + ' מדבקות');
+    { const k = Object.keys(have).length; say('האלבום שלי. ' + (k === 0 ? 'עוד לא אספת מדבקות' : k === 1 ? 'אספת מדבקה אחת' : 'אספת ' + k + ' מדבקות')); }
   }
 
   // levelMap(container, {count, unlocked (1-based max playable), stars:i=>0..3, icon:i=>'', current, onPick(i), cols})
@@ -418,7 +501,7 @@ ${eyes}<circle cx="100" cy="104" r="2.6" fill="#1b1b1b"/>${mouth}${arms}
     return m;
   }
 
-  window.OJ = { say, sfx, confetti, sparkle, shake, bounce, enter, pika, mascot, celebrate, intro, helpButton, album, award, stickers, stickerCount, STICKERS,
+  window.OJ = { say, speechText, sfx, confetti, sparkle, shake, bounce, enter, pika, mascot, celebrate, intro, helpButton, album, award, stickers, stickerCount, STICKERS,
     getStars, setStars, totalStars, levelMap, ac, music: { on: musicOn, off: musicOff, get enabled() { return PREF.music; } },
     get sfxOn() { return PREF.sfx; }, set sfxOn(v) { PREF.sfx = !!v; savePref(); }, LS };
   const ready = () => { addCss(); musicButton(); };

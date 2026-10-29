@@ -273,7 +273,12 @@ function near(ans, extra = []) {
 }
 /* ===== MATH ===== */
 const OPS = { '+': ['+', 'ועוד', 'plus', (a, b) => a + b], '-': ['−', 'פחות', 'minus', (a, b) => a - b], '*': ['×', 'כפול', 'times', (a, b) => a * b], '/': ['÷', 'חלקי', 'divided by', (a, b) => a / b] };
-const ITEMS = [{ he: 'תותים', en: 'strawberries', e: '🍓' }, { he: 'כדורים', en: 'balls', e: '⚽' }, { he: 'מדבקות', en: 'stickers', e: '⭐' }, { he: 'עוגיות', en: 'cookies', e: '🍪' }, { he: 'קלפים', en: 'cards', e: '🃏' }, { he: 'בלונים', en: 'balloons', e: '🎈' }, { he: 'תפוחים', en: 'apples', e: '🍎' }];
+const ITEMS = [{ he: 'תותים', one: 'תות', m: 1, en: 'strawberries', e: '🍓' }, { he: 'כדורים', one: 'כדור', m: 1, en: 'balls', e: '⚽' }, { he: 'מדבקות', one: 'מדבקה', m: 0, en: 'stickers', e: '⭐' }, { he: 'עוגיות', one: 'עוגייה', m: 0, en: 'cookies', e: '🍪' }, { he: 'קלפים', one: 'קלף', m: 1, en: 'cards', e: '🃏' }, { he: 'בלונים', one: 'בלון', m: 1, en: 'balloons', e: '🎈' }, { he: 'תפוחים', one: 'תפוח', m: 1, en: 'apples', e: '🍎' }];
+// spoken Hebrew counts with gender agreement (speech only; screen keeps digits): 3 בלונים -> שלושה בלונים
+const HE_M = ['אפס', 'אחד', 'שניים', 'שלושה', 'ארבעה', 'חמישה', 'שישה', 'שבעה', 'שמונה', 'תשעה', 'עשרה'];
+const HE_F = ['אפס', 'אחת', 'שתיים', 'שלוש', 'ארבע', 'חמש', 'שש', 'שבע', 'שמונה', 'תשע', 'עשר'];
+const heN = (n, m) => n <= 10 ? (m ? HE_M : HE_F)[n] : String(n);
+const heC = (n, it) => n === 1 ? `${it.one} ${it.m ? 'אחד' : 'אחת'}` : n === 2 ? `${it.m ? 'שני' : 'שתי'} ${it.he}` : `${heN(n, it.m)} ${it.he}`;
 const HEROES = [["פיקאצ'ו", 'Pikachu'], ['אש', 'Ash'], ['בולבזאור', 'Bulbasaur'], ["צ'רמנדר", 'Charmander'], ['סקווירטל', 'Squirtle']];
 const PLACE_HE = ['אחדות', 'עשרות', 'מאות', 'אלפים', 'עשרות האלפים', 'מאות האלפים'];
 const PLACE_EN = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands', 'hundred-thousands'];
@@ -311,12 +316,12 @@ const pics = (n, e) => e.repeat(n);
 function addPics(L, lvl) {
   const it = pick(ITEMS); const a = R(1, 6), b = R(1, 10 - a);
   const q = bin(L, lvl, a, '+', b, `<div>${pics(a, it.e)} <b style="color:#3b4cca">+</b> ${pics(b, it.e)}</div>`);
-  q.say = P(L, `יש ${a} ${it.he} ועוד ${b}. כמה ${it.he} יש בסך הכול?`, `${a} ${it.en} and ${b} more. How many ${it.en} in all?`); return q;
+  q.say = P(L, `יש ${heC(a, it)} ועוד ${heN(b, it.m)}. כמה ${it.he} יש בסך הכול?`, `${a} ${it.en} and ${b} more. How many ${it.en} in all?`); return q;
 }
 function subPics(L, lvl) {
   const it = pick(ITEMS); const a = R(4, 10), b = R(1, a - 1);
   const q = bin(L, lvl, a, '-', b, `<div>${pics(a - b, it.e)}<span style="opacity:.3">${pics(b, it.e)}</span></div>`);
-  q.say = P(L, `היו ${a} ${it.he}. ${b} הלכו. כמה נשארו?`, `There were ${a} ${it.en}. ${b} went away. How many are left?`); return q;
+  q.say = P(L, `היו ${heC(a, it)}. ${b === 1 ? (it.m ? 'אחד נעלם' : 'אחת נעלמה') : heN(b, it.m) + ' נעלמו'}. כמה נשארו?`, `There were ${a} ${it.en}. ${b} went away. How many are left?`); return q;
 }
 function missing(L, lvl, max, form) {
   form = form || pick(['a+', '+b', '-b']);
@@ -333,10 +338,10 @@ function compare(L, lvl, digits) {
   const r = Math.random();
   if (r < 0.15) b = a; else if (r < 0.6) { const s = String(a).split(''); const i = R(0, s.length - 2); [s[i], s[i + 1]] = [s[i + 1], s[i]]; b = +s.join(''); if (b === a || b < lo) b = Math.min(hi, a + R(1, 9)); if (b === a) b = a - 1; } else b = R(lo, hi);
   const ansV = a > b ? '>' : a < b ? '<' : '==';
-  const lab = { '<': '<', '==': '=', '>': '>' }; const sayHe = { '<': 'קטן מ', '==': 'שווה ל', '>': 'גדול מ' }; const sayEn = { '<': 'less than', '==': 'equal to', '>': 'greater than' };
+  const lab = { '<': '<', '==': '=', '>': '>' }; const sayHe = { '<': 'קטן יותר', '==': 'שווה', '>': 'גדול יותר' }; const sayEn = { '<': 'less than', '==': 'equal to', '>': 'greater than' };
   const choices = ['<', '==', '>'].map(v => ({ v, t: lab[v], say: P(L, sayHe[v], sayEn[v]) }));
   return { track: 'math', lang: L, text: P(L, 'איזה סימן מתאים?', 'Which sign fits?'), eq: `${fmt(a)} ☐ ${fmt(b)}`, vis: '', choices, ans: choices.findIndex(x => x.v === ansV),
-    say: P(L, `איזה סימן מתאים? ${a} ... ${b}. גדול מ, קטן מ, או שווה?`, `Which sign fits? ${a} ... ${b}. Greater than, less than, or equal?`),
+    say: P(L, `איזה סימן מתאים? ${a} ... ${b}. גדול יותר, קטן יותר, או שווה?`, `Which sign fits? ${a} ... ${b}. Greater than, less than, or equal?`),
     hint: P(L, 'משווים מהספרה הכי שמאלית (הכי גדולה). הצד הפתוח של הסימן פונה למספר הגדול.', 'Compare from the leftmost (biggest) digit. The open side faces the bigger number.') + '\n' + `${fmt(a)} ${lab[ansV]} ${fmt(b)}`,
     meta: { check: `${a}?${b}`, kind: 'cmp' }, key: `mc${a}_${b}` };
 }
@@ -373,14 +378,14 @@ function groups(L, lvl, maxG, maxN) {
   const it = pick(ITEMS); const g = R(2, maxG), n = R(2, maxN);
   const vis = Array.from({ length: g }, () => `<span class="grp">${it.e.repeat(n)}</span>`).join('');
   const q = bin(L, lvl, g, '*', n, vis);
-  q.say = P(L, `יש ${g} קבוצות, ובכל קבוצה ${n} ${it.he}. כמה ${it.he} יש בסך הכול?`, `${g} groups with ${n} ${it.en} in each. How many ${it.en} in all?`);
+  q.say = P(L, `יש ${heN(g, 0)} קבוצות, ובכל קבוצה ${heC(n, it)}. כמה ${it.he} יש בסך הכול?`, `${g} groups with ${n} ${it.en} in each. How many ${it.en} in all?`);
   q.text = P(L, `${g} קבוצות של ${n}`, `${g} groups of ${n}`); return q;
 }
 function share(L, lvl) {
   const it = pick(ITEMS); const k = R(2, 4), each = R(2, 5), N = k * each;
   const vis = `<div>${it.e.repeat(N)}</div><div>${'🧒'.repeat(k)}</div>`;
   const q = bin(L, lvl, N, '/', k, vis);
-  q.say = P(L, `${N} ${it.he} מתחלקים שווה בשווה בין ${k} ילדים. כמה מקבל כל ילד?`, `${N} ${it.en} are shared equally by ${k} kids. How many does each kid get?`);
+  q.say = P(L, `${N} ${it.he} מתחלקים שווה בשווה בין ${heN(k, 1)} ילדים. כמה מקבל כל ילד?`, `${N} ${it.en} are shared equally by ${k} kids. How many does each kid get?`);
   q.text = P(L, 'כמה מקבל כל ילד?', 'How many does each kid get?'); return q;
 }
 function pieSVG(k, d) {
@@ -399,11 +404,11 @@ function word(L, lvl, kind, big) {
   else if (kind === 'sub') { a = big ? R(500, 2000) : R(30, 99); b = R(Math.floor(a / 5), a - 3); ans = a - b; chk = `${a}-${b}==?`;
     he = `ל${nm} היו ${a} ${it.he}. הוא נתן ${b} לחברים. כמה ${it.he} נשארו לו?`; en = `${nm} had ${a} ${it.en}. He gave ${b} to friends. How many ${it.en} are left?`; }
   else if (kind === 'mul') { a = R(3, big ? 12 : 9); b = R(3, big ? 25 : 10); ans = a * b; chk = `${a}*${b}==?`;
-    he = `ל${nm} יש ${a} קופסאות. בכל קופסה ${b} ${it.he}. כמה ${it.he} יש בסך הכול?`; en = `${nm} has ${a} boxes with ${b} ${it.en} in each box. How many ${it.en} in all?`; }
+    he = `ל${nm} יש ${heN(a, 0)} קופסאות. בכל קופסה ${heC(b, it)}. כמה ${it.he} יש בסך הכול?`; en = `${nm} has ${a} boxes with ${b} ${it.en} in each box. How many ${it.en} in all?`; }
   else if (kind === 'div') { b = R(2, 9); ans = R(3, big ? 40 : 10); a = ans * b; chk = `${a}/${b}==?`;
     he = `${nm} חילק ${a} ${it.he} שווה בשווה בין ${b} חברים. כמה קיבל כל חבר?`; en = `${nm} shared ${a} ${it.en} equally among ${b} friends. How many did each friend get?`; }
   else if (kind === 'multi') { a = R(3, big ? 15 : 8); b = R(4, big ? 25 : 12); c = R(2, a * b - 2); ans = a * b - c; chk = `${a}*${b}-${c}==?`;
-    he = `ל${nm} יש ${a} קופסאות, ובכל קופסה ${b} ${it.he}. הוא נתן ${c} לחבר. כמה ${it.he} נשארו לו?`; en = `${nm} has ${a} boxes with ${b} ${it.en} in each. He gives ${c} to a friend. How many ${it.en} are left?`; }
+    he = `ל${nm} יש ${heN(a, 0)} קופסאות, ובכל קופסה ${heC(b, it)}. הוא נתן ${c} לחבר. כמה ${it.he} נשארו לו?`; en = `${nm} has ${a} boxes with ${b} ${it.en} in each. He gives ${c} to a friend. How many ${it.en} are left?`; }
   else { c = R(2, 6); ans = R(5, big ? 60 : 20); const tot = ans * c; a = R(1, tot - 1); b = tot - a; chk = `(${a}+${b})/${c}==?`;
     he = `${nm} מצא ${a} ${it.he} ועוד ${b} ${it.he}, וחילק את כולם שווה בשווה בין ${c} חברים. כמה קיבל כל חבר?`; en = `${nm} found ${a} ${it.en} and then ${b} more. He shared them all equally among ${c} friends. How many did each friend get?`; }
   const pretty = chk.replace('==?', ' = ' + fmt(ans)).replace(/\*/g, ' × ').replace(/\//g, ' ÷ ').replace(/\+/g, ' + ').replace(/-/g, ' − ');
@@ -442,7 +447,7 @@ const MATH_DESC = ['', 'חיבור וחיסור עד 10 בתמונות', 'חיב
 function grpK(L, lvl, ks) { const it = pick(ITEMS); const g = R(2, 5), n = pick(ks);
   const vis = Array.from({ length: g }, () => `<span class="grp">${it.e.repeat(n)}</span>`).join('');
   const q = bin(L, lvl, g, '*', n, vis);
-  q.say = P(L, `יש ${g} קבוצות, ובכל קבוצה ${n} ${it.he}. כמה ${it.he} יש בסך הכול?`, `${g} groups with ${n} ${it.en} in each. How many ${it.en} in all?`);
+  q.say = P(L, `יש ${heN(g, 0)} קבוצות, ובכל קבוצה ${heC(n, it)}. כמה ${it.he} יש בסך הכול?`, `${g} groups with ${n} ${it.en} in each. How many ${it.en} in all?`);
   q.text = P(L, `${g} קבוצות של ${n}`, `${g} groups of ${n}`); return q; }
 function genMath(lvl, L) {
   switch (lvl) {
@@ -472,12 +477,12 @@ function seqQ(lvl, seq, miss, kind, extra, opts = {}) {
   const last = miss === seq.length - 1;
   return { track: 'logic', lang: 'he', text: last ? 'מה בא אחר כך?' : 'מה חסר בסדרה?', eq: '', vis: `<div class="seq ${isNum ? 'nums' : ''}${isNum && seq.map(x => fmt(x)).join('').length > 16 ? ' sm' : ''}">${shown}</div>`,
     say: last ? (isNum ? 'מה המספר הבא בסדרה? ' + seq.slice(0, -1).join(', ') : 'מה בא אחר כך בסדרה?') : 'איזה מספר חסר בסדרה? ' + seq.map((x, i) => i === miss ? 'משהו' : x).join(', '),
-    choices: c.choices, ans: c.ans, hint: opts.hint, meta: { kind, seq: seq.slice(), miss, ...(opts.meta || {}) }, key: 'l' + kind + seq.join(',') + miss };
+    choices: c.choices, ans: c.ans, hint: opts.hint, sayHint: opts.sayHint, meta: { kind, seq: seq.slice(), miss, ...(opts.meta || {}) }, key: 'l' + kind + seq.join(',') + miss };
 }
 function cyc(lvl, alph, pat, len) {
   const sym = shuffle(alph).slice(0, Math.max(...pat) + 1); const seq = Array.from({ length: len }, (_, i) => sym[pat[i % pat.length]]);
   const others = sym.filter(s => s !== seq[len - 1]).concat(shuffle(alph.filter(a => !sym.includes(a))).slice(0, 2));
-  return seqQ(lvl, seq, len - 1, 'cycle', others, { meta: { period: pat.length }, hint: `החלק שחוזר הוא: ${seq.slice(0, pat.length).join(' ')} – ושוב מההתחלה.` });
+  return seqQ(lvl, seq, len - 1, 'cycle', others, { meta: { period: pat.length }, hint: `החלק שחוזר הוא: ${seq.slice(0, pat.length).join(' ')} – ושוב מההתחלה.`, sayHint: `מוצאים את החלק שחוזר שוב ושוב, ${pat.length === 2 ? 'שתי' : pat.length === 3 ? 'שלוש' : pat.length === 4 ? 'ארבע' : pat.length} תמונות, ואז מתחילים אותו מההתחלה.` });
 }
 function arith(lvl, start, step, len, miss) {
   if (step < 0) start = Math.max(start, -step * len + R(0, 20));
@@ -494,7 +499,7 @@ function oddCat(lvl) {
   const cs = shuffle(Object.keys(CATS)); const main = shuffle(CATS[cs[0]]).slice(0, 3); const odd = pick(CATS[cs[1]].filter(x => !Object.values(CATS).some((v, i) => v.includes(x) && Object.keys(CATS)[i] === cs[0])));
   const items = shuffle([...main, odd]);
   return { track: 'logic', lang: 'he', text: 'מי לא שייך לקבוצה?', eq: '', vis: '', say: 'מי לא שייך לקבוצה? איזה מהם שונה מכולם?', choices: items.map(v => ({ v, t: v })), ans: items.indexOf(odd),
-    hint: `שלושה הם ${CAT_NAME[cs[0]]}, ו-${odd} לא.`, meta: { kind: 'oddcat', items }, key: 'lo' + items.join('') };
+    hint: `שלושה הם ${CAT_NAME[cs[0]]}, ו-${odd} לא.`, sayHint: `שלושה הם ${CAT_NAME[cs[0]]}, ורק אחד לא.`, meta: { kind: 'oddcat', items }, key: 'lo' + items.join('') };
 }
 const PROPS = { even: x => x % 2 === 0, odd: x => x % 2 === 1, mult5: x => x % 5 === 0, mult10: x => x % 10 === 0, mult3: x => x % 3 === 0, mult4: x => x % 4 === 0, twodig: x => x >= 10 && x < 100, big: x => x >= 100 };
 const PROP_NAME = { even: 'זוגיים', odd: 'אי-זוגיים', mult5: 'מתחלקים ב-5', mult10: 'עגולים (מתחלקים ב-10)', mult3: 'מתחלקים ב-3', mult4: 'מתחלקים ב-4' };
@@ -692,7 +697,7 @@ function rSyl(lvl) {
   const [w, e] = pick(WALL); const s = syl1(w); const f = first(w); const grp = SOUND.find(g => g.includes(f)) || [f];
   const pickD = []; for (const o of shuffle(WALL)) { if (pickD.length >= 3) break; const fo = first(o[0]); if (!grp.includes(fo) && fo !== f && !pickD.some(p => first(p[0]) === fo)) pickD.push(o); }
   const c = mk([e, ...pickD.map(x => x[1])], {});
-  return rq(lvl, 'איזו תמונה מתחילה ב...', `<div class="qtext readq">${s}</div>`, 'קראו את ההברה. איזו תמונה מתחילה בצליל הזה?', c, `${s} – כמו בהתחלה של ${w} ${e}`, { kind: 'syl', word: w }, 's' + w);
+  return Object.assign(rq(lvl, 'איזו תמונה מתחילה ב...', `<div class="qtext readq">${s}</div>`, 'קראו את ההברה. איזו תמונה מתחילה בצליל הזה?', c, `${s} – כמו בהתחלה של ${w} ${e}`, { kind: 'syl', word: w }, 's' + w), { sayHint: `כמו בהתחלה של המילה ${w}` });
 }
 function rWord(lvl, list, sameFirst) {
   const [w, e] = pick(list); const pool = WALL.filter(x => x[0] !== w);
@@ -867,17 +872,8 @@ let voices = [];
 const loadVoices = () => { try { voices = speechSynthesis.getVoices() || []; } catch (e) {} };
 if (window.speechSynthesis) { loadVoices(); try { speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {} }
 function speak(text, lang = 'he', queue = false) {
-  if (!window.speechSynthesis || !text || !window.SpeechSynthesisUtterance) return;
-  try {
-    if (!queue) speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(String(text).replace(/<[^>]+>/g, ' ').replace(/[☐❓]/g, ' '));
-    u.lang = lang === 'en' ? 'en-US' : 'he-IL';
-    const want = lang === 'en' ? ['en-us', 'en'] : ['he', 'iw'];
-    const v = voices.find(v => v.lang && v.lang.replace('_', '-').toLowerCase().startsWith(want[0])) || voices.find(v => v.lang && v.lang.toLowerCase().startsWith(want[1]));
-    if (v) u.voice = v;
-    u.rate = lang === 'en' ? 0.9 : 0.95; u.pitch = 1.1;
-    speechSynthesis.speak(u);
-  } catch (e) {}
+  if (!text) return;
+  return OJ.say(String(text), lang === 'en' ? 'en-US' : 'he-IL', { queue });
 }
 
 /* bidi-safe hint lines: math runs stay left-to-right inside Hebrew text */
@@ -921,7 +917,7 @@ function sayQ() { if (cur) speak(cur.say || cur.text, cur.lang); }
 function show() {
   clearTimeout(nextTimer);
   cur = nextQ(curT); locked = false; tStart = Date.now(); render();
-  if (S.autoRead) setTimeout(sayQ, 250);
+  if (S.autoRead) setTimeout(() => { if (cur) speak(cur.say || cur.text, cur.lang, true); }, 250);
 }
 function render() {
   const q = cur; header();
@@ -965,7 +961,7 @@ function choose(i) {
     save(); header();
     el('hintTx').innerHTML = `<div>💡 לא נורא! בואו נבין:</div><div class="hx">${hintHTML(cur.hint)}</div>${down ? `<div style="margin-top:6px">${down}</div>` : ''}`;
     el('hint').classList.remove('hide');
-    speak((cur.lang === 'en' ? 'Good try! ' : 'לא נורא! ') + String(cur.hint || '').replace(/\n/g, '. ').replace(/×/g, cur.lang === 'en' ? ' times ' : ' כפול ').replace(/÷/g, cur.lang === 'en' ? ' divided by ' : ' חלקי ').replace(/−/g, cur.lang === 'en' ? ' minus ' : ' פחות ').replace(/ = /g, cur.lang === 'en' ? ' equals ' : ' שווה ').replace(/,(?=\d{3})/g, ''), cur.lang);
+    speak((cur.lang === 'en' ? 'Good try! ' : 'לא נורא! ') + String(cur.sayHint || cur.hint || '').replace(/\n/g, '. ').replace(/×/g, cur.lang === 'en' ? ' times ' : ' כפול ').replace(/÷/g, cur.lang === 'en' ? ' divided by ' : ' חלקי ').replace(/−/g, cur.lang === 'en' ? ' minus ' : ' פחות ').replace(/ = /g, cur.lang === 'en' ? ' equals ' : ' שווה ').replace(/,(?=\d{3})/g, ''), cur.lang);
     setTimeout(() => el('hint').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
   }
 }

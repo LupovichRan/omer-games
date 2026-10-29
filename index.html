@@ -92,8 +92,13 @@ SHELVES.forEach((s,i)=>{
   track.appendChild(el);
   const d=document.createElement('span');d.className='dot';d.textContent=s.icon;d.onclick=()=>go(i);dots.appendChild(d);
 });
-// Say game name, then open (short delay so speech starts)
-track.addEventListener('click',e=>{const a=e.target.closest('a.box');if(!a)return;e.preventDefault();OJ.sfx('whoosh');OJ.bounce&&OJ.bounce(a);say(a.querySelector('.name').textContent);setTimeout(()=>location.href=a.getAttribute('href'),700)});
+// Say the game name, open it when the name has been fully spoken (max 3s; at once if speech/sound is off)
+let opening=false;
+track.addEventListener('click',e=>{const a=e.target.closest('a.box');if(!a)return;e.preventDefault();if(opening)return;opening=true;
+  OJ.sfx('whoosh');OJ.bounce&&OJ.bounce(a);const href=a.getAttribute('href');let went=false;const open=()=>{if(went)return;went=true;location.href=href};
+  if(!OJ.sfxOn||!window.speechSynthesis)return open();
+  Promise.race([say(a.querySelector('.name').textContent),new Promise(r=>setTimeout(r,3000))]).then(()=>setTimeout(open,120))});
+addEventListener('pageshow',()=>{opening=false});
 let cur=+(sessionStorage.getItem('shelf')??Math.floor(SHELVES.length/2));
 if(!(cur>=0&&cur<SHELVES.length))cur=Math.floor(SHELVES.length/2);
 function go(i,speak=true){cur=Math.max(0,Math.min(SHELVES.length-1,i));sessionStorage.setItem('shelf',cur);

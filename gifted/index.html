@@ -576,7 +576,7 @@
     const R = REL[rk];
     return {
       kind: 'semana', prompt: 'מה מתאים במקום סימן השאלה?',
-      say: `${nm(A)} ו${nm(B)}. ${nm(C)} ו... מה? ${O.map(nm).join(', ')}.`,
+      say: `${nm(A)} ו${nm(B)}. ${nm(C)} הולך עם מה? ${O.map(nm).join(', ')}.`,
       stem: `<div class="ana"><div class="pair">${emoBox(A)}<span class="arrow">⬅</span>${emoBox(B)}</div><div class="pair">${emoBox(C)}<span class="arrow">⬅</span><div class="box q">?</div></div></div>`,
       opts: O.map(e => ({ html: emoOpt(e), key: e, say: nm(e) })), ans: order.indexOf(0),
       check: i => Rs.some(k => inRel(k, C, O[i])),
@@ -967,18 +967,18 @@
       };
     }
     // convert: 1 A = p B ; 1 B = q C  => 1 A = p*q C
-    const [A, B, C] = sample([['🍉', 'אבטיח'], ['🍍', 'אננס'], ['🍎', 'תפוח'], ['🍓', 'תות'], ['🍇', 'ענבים']], 3);
+    const [A, B, C] = sample([['🍉', 'אבטיח', 'אבטיחים'], ['🍍', 'אננס', 'אננסים'], ['🍎', 'תפוח', 'תפוחים'], ['🍓', 'תות', 'תותים'], ['🍇', 'אשכול ענבים', 'אשכולות ענבים']], 3);
     const p = rr(2, 3), q = rr(2, 4), ans = p * q;
     const ratios = new Set(); for (let wc = 1; wc <= 6; wc++) { const wb = q * wc, wa = p * wb; ratios.add(wa / wc); }
     const vals = numOpts(ans, [p + q, p, q, ans + 1, ans - 1].filter(v => v > 0 && v !== ans), [1, 2]);
     const order = shuffle([0, 1, 2, 3]), O = order.map(i => vals[i]);
     return {
       kind: 'balance', prompt: `${A[0]} שווה כמה ${C[0]}?`,
-      say: `${A[1]} אחד שוקל כמו ${p} ${B[1]}. ${B[1]} אחד שוקל כמו ${q} ${C[1]}. כמה ${C[1]} שוקלים כמו ${A[1]} אחד?`,
+      say: `${A[1]} אחד שוקל כמו ${p} ${B[2]}. ${B[1]} אחד שוקל כמו ${q} ${C[2]}. כמה ${C[2]} שוקלים כמו ${A[1]} אחד?`,
       stem: `<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${scaleSvg(A[0], B[0].repeat(p), 0)}${scaleSvg(B[0], C[0].repeat(q), 0)}</div>`,
       opts: O.map(v => ({ html: numHtml(v), key: 'n' + v, say: String(v) })), ans: order.indexOf(0),
-      check: i => ratios.size === 1 && ratios.has(O[i]), hint: `כל ${B[1]} אפשר להחליף ב־${q} ${C[1]}.`,
-      explain: `${A[1]} = ${p} ${B[1]}, וכל ${B[1]} = ${q} ${C[1]}. אז ${p} × ${q} = ${ans}.`
+      check: i => ratios.size === 1 && ratios.has(O[i]), hint: `כל ${B[1]} אפשר להחליף ב־${q} ${C[2]}.`,
+      explain: `${A[1]} = ${p} ${B[2]}, וכל ${B[1]} = ${q} ${C[2]}. אז ${p} × ${q} = ${ans}.`
     };
   }
   const emoOptQ = o => `<div class="emo">${o[0]}</div><div class="nm">${o[1]}</div>`;
@@ -1052,7 +1052,7 @@
     add([1, 3], () => { const a = rr(8, L > 2 ? 60 : 12), b = rr(2, a - 2); return { text: `היו <b>${a}</b> בלונים. <b>${b}</b> בלונים עפו. כמה בלונים נשארו?`, pics: a <= 14 ? rep('🎈', a) : '🎈🎈🎈', ans: a - b, sim: () => { let s = a; for (let i = 0; i < b; i++) s--; return s; }, wrong: [a + b, a - b + 1, a - b - 1], why: `${a} - ${b} = ${a - b}.` }; });
     add([3, 5], () => { const n = rr(2, 5), k = pick([2, 5, 10]); return { text: `יש <b>${n}</b> חברים, ולכל אחד <b>${k}</b> מדבקות. כמה מדבקות יש לכולם ביחד?`, pics: rep('🧒', n), ans: n * k, sim: () => { let s = 0; for (let i = 0; i < n; i++) for (let j = 0; j < k; j++) s++; return s; }, wrong: [n + k, n * k + k, n * k - n], why: `${n} פעמים ${k}: ${n} × ${k} = ${n * k}.` }; });
     add([99, 99], () => { const n = rr(2, 6), q = rr(3, 12); return { text: `<b>${n * q}</b> תותים מתחלקים שווה בשווה בין <b>${n}</b> ילדים. כמה תותים יקבל כל ילד?`, pics: rep('🍓', Math.min(n * q, 12)) + (n * q > 12 ? '…' : ''), ans: q, sim: () => { let left = n * q, each = 0; while (left >= n) { left -= n; each++; } return each; }, wrong: [n * q - n, q + 1, n], why: `${n * q} לחלק ל־${n} = ${q}.` }; });
-    add([4, 7], () => { const h = rr(2, 7), d = rr(1, 5); return { text: `בחצר יש <b>${h}</b> תרנגולות ו־<b>${d}</b> כלבים. כמה רגליים יש לכולם ביחד?`, pics: rep('🐔', h) + ' ' + rep('🐕', d), ans: 2 * h + 4 * d, sim: () => { let s = 0; for (let i = 0; i < h; i++) s += 2; for (let i = 0; i < d; i++) s += 4; return s; }, wrong: [(h + d) * 2, (h + d) * 4, h + d, 2 * h + 2 * d + 2], why: `לתרנגולת 2 רגליים ולכלב 4: ${h} × 2 + ${d} × 4 = ${2 * h + 4 * d}.` }; });
+    add([4, 7], () => { const h = rr(2, 7), d = rr(2, 5); return { text: `בחצר יש <b>${h}</b> תרנגולות ו־<b>${d}</b> כלבים. כמה רגליים יש לכולם ביחד?`, pics: rep('🐔', h) + ' ' + rep('🐕', d), ans: 2 * h + 4 * d, sim: () => { let s = 0; for (let i = 0; i < h; i++) s += 2; for (let i = 0; i < d; i++) s += 4; return s; }, wrong: [(h + d) * 2, (h + d) * 4, h + d, 2 * h + 2 * d + 2], why: `לתרנגולת 2 רגליים ולכלב 4: ${h} × 2 + ${d} × 4 = ${2 * h + 4 * d}.` }; });
     add([99, 99], () => { const k = rr(6, 15), n = rr(3, 7), m = rr(2, 9); return { text: `בכל קופסה יש <b>${k}</b> עפרונות. יש <b>${n}</b> קופסות, ועוד <b>${m}</b> עפרונות מחוץ לקופסות. כמה עפרונות יש בסך הכול?`, pics: rep('📦', n) + ' ➕ ' + rep('✏️', m), ans: k * n + m, sim: () => { let s = 0; for (let i = 0; i < n; i++) s += k; return s + m; }, wrong: [k * n, k * (n + 1), k + n + m, k * n + m + 1], why: `${n} × ${k} = ${k * n}, ועוד ${m} = ${k * n + m}.` }; });
     add([6, 8], () => { const o = rr(5, 8), d = rr(2, 6), f = rr(2, 9); return { text: `דני בן <b>${o}</b>. אחותו נועה גדולה ממנו ב־<b>${d}</b> שנים. בת כמה תהיה נועה בעוד <b>${f}</b> שנים?`, pics: '👦 👧 🎂', ans: o + d + f, sim: () => { let age = o; age += d; for (let i = 0; i < f; i++) age++; return age; }, wrong: [o + f, o + d, d + f, o + d + f - 1], why: `נועה עכשיו בת ${o} + ${d} = ${o + d}, ובעוד ${f} שנים: ${o + d + f}.` }; });
     add([6, 8], () => { const a = rr(8, 40), b = rr(3, 15); return { text: `לאש יש <b>${a}</b> קלפים. לפיקאצ'ו יש <b>${b}</b> קלפים יותר מלאש. כמה קלפים יש לשניהם ביחד?`, pics: '🃏 ⚡', ans: 2 * a + b, sim: () => { const p = a + b; return a + p; }, wrong: [a + b, 2 * a, a + 2 * b, 2 * (a + b)], why: `לפיקאצ'ו יש ${a} + ${b} = ${a + b}. ביחד: ${a} + ${a + b} = ${2 * a + b}.` }; });
@@ -1247,9 +1247,9 @@
   const hmS = () => OJ.sfx('bad');
   const tapS = () => OJ.sfx('tap');
   const upS = () => OJ.sfx('levelup');
-  function say(txt, force) {
+  function say(txt, force, queue) {
     if ((!S.voice && !force) || !window.speechSynthesis || !txt) return;
-    try { const u = new SpeechSynthesisUtterance(txt); u.lang = 'he-IL'; u.rate = 0.92; u.pitch = 1.25; const v = speechSynthesis.getVoices().find(v => /^he/i.test(v.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+    return OJ.say(txt, 'he-IL', { queue: !!queue });
   }
   const hush = () => { try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} };
   // ---- visuals ----
@@ -1297,7 +1297,7 @@
     el('chap').textContent = mode === 'test' ? `פרק ${test.chap[test.i] + 1} מתוך ${test.nChap}: ${SEC[q.sec].nm} · שאלה ${test.i + 1} מתוך ${test.qs.length}` : '';
     drawPika(0);
     el('scorePill').textContent = '⭐ ' + (mode === 'test' ? (test.i + 1) + '/' + test.qs.length : S.stars);
-    say(q.say);
+    say(q.say, false, true);
   }
   function nextPractice() {
     const sid = practiceSec === 'mix' ? pick(SECS).id : practiceSec;
@@ -1311,7 +1311,7 @@
     if (mode === 'test') {
       answered = true; tapS(); btn.classList.add('picked');
       test.res.push({ sec: q.sec, ok, t: (performance.now() - tStart) / 1000 });
-      setTimeout(() => { test.i++; if (test.i < test.qs.length) render(test.qs[test.i]); else finishTest(); }, 550);
+      setTimeout(() => { if (!test || mode !== 'test') return; test.i++; if (test.i < test.qs.length) render(test.qs[test.i]); else finishTest(); }, 550);
       return;
     }
     const first = tries === 0; tries++;

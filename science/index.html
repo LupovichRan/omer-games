@@ -205,9 +205,7 @@
     lastSay = text;
     const b = $('bubble'); b.textContent = text; b.classList.add('show'); guideHappy = 2.5;
     clearTimeout(bubbleT); bubbleT = setTimeout(() => b.classList.remove('show'), 7000);
-    if (!muted && OJ.sfxOn && heVoice && speak) {
-      try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(speak.replace(/[^\u0590-\u05FF\s,.!?'"-]/g, '')); u.voice = heVoice; u.lang = heVoice.lang; u.rate = 0.9; u.pitch = 1.2; speechSynthesis.speak(u); } catch (e) {}
-    }
+    if (!muted && OJ.sfxOn && speak) OJ.say(speak);
   }
   $('sayBtn').onclick = () => { if (lastSay) say(lastSay); };
   const paintMute = () => { $('muteBtn').textContent = OJ.sfxOn ? '🔊' : '🔇'; }; paintMute();
@@ -371,7 +369,7 @@
         b.onclick = () => { if (busy || cur) return; sfx.tap(); cur = { o, b }; b.classList.add('used'); const h = $('held'); h.textContent = o.e; h.style.display = 'block'; $('predict').classList.add('on'); say('מה יקרה? צף או שוקע?'); };
         tray.appendChild(b);
       });
-      say('בחר משהו וננחש: צף או שוקע?');
+      say('בוחרים משהו ומנחשים: צף או שוקע?');
     }
     function guess(fl) {
       if (!cur || busy) return; busy = true; sfx.tap();

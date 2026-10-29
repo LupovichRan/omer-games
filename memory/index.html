@@ -249,7 +249,7 @@
   const bonkS = () => { const n = performance.now(); if (n - lastBonk < 120) return; lastBonk = n; tone(180 + Math.random() * 60, 0.06, 'sine', 0.05); };
   function say(txt) {
     if (muted || !OJ.sfxOn || !window.speechSynthesis) return;
-    try { const u = new SpeechSynthesisUtterance(txt); u.lang = 'he-IL'; u.rate = 0.95; u.pitch = 1.3; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+    return OJ.say(txt);
   }
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function cols(n) { const wide = innerWidth > innerHeight; if (n <= 6) return 3; if (n <= 8) return 4; if (n <= 12) return wide ? 6 : 4; if (n <= 16) return wide ? 8 : 4; if (n <= 20) return wide ? 5 : 4; return wide ? 6 : 4; }
@@ -465,7 +465,7 @@
     { pic: '🍎 = 🍎', text: 'הופכים שני קלפים. אם הם אותו דבר, מצאת זוג!', expr: 'cheer' },
     { pic: '🐶 🍎 🐠 🚀 🚗', text: 'אפשר לבחור נושא: חיות, פירות, ים, חלל או רכבים.' }
   ];
-  el('startBtn').addEventListener('click', () => { ac(); OJ.intro('memory', INTRO).then(() => { level = 0; el('startOv').classList.add('hide'); say('מצא זוגות!'); deal(); }); });
+  el('startBtn').addEventListener('click', () => { ac(); OJ.intro('memory', INTRO).then(() => { level = 0; el('startOv').classList.add('hide'); say('מוצאים זוגות!'); deal(); }); });
   el('albumBtn').addEventListener('click', () => OJ.album());
   el('helpBtn').addEventListener('click', () => OJ.intro('memory', INTRO, { force: true }));
   el('nextBtn').addEventListener('click', () => { el('winOv').classList.add('hide'); deal(); });

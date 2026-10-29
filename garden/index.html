@@ -126,9 +126,9 @@ S.stars++;let up=false;S.streak++;if(S.streak>=3&&S.lvl<5){S.lvl++;S.streak=0;up
 const d=DECOR[rnd(DECOR.length)];let dx=5+rnd(85),dy=5+rnd(70);if(dx>36&&dx<60)dx=rnd(2)?5+rnd(28):62+rnd(30);S.decor.push({e:d,x:dx,y:dy});if(S.decor.length>40)S.decor.shift();newDecor=S.decor.length-1;save();
 $("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("cheer",90);
 const sticker=S.stars%3==0;
-setTimeout(()=>{if(up||sticker){OJ.celebrate({title:up?"עלית לשלב "+S.lvl+"!":"כל הכבוד!",sub:"קיבלת "+d+" לגינה",stars:3,sticker:sticker,game:"garden",onDone:()=>show("hub")})}
+setTimeout(()=>{if(up||sticker){OJ.celebrate({title:up?"עלית לשלב "+S.lvl+"!":"כל הכבוד!",sub:"קיבלת קישוט חדש לגינה "+d,stars:3,sticker:sticker,game:"garden",onDone:()=>show("hub")})}
 else{say("כל הכבוד! קיבלת קישוט חדש לגינה");OJ.mascot("cheer","כל הכבוד! "+d,{say:false});setTimeout(()=>show("hub"),1300)}},900)}
-function oops(el,msg){OJ.sfx("bad");OJ.shake(el);$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("oops",80);setTimeout(()=>{if($("who").querySelector(".oops"))$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("think",80)},1600);say(msg||"כמעט! נסה שוב")}
+function oops(el,msg){OJ.sfx("bad");OJ.shake(el);$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("oops",80);setTimeout(()=>{if($("who").querySelector(".oops"))$("who").innerHTML='<span class="fr">'+cur.who+'</span>'+OJ.pika("think",80)},1600);say(msg||"כמעט! תנסה שוב")}
 function opts(ans,area,lo=0){let s=new Set([ans]);while(s.size<3){let v=ans+rnd(5)-2;if(v>=lo&&v<=20)s.add(v)}
 const r=document.createElement("div");r.className="row";[...s].sort(()=>Math.random()-.5).forEach(v=>{const b=document.createElement("button");b.className="opt";b.textContent=v;b.onclick=()=>v==ans?win(b):(b.classList.add("no"),oops(b));r.appendChild(b)});area.appendChild(r)}
 /* 1. feed berries */
@@ -143,14 +143,14 @@ const toBasket=(b,col)=>{if(basket.length>=20)return;basket.push(col);snd(400+ba
 for(let i=0;i<total;i++){const col=i<n?c:cols[rnd(cols.length)];const b=document.createElement("div");b.className="berry";b.style.background=col[2];b.onclick=()=>toBasket(b,col);bush.appendChild(b)}
 [...bush.children].sort(()=>Math.random()-.5).forEach(x=>bush.appendChild(x));
 const give=document.createElement("button");give.className="big";give.textContent="🧺 תן";
-give.onclick=()=>{if(basket.length==n&&basket.every(x=>x==c))win(bk);else if(basket.some(x=>x!=c))oops(bk,"יש בסל צבע אחר. אני רוצה רק "+c[1]);else oops(bk,basket.length<n?"צריך עוד! ספרנו "+basket.length:"יותר מדי! ספרנו "+basket.length)};
+give.onclick=()=>{if(basket.length==n&&basket.every(x=>x==c))win(bk);else if(basket.some(x=>x!=c))oops(bk,"יש בסל צבע אחר. אני רוצה רק "+c[1]);else oops(bk,!basket.length?"הסל ריק! לוחצים על התותים, ואז על תן":basket.length<n?"צריך עוד! ספרנו "+basket.length:"יותר מדי! ספרנו "+basket.length)};
 a.append(bush,bk,cnt,give)}})}
 /* 2. water flowers: + / - */
 function water(){const M=max();let x,y,plus=S.lvl<2||rnd(2),ans;
 if(plus){x=1+rnd(M-1);y=1+rnd(M-x);ans=x+y}else{x=2+rnd(M-1);y=1+rnd(x-1);ans=x-y}
 if(S.lvl==1){x=1+rnd(5);y=1+rnd(5-x+1);ans=x+y;plus=1}
 start({who:"💧",ltr:1,text:plus?"🌷 "+x+" + "+y+" = ?":"🌷 "+x+" − "+y+" = ?",
-say:plus?"יש "+x+" פרחים, ועוד "+y+" פרחים צמחו. כמה פרחים יש? השקה אותם וספור":"היו "+x+" פרחים, ו"+y+" נקטפו. כמה נשארו?",
+say:plus?(x==1?"יש פרח אחד":"יש "+x+" פרחים")+", "+(y==1?"ועוד פרח אחד צמח":"ועוד "+y+" פרחים צמחו")+". כמה פרחים יש? משקים אותם וסופרים":"היו "+x+" פרחים, "+(y==1?"ופרח אחד נקטף":"ו-"+y+" נקטפו")+". כמה נשארו?",
 draw(a){const fl=document.createElement("div");fl.className="row";let k=0;
 for(let i=0;i<x+(plus?y:0);i++){const s=document.createElement("span");s.className="flower";s.textContent=plus&&i>=x?"🌼":"🌷";if(!plus&&i>=x-y)s.style.opacity=.25;
 s.onclick=()=>{if(!s.classList.contains("w")){s.classList.add("w");k++;snd(500+i*40,.1);OJ.sparkle(s,{n:6,emoji:"💧"});say(String(k))}};fl.appendChild(s)}

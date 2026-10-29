@@ -54,6 +54,7 @@
   const findVoice = () => { try { heVoice = speechSynthesis.getVoices().find(v => /^(he|iw)/i.test(v.lang)) || null; } catch (e) {} };
   if (window.speechSynthesis) { findVoice(); try { speechSynthesis.addEventListener('voiceschanged', findVoice); } catch (e) {} }
   function say(t) {
+    if (window.OJ && OJ.say) return OJ.say(t);
     if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
     try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'he-IL'; if (heVoice) u.voice = heVoice; u.rate = 0.92; u.pitch = 1.25; speechSynthesis.speak(u); } catch (e) {}
   }
