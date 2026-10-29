@@ -53,6 +53,16 @@
   .small { font-family: inherit; font-size: 26px; margin-top: 12px; padding: 6px 18px; border-radius: 24px; border: 4px solid #3b4cca; background: #fff; cursor: pointer; }
   @media (max-height: 700px) { .panel canvas { width: 100px; height: 100px; } .big { font-size: 32px; padding: 8px 34px; } }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 11; }
+  .back { background: radial-gradient(circle at 50% 35%, #fff59d 0 18%, transparent 19%), repeating-conic-gradient(from 0deg at 50% 40%, #ffcb05 0 15deg, #ffb300 15deg 30deg) !important; text-shadow: 0 3px 0 #e65100; }
+  .front { background: radial-gradient(circle at 50% 30%, #fff, #fff8e1) !important; }
+  .card.done .front { background: radial-gradient(circle, #e8f5e9, #a5d6a7) !important; }
+  .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+  .theme { font-family: inherit; font-weight: 800; font-size: 19px; line-height: 1.1; padding: 6px 2px 8px; border-radius: 20px; border: 4px solid #e0e0e0; background: #fff; color: #333; cursor: pointer; box-shadow: 0 4px 0 #bdbdbd; min-height: 74px; }
+  .theme b { display: block; font-size: 32px; }
+  .theme.on { border-color: #3b4cca; background: #e8eaf6; box-shadow: 0 4px 0 #23308a; scale: 1.06; }
+  .lvpill { font-size: 20px !important; min-width: 0 !important; }
+  .panel h1 { text-shadow: 0 3px 0 #ffe082; }
+  #heroBox { display: flex; justify-content: center; }
 </style>
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -72,6 +82,7 @@
   <div class="top">
     <button class="round" id="homeBtn" aria-label="תפריט">🏠</button>
     <div class="stars" id="stars">⭐ 0</div>
+    <div class="stars lvpill" id="lvPill"></div>
     <div class="side">
       <button class="round" id="moveBtn" aria-label="קלפים זזים">🌀</button>
       <button class="round" id="muteBtn" aria-label="קול">🔊</button>
@@ -79,9 +90,9 @@
   </div>
   <div id="board"></div>
   <div class="overlay" id="startOv"><div class="panel">
-    <canvas id="hero" width="360" height="360"></canvas>
+    <div id="heroBox"></div>
     <h1>הזיכרון של פיקאצ'ו</h1>
-    <div class="lv">🃏 ➜ 🃏 = ⭐</div>
+    <div class="themes" id="themes"></div>
     <div class="diffs" id="diffs">
       <button class="diff" data-d="0"><b>🙂</b>קל</button>
       <button class="diff" data-d="1"><b>😃</b>בינוני</button>
@@ -89,6 +100,7 @@
     </div>
     <button class="toggle" id="moveTog">🌀 קלפים זזים<span class="sw"></span></button>
     <button class="big" id="startBtn">▶ שחק</button>
+    <div style="display:flex;gap:10px;justify-content:center"><button class="small" id="albumBtn" aria-label="אלבום">📒 אלבום</button><button class="small" id="helpBtn" aria-label="הסבר">❓</button></div>
     <div data-pwa-slot></div>
   </div></div>
   <div class="overlay hide" id="winOv"><div class="panel">
@@ -197,6 +209,15 @@
     F('🐶', 'כלב'), F('🐱', 'חתול'), F('🐭', 'עכבר'), F('🐹', 'אוגר')
   ];
   FACES.forEach(f => { if (f.img) f.src = f.img(); });
+  const TH = (id, icon, name, list) => ({ id, icon, name, faces: list.map(([t, say]) => { let f = FACES.find(x => x.t === t); if (!f) { f = F(t, say); FACES.push(f); } return f; }) });
+  const THEMES = [
+    { id: 'pika', icon: '⚡', name: 'פיקאצ׳ו', faces: null },
+    TH('animals', '🐶', 'חיות', [['🐶', 'כלב'], ['🐱', 'חתול'], ['🐰', 'ארנב'], ['🐻', 'דוב'], ['🦁', 'אריה'], ['🐸', 'צפרדע'], ['🐵', 'קוף'], ['🐷', 'חזיר'], ['🐮', 'פרה'], ['🐔', 'תרנגולת'], ['🦊', 'שועל'], ['🐼', 'פנדה']]),
+    TH('fruit', '🍎', 'פירות', [['🍎', 'תפוח'], ['🍌', 'בננה'], ['🍇', 'ענבים'], ['🍓', 'תות'], ['🍉', 'אבטיח'], ['🍊', 'תפוז'], ['🍐', 'אגס'], ['🍒', 'דובדבן'], ['🍑', 'אפרסק'], ['🍍', 'אננס'], ['🥝', 'קיווי'], ['🍋', 'לימון']]),
+    TH('sea', '🐠', 'הים', [['🐠', 'דג'], ['🐙', 'תמנון'], ['🦀', 'סרטן'], ['🐬', 'דולפין'], ['🐳', 'לוויתן'], ['🐢', 'צב'], ['🦈', 'כריש'], ['🐚', 'צדף'], ['🦑', 'דיונון'], ['🐡', 'דג נפוח'], ['🪸', 'אלמוג'], ['⛵', 'סירה']]),
+    TH('space', '🚀', 'חלל', [['🚀', 'חללית'], ['🌙', 'ירח'], ['⭐', 'כוכב'], ['☀️', 'שמש'], ['🪐', 'כוכב לכת'], ['🛸', 'צלחת מעופפת'], ['👽', 'חייזר'], ['☄️', 'כוכב שביט'], ['🌍', 'כדור הארץ'], ['🔭', 'טלסקופ'], ['👨‍🚀', 'אסטרונאוט'], ['🌌', 'גלקסיה']]),
+    TH('cars', '🚗', 'רכבים', [['🚗', 'מכונית'], ['🚌', 'אוטובוס'], ['🚒', 'כבאית'], ['🚑', 'אמבולנס'], ['🚓', 'ניידת'], ['🚜', 'טרקטור'], ['🚂', 'רכבת'], ['✈️', 'מטוס'], ['🚁', 'מסוק'], ['🚲', 'אופניים'], ['🛴', 'קורקינט'], ['🚚', 'משאית']])
+  ];
   const byT = t => FACES.find(f => f.t === t);
   const SIMILAR = [['🍎', '🍏', '🍒', '🍓'], ['⭐', '🌟', '☀️', '🌙'], ['💧', '💦', '🔵'], ['🔴', '🟠', '🟡', '🟢', '🟣'], ['🐶', '🐱', '🐭', '🐹'], ['🔥', '⚡']].map(g => g.map(byT));
   // difficulty: pairs per level, how long the first peek lasts, how fast cards drift, when look-alike cards start
@@ -206,14 +227,14 @@
     { levels: [6, 8, 10, 12], peek: 1100, step: 150, minPeek: 500, perPair: 50, speed: 0.25, similarFrom: 1 }
   ];
   let saved = {}; try { saved = JSON.parse(localStorage.getItem('omerMemory') || '{}'); } catch (e) {}
-  let diff = [0, 1, 2].includes(saved.d) ? saved.d : 1, moving = !!saved.m;
+  let diff = [0, 1, 2].includes(saved.d) ? saved.d : 1, moving = !!saved.m, theme = THEMES.some(t => t.id === saved.t) ? saved.t : 'pika', misses = 0;
   let level = 0, stars = 0, open = [], lock = false, found = 0, pairs = 0, peeking = false, dealId = 0;
-  function save() { try { localStorage.setItem('omerMemory', JSON.stringify({ d: diff, m: moving })); } catch (e) {} }
+  function save() { try { localStorage.setItem('omerMemory', JSON.stringify({ d: diff, m: moving, t: theme })); } catch (e) {} }
   // audio
   let actx = null, muted = false;
   function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
   function tone(f, d, type = 'sine', v = 0.2, delay = 0) {
-    if (muted) return; const a = ac(); if (!a) return;
+    if (muted || !OJ.sfxOn) return; const a = ac(); if (!a) return;
     const o = a.createOscillator(), g = a.createGain(), t0 = a.currentTime + delay;
     o.type = type; o.frequency.setValueAtTime(f, t0);
     g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + d);
@@ -227,7 +248,7 @@
   let lastBonk = 0;
   const bonkS = () => { const n = performance.now(); if (n - lastBonk < 120) return; lastBonk = n; tone(180 + Math.random() * 60, 0.06, 'sine', 0.05); };
   function say(txt) {
-    if (muted || !window.speechSynthesis) return;
+    if (muted || !OJ.sfxOn || !window.speechSynthesis) return;
     try { const u = new SpeechSynthesisUtterance(txt); u.lang = 'he-IL'; u.rate = 0.95; u.pitch = 1.3; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
   }
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -339,6 +360,8 @@
   // ---------- game ----------
   function pickFaces() {
     const D = DIFFS[diff];
+    const T = THEMES.find(t => t.id === theme);
+    if (T && T.faces) return shuffle(T.faces.slice()).slice(0, pairs);
     if (level >= D.similarFrom) {
       const pool = [];
       shuffle(SIMILAR.slice()).forEach(g => shuffle(g.slice()).forEach(f => { if (!pool.includes(f)) pool.push(f); }));
@@ -350,7 +373,8 @@
   }
   function deal() {
     const D = DIFFS[diff], my = ++dealId;
-    pairs = D.levels[Math.min(level, D.levels.length - 1)]; found = 0; open = []; lock = true;
+    pairs = D.levels[Math.min(level, D.levels.length - 1)]; found = 0; open = []; lock = true; misses = 0;
+    el('lvPill').textContent = THEMES.find(t => t.id === theme).icon + ' ' + (level + 1);
     const deck = shuffle(pickFaces().flatMap(f => [f, f]));
     const b = el('board'); b.innerHTML = ''; phys = null;
     deck.forEach(f => {
@@ -386,22 +410,24 @@
         setTimeout(() => {
           if (my !== dealId) return;
           a.classList.add('done'); b.classList.add('done'); a.classList.remove('open'); b.classList.remove('open');
-          yesS(); stars++; found++; el('stars').textContent = '⭐ ' + stars; burst(a); burst(b);
+          OJ.sfx('good'); stars++; found++; el('stars').textContent = '⭐ ' + stars; burst(a); burst(b); OJ.sparkle(a, { n: 10 }); OJ.sparkle(b, { n: 10 }); OJ.bounce(el('stars'));
           open = []; lock = false;
           if (moving) setTimeout(() => { if (my === dealId && moving) { a.classList.add('gone'); b.classList.add('gone'); } }, 650);
           if (found === pairs) setTimeout(win, 700);
         }, 450);
       } else {
-        setTimeout(() => { a.classList.add('nope'); b.classList.add('nope'); hmS(); }, 500);
+        misses++; setTimeout(() => { a.classList.add('nope'); b.classList.add('nope'); hmS(); }, 500);
         setTimeout(() => { if (my !== dealId) return; a.classList.remove('open', 'nope'); b.classList.remove('open', 'nope'); open = []; lock = false; }, 1300);
       }
     }
   }
-  function drawHero(id, happy) { const c = el(id).getContext('2d'); c.clearRect(0, 0, 360, 360); drawMouse(c, 190, 220, 220, { happy }); }
+  function drawHero() { el('heroBox').innerHTML = OJ.pika('happy', Math.min(150, innerHeight * .17)); }
   function win() {
-    winS(); say('כל הכבוד!'); level++;
-    el('winLv').textContent = '⭐'.repeat(Math.min(level, 10));
-    drawHero('hero2', 1); el('winOv').classList.remove('hide'); confetti(120);
+    const st = misses <= Math.floor(pairs / 2) ? 3 : misses <= pairs ? 2 : 1;
+    OJ.setStars('memory', theme + diff, Math.max(st, 0));
+    level++; confetti(80);
+    setTimeout(() => OJ.celebrate({ title: 'מצאת את כל הזוגות!', sub: st === 3 ? 'זיכרון של אלוף!' : st === 2 ? 'כמעט בלי טעויות!' : 'כל הכבוד!', stars: st, sticker: true, game: 'memory',
+      button: '▶ עוד!', onDone: () => deal(), again: { label: '⚙️ 🃏', fn: () => { paintChoices(); el('startOv').classList.remove('hide'); } } }), 300);
   }
   // confetti / sparkles
   const cf = el('confetti'), cx = cf.getContext('2d'); let parts = [], anim = false;
@@ -417,7 +443,12 @@
     if (parts.length) requestAnimationFrame(step); else { anim = false; cx.clearRect(0, 0, cf.width, cf.height); }
   }
   // ---------- controls ----------
+  function paintThemes() {
+    el('themes').innerHTML = THEMES.map(t => `<button class="theme${t.id === theme ? ' on' : ''}" data-t="${t.id}"><b>${t.icon}</b>${t.name}</button>`).join('');
+    el('themes').querySelectorAll('.theme').forEach(b => b.addEventListener('click', () => { theme = b.dataset.t; save(); paintThemes(); OJ.sfx('pop'); say(THEMES.find(t => t.id === theme).name); }));
+  }
   function paintChoices() {
+    paintThemes();
     document.querySelectorAll('.diff').forEach(x => x.classList.toggle('on', +x.dataset.d === diff));
     el('moveTog').classList.toggle('on', moving); el('moveBtn').classList.toggle('on', moving);
   }
@@ -428,15 +459,24 @@
   document.querySelectorAll('.diff').forEach(x => x.addEventListener('click', () => { ac(); diff = +x.dataset.d; save(); paintChoices(); tone(440 + diff * 160, 0.12, 'triangle', 0.15); }));
   el('moveTog').addEventListener('click', () => { ac(); setMoving(!moving); tone(moving ? 700 : 400, 0.12, 'triangle', 0.15); });
   el('moveBtn').addEventListener('click', () => { ac(); setMoving(!moving); if (moving) say('קלפים זזים!'); });
-  el('startBtn').addEventListener('click', () => { ac(); level = 0; el('startOv').classList.add('hide'); say('מצא זוגות!'); deal(); });
+  const INTRO = [
+    { pic: '🃏 🃏', text: 'בכל קלף מסתתרת תמונה. לכל תמונה יש תאומה!' },
+    { pic: '👀', text: 'בהתחלה כל הקלפים נפתחים לרגע. תזכור איפה כל תמונה!' },
+    { pic: '🍎 = 🍎', text: 'הופכים שני קלפים. אם הם אותו דבר, מצאת זוג!', expr: 'cheer' },
+    { pic: '🐶 🍎 🐠 🚀 🚗', text: 'אפשר לבחור נושא: חיות, פירות, ים, חלל או רכבים.' }
+  ];
+  el('startBtn').addEventListener('click', () => { ac(); OJ.intro('memory', INTRO).then(() => { level = 0; el('startOv').classList.add('hide'); say('מצא זוגות!'); deal(); }); });
+  el('albumBtn').addEventListener('click', () => OJ.album());
+  el('helpBtn').addEventListener('click', () => OJ.intro('memory', INTRO, { force: true }));
   el('nextBtn').addEventListener('click', () => { el('winOv').classList.add('hide'); deal(); });
   el('setBtn').addEventListener('click', () => { el('winOv').classList.add('hide'); paintChoices(); el('startOv').classList.remove('hide'); });
   el('homeBtn').addEventListener('click', () => { location.href = '../index.html'; });
-  el('muteBtn').addEventListener('click', () => { muted = !muted; el('muteBtn').textContent = muted ? '🔇' : '🔊'; if (muted && window.speechSynthesis) speechSynthesis.cancel(); });
+  const paintMute = () => { el('muteBtn').textContent = OJ.sfxOn ? '🔊' : '🔇'; }; paintMute();
+  el('muteBtn').addEventListener('click', () => { OJ.sfxOn = !OJ.sfxOn; paintMute(); if (!OJ.sfxOn && window.speechSynthesis) speechSynthesis.cancel(); });
   addEventListener('resize', () => { sizeCf(); layout(); });
-  sizeCf(); drawHero('hero', 1); paintChoices();
+  sizeCf(); drawHero(); paintChoices();
   window.__game = {
-    get level() { return level; }, get found() { return found; }, get pairs() { return pairs; },
+    get level() { return level; }, get misses() { return misses; }, setTheme(t) { theme = t; }, get found() { return found; }, get pairs() { return pairs; },
     get moving() { return moving; }, get diff() { return diff; }, get lock() { return lock; }, get peeking() { return peeking; }, get phys() { return phys; },
     jump(n) { level = n; el('startOv').classList.add('hide'); el('winOv').classList.add('hide'); deal(); } // test hook
   };
