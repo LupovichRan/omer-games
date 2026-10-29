@@ -2,7 +2,7 @@
    Cache-first for this app's files, versioned cache name so updates roll out; page navigations are
    served from cache and refreshed in the background. Only deletes its own old caches. */
 const APP = 'brain';
-const VERSION = '552efddad6';
+const VERSION = 'cd1152c584';
 const PREFIX = 'omer-' + APP + '-';
 const CACHE = PREFIX + VERSION;
 const FILES = [
@@ -14,7 +14,10 @@ const FILES = [
   "index.html",
   "manifest.webmanifest",
   "pwa.js",
-  "../shared/parental.js"
+  "../shared/parental.js",
+  "../shared/juice.js",
+  "../shared/fonts/rubik-hebrew.woff2",
+  "../shared/fonts/rubik-latin.woff2"
 ];
 const SHARED = new Set(FILES.map(f => new URL(f, self.registration.scope).pathname).filter(p => !(location.origin + p).startsWith(self.registration.scope)));
 

@@ -22,7 +22,7 @@ BASE = '/omer-games/'           # GitHub Pages base path
 TPL = os.path.join(ROOT, 'tools', 'templates')
 EMOJI_FONT = '/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf'
 SKIP_DIRS = {'tools', '.git', '.github', 'shared'}
-SHARED = ['shared/parental.js']  # site-wide files every app loads + precaches (parental controls)
+SHARED = ['shared/parental.js', 'shared/juice.js', 'shared/fonts/rubik-hebrew.woff2', 'shared/fonts/rubik-latin.woff2']  # site-wide files every app loads + precaches (parental controls, polish kit + font)
 MENU = '.'
 
 
@@ -118,6 +118,7 @@ def patch_html(folder, m):
              '<meta name="apple-mobile-web-app-status-bar-style" content="default">\n'
              f'<meta name="apple-mobile-web-app-title" content="{m["short_name"]}">\n'
              '<script src="pwa.js" defer></script>\n'
+             f'<script src="{"" if folder == MENU else "../"}shared/juice.js"></script>\n'
              f'<script src="{"" if folder == MENU else "../"}shared/parental.js" defer></script>\n'
              '<!-- /PWA -->')
     if '<!-- PWA -->' in h:
