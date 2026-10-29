@@ -139,7 +139,8 @@
     if (!badge) return;
     if (!c.on) { badge.className = 'opc off'; return; }
     const r = remaining(c, d), m = Math.ceil(r / 60);
-    badge.className = 'opc ' + (r <= 300 ? 'low' + (r <= 60 ? ' pulse' : '') : r <= 900 ? 'mid' : '');
+    if (r > 600) { badge.className = 'opc off'; return; } // show only in the last 10 minutes
+    badge.className = 'opc ' + (r <= 300 ? 'low' + (r <= 60 ? ' pulse' : '') : 'mid');
     badge.textContent = '⏳ ' + (r < 60 ? `0:${pad(Math.floor(r))}` : m + '′');
   }
   function warn(n) {
