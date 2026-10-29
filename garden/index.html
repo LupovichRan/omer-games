@@ -102,7 +102,7 @@ S.decor.forEach((d,i)=>{const e=document.createElement("span");e.textContent=d.e
 function max(){return S.lvl<3?10:20}
 function start(o){cur=o;show("play");$("stars2").textContent=S.stars;$("who").textContent=o.who;$("ask").textContent=o.text;$("area").innerHTML="";o.draw($("area"));say(o.say)}
 function win(){yay();S.stars++;streak++;if(streak>=3&&S.lvl<5){S.lvl++;streak=0}
-const d=DECOR[rnd(DECOR.length)];S.decor.push({e:d,x:5+rnd(85),y:5+rnd(70)});if(S.decor.length>40)S.decor.shift();save();
+const d=DECOR[rnd(DECOR.length)];let dx=5+rnd(85),dy=5+rnd(70);if(dx>33&&dx<62&&dy>20)dx=rnd(2)?5+rnd(25):65+rnd(25);S.decor.push({e:d,x:dx,y:dy});if(S.decor.length>40)S.decor.shift();save();
 $("pop").innerHTML=d+"<div>כל הכבוד! קיבלת "+d+" לגינה</div>";$("pop").classList.add("on");say("כל הכבוד! קיבלת קישוט חדש לגינה");
 setTimeout(()=>{$("pop").classList.remove("on");show("hub")},2200)}
 function oops(el,msg){snd(220,.2,"triangle");streak=0;if(el){el.classList.add("shake");setTimeout(()=>el.classList.remove("shake"),400)}say(msg||"כמעט! נסה שוב")}
