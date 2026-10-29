@@ -38,6 +38,20 @@ One shared script loaded by the menu and **every** game (same origin → one sha
 - `tools/new-game-pwa.py` adds `<script src="../shared/parental.js" defer>` to every app's `<!-- PWA -->` block and precaches it in every
   service worker, so **new games get it automatically** – just run the tool. Tests: `omer-games-shots/parental-test.js <base-url>`.
 
+## Shared polish kit (`shared/juice.js`)
+Loaded (not deferred) in every page's `<!-- PWA -->` block and precached by every SW, exposing `window.OJ`:
+- **Look:** the bundled Rubik font (`shared/fonts/*.woff2`, OFL) as `var(--oj-font)`; `OJ.pika(expr,size)` draws the original
+  SVG Pikachu-style mascot with expressions `happy|cheer|think|wow|oops|sleep`; `OJ.mascot(expr,text)` pops a talking bubble.
+- **Juice:** `OJ.confetti()`, `OJ.sparkle(el|{x,y},{n})`, `OJ.shake(el)`, `OJ.bounce(el)`, `OJ.enter(el)`.
+- **Sound:** `OJ.sfx('tap|pop|good|great|bad|star|whoosh|sticker|levelup|cheer')` (WebAudio, no files) + background music
+  with the 🎵 button bottom-right; mute is remembered (`OJ.sfxOn` getter/setter). `OJ.say(text)` speaks he-IL (silent if unsupported).
+- **Progression:** `OJ.setStars(game,key,n)` / `getStars` / `totalStars(game?)` (stored in `omerJ_prog`, best score kept),
+  stickers album (`OJ.award(game)`, `OJ.album()`, 48 stickers, `omerJ_stk`).
+- **Screens:** `OJ.celebrate({title,sub,stars,sticker,game,button,onDone,again})` level-up/win overlay;
+  `OJ.intro(game,steps)` spoken 4-step how-to (shown once per game, replay with `OJ.helpButton`).
+- Games' own save keys (`omerMemory`, brain/gifted state, etc.) are untouched, so old progress still loads.
+- brain/ and gifted/ are built from sources outside this repo (`brain-src/`, `gifted-src/`); brain must pass `node verify.js 300`.
+
 ## Adding a game
 1. Create a folder, e.g. `dino/`, with a single self-contained `index.html` (Hebrew, `dir="rtl"`, `lang="he"`).
    Put `<div data-pwa-slot></div>` on its start screen (under the play button) – the install button goes there.
