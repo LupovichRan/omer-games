@@ -85,6 +85,23 @@
   #parent .pbtn { font-family: inherit; font-size: 18px; padding: 8px 14px; border-radius: 16px; border: 3px solid #3b4cca; background: #fff; cursor: pointer; margin: 4px; }
   #parent .note { font-size: 15px; color: #666; max-width: 520px; margin: 4px auto; }
   #toast { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(.5); opacity: 0; font-size: 64px; pointer-events: none; transition: all .3s; z-index: 12; text-shadow: 0 4px 0 rgba(0,0,0,.2); }
+  body { font-family: "OJ Rubik", "Arial Rounded MT Bold", Arial, sans-serif; }
+  button { font-family: inherit; }
+  #hero { width: auto !important; height: auto !important; display: flex; justify-content: center; animation: bBob 2.4s ease-in-out infinite; }
+  @keyframes bBob { 50% { transform: translateY(-7px); } }
+  .guide { top: -26px !important; inset-inline-start: -14px !important; width: 84px !important; height: 84px !important; display: flex; align-items: flex-end; justify-content: center; }
+  .hbtns { display: flex; gap: 10px; margin: -4px 0 10px; }
+  .track { position: relative; overflow: hidden; }
+  .track::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 80% 10%, rgba(255,255,255,.35), transparent 45%); pointer-events: none; }
+  .track .pb { width: 80%; height: 10px; border-radius: 5px; background: rgba(0,0,0,.2); margin-top: 6px; overflow: hidden; }
+  .track .pb i { display: block; height: 100%; background: linear-gradient(90deg, #fff59d, #ffeb3b); border-radius: 5px; }
+  .track .st { font-size: 18px; letter-spacing: -1px; text-shadow: none; }
+  .bar { height: 20px !important; border: 3px solid #fff; position: relative; }
+  .bar::after { content: "⭐"; position: absolute; left: 4px; top: -6px; font-size: 20px; }
+  .card { background: linear-gradient(#fff, #fffdf3) !important; }
+  .card.ok { animation: cardOk .5s; }
+  @keyframes cardOk { 40% { transform: scale(1.03); box-shadow: 0 0 0 8px #a5d6a7, 0 8px 0 rgba(0,0,0,.2); } }
+  .ch { transition: transform .12s; }
   #toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 </style>
 <!-- PWA -->
@@ -108,9 +125,10 @@
       <div class="stars" id="starsH">⭐ 0</div>
       <button class="round" id="sayHome" aria-label="הקראה">🔊</button>
     </div>
-    <canvas id="hero" width="300" height="300"></canvas>
+    <div id="hero"></div>
     <h1 id="title">חדר כושר למוח</h1>
     <div class="sub">🧠 בחר אימון – כל הצלחה מעלה שלב!</div>
+    <div class="hbtns"><button class="round" id="albumBtn" aria-label="אלבום">📒</button><button class="round" id="helpBtn" aria-label="הסבר">❓</button></div>
     <div class="tracks" id="tracks"></div>
     <div data-pwa-slot></div>
   </div>
@@ -126,7 +144,7 @@
     <div class="bar"><i id="bar"></i></div>
     <div class="stars" id="starsP">⭐ 0</div>
     <div class="card" id="card">
-      <canvas class="guide" id="guide" width="150" height="150"></canvas>
+      <div class="guide" id="guide"></div>
       <div class="qtext" id="qtext"></div>
       <div class="eq" id="eq"></div>
       <div class="vis" id="vis"></div>
@@ -135,7 +153,7 @@
     <div class="hint hide" id="hint"><div id="hintTx"></div><button class="big" id="gotIt">הבנתי ▶</button></div>
   </div>
   <div class="overlay hide" id="upOv"><div class="panel">
-    <canvas id="upHero" width="300" height="300"></canvas>
+    <div id="upHero"></div>
     <h1 id="upTx">עלית שלב! ⚡</h1>
     <button class="big" id="upGo">▶ ממשיכים</button>
   </div></div>
@@ -869,13 +887,15 @@ function hintHTML(h) {
 }
 const isEmo = t => /^\p{Extended_Pictographic}/u.test(t) && t.length <= 8;
 /* pikachu helpers */
-function drawPika(id, happy) { const cv = el(id); const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); drawMouse(c, cv.width * .52, cv.height * .64, cv.width * .62, { happy }); }
+const PSZ = { hero: 130, guide: 82, upHero: 150 };
+function drawPika(id, happy) { const e = typeof happy === 'string' ? happy : happy ? 'cheer' : 'think'; const x = el(id); if (x.dataset.e === e) return; x.dataset.e = e; x.innerHTML = OJ.pika(e, PSZ[id] || 100); }
+const trackStars = id => { const st = S.t[id], m = TR[id].max; return st.best >= m ? 3 : st.best >= Math.ceil(m * 2 / 3) ? 2 : st.best > TR[id].start ? 1 : 0; };
 
 /* home */
 function renderHome() {
   el('starsH').textContent = '⭐ ' + S.stars; el('starsP').textContent = '⭐ ' + S.stars;
-  el('tracks').innerHTML = Object.entries(TR).map(([id, t]) => `<button class="track t-${id}" data-t="${id}"><span class="ic">${t.icon}</span><span class="nm">${t.name}</span><span class="lv">שלב ${S.t[id].lvl}</span></button>`).join('');
-  el('tracks').querySelectorAll('.track').forEach(b => b.addEventListener('click', () => startTrack(b.dataset.t)));
+  el('tracks').innerHTML = Object.entries(TR).map(([id, t]) => `<button class="track t-${id}" data-t="${id}"><span class="ic">${t.icon}</span><span class="nm">${t.name}</span><span class="lv">שלב ${S.t[id].lvl} / ${t.max}</span><span class="pb"><i style="width:${Math.round(S.t[id].lvl / t.max * 100)}%"></i></span><span class="st">${'⭐'.repeat(trackStars(id))}${'☆'.repeat(3 - trackStars(id))}</span></button>`).join('');
+  el('tracks').querySelectorAll('.track').forEach(b => b.addEventListener('click', () => { OJ.sfx('tap'); OJ.intro('brain', INTRO).then(() => startTrack(b.dataset.t)); }));
 }
 let curT = null, cur = null, locked = false, tStart = 0, quick = [], nextTimer = 0;
 const recent = {};
@@ -889,7 +909,7 @@ function startTrack(t) {
   speak(TR[t].name === 'English' ? 'אנגלית' : TR[t].name);
   show();
 }
-function goHome() { clearTimeout(nextTimer); curT = null; el('play').classList.add('hide'); el('home').classList.remove('hide'); el('hint').classList.add('hide'); renderHome(); drawPika('hero', 1); if (window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) {} }
+function goHome() { clearTimeout(nextTimer); curT = null; el('play').classList.add('hide'); el('home').classList.remove('hide'); el('hint').classList.add('hide'); renderHome(); drawPika('hero', 'happy'); if (window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) {} }
 function header() {
   const st = S.t[curT];
   el('ptName').textContent = TR[curT].icon + ' ' + TR[curT].name; el('ptLv').textContent = 'שלב ' + st.lvl + ' / ' + TR[curT].max;
@@ -918,7 +938,7 @@ function render() {
     choose(+b.dataset.i);
   }));
   el('hint').classList.add('hide');
-  drawPika('guide', 0);
+  drawPika('guide', 'think'); OJ.enter && OJ.enter(el('card'));
 }
 const PRAISE_HE = ['יופי!', 'מעולה!', 'אלוף!', 'גאון!', 'כל הכבוד!', 'וואו!', 'מדויק!', 'פיקה פיקה!'];
 const PRAISE_EN = ['Great!', 'Awesome!', 'Super!', 'Well done!', 'Perfect!', 'Yes!'];
@@ -930,7 +950,7 @@ function choose(i) {
   if (ok) {
     st.ok++; st.streak++; S.stars++; quick.push(Date.now() - tStart < 9000);
     btns[i].classList.add('ok'); btns.forEach((b, j) => j !== i && b.classList.add('dim'));
-    drawPika('guide', 1); toast('⭐'); speak(cur.lang === 'en' ? pick(PRAISE_EN) : pick(PRAISE_HE), cur.lang);
+    drawPika('guide', 1); toast('⭐'); OJ.sfx(st.streak >= 3 ? 'great' : 'good'); OJ.sparkle(btns[i], { n: 12 }); OJ.bounce(el('starsP')); el('card').classList.remove('ok'); void el('card').offsetWidth; el('card').classList.add('ok'); speak(cur.lang === 'en' ? pick(PRAISE_EN) : pick(PRAISE_HE), cur.lang);
     let up = 0;
     if (st.streak >= 3) { up = 1; if (curT === 'math' && quick.slice(-3).length === 3 && quick.slice(-3).every(Boolean)) up = 2; st.streak = 0; }
     if (up && st.lvl < TR[curT].max) {
@@ -939,7 +959,7 @@ function choose(i) {
     } else { save(); header(); nextTimer = setTimeout(show, 1100); }
   } else {
     st.streak = 0; quick = []; st.wrong++;
-    btns[i].classList.add('bad'); btns[cur.ans].classList.add('ok');
+    btns[i].classList.add('bad'); btns[cur.ans].classList.add('ok'); OJ.sfx('bad'); drawPika('guide', 'oops');
     let down = '';
     if (st.wrong >= 2) { st.wrong = 0; if (st.lvl > 1) { st.lvl--; down = 'נתאמן רגע בשלב ' + st.lvl + ' ואז נעלה שוב 💪'; } }
     save(); header();
@@ -950,9 +970,19 @@ function choose(i) {
   }
 }
 function levelUp(n) {
-  el('upTx').textContent = `עלית לשלב ${n}! ⚡`; drawPika('upHero', 1); el('upOv').classList.remove('hide');
-  speak(`כל הכבוד! עלית לשלב ${n}!`);
+  OJ.setStars('brain', curT, Math.max(1, trackStars(curT)));
+  const sticker = n % 2 === 0 || n === TR[curT].max;
+  OJ.celebrate({ title: `עלית לשלב ${n}! ⚡`, sub: TR[curT].icon + ' ' + TR[curT].name + ' · ' + n + ' / ' + TR[curT].max, stars: 3, sticker, game: 'brain',
+    speak: `כל הכבוד! עלית לשלב ${n}!`, button: '▶ ממשיכים', onDone: show, again: { label: '🏠', fn: goHome } });
 }
+const INTRO = [
+  { pic: '🧠💪', text: 'ברוך הבא לחדר הכושר למוח! כאן מתאמנים כמו אלופים.' },
+  { pic: '🔢 🧩 🧊 📖 🔬 🇬🇧', text: 'בוחרים אימון: חשבון, דפוסים, צורות, קריאה, מדע או אנגלית.' },
+  { pic: '🔊', text: 'לוחצים על הרמקול כדי לשמוע את השאלה שוב.', expr: 'think' },
+  { pic: '✅✅✅ ➜ ⚡', text: 'שלוש תשובות נכונות ברצף, ועולים שלב!', expr: 'cheer' }
+];
+el('albumBtn').addEventListener('click', () => OJ.album());
+el('helpBtn').addEventListener('click', () => OJ.intro('brain', INTRO, { force: true }));
 el('upGo').addEventListener('click', () => { el('upOv').classList.add('hide'); show(); });
 el('gotIt').addEventListener('click', show);
 el('backBtn').addEventListener('click', goHome);
@@ -982,7 +1012,7 @@ el('autoRead').addEventListener('change', e => { S.autoRead = e.target.checked; 
 el('closeParent').addEventListener('click', () => { el('parent').classList.add('hide'); renderHome(); });
 el('resetBtn').addEventListener('click', () => { if (confirm('לאפס את כל ההתקדמות?')) { S = fresh(); save(); S = load(); save(); openParent(); renderHome(); } });
 
-renderHome(); drawPika('hero', 1);
+renderHome(); drawPika('hero', 'happy');
 window.__brain = { hintHTML, get S() { return S; }, get cur() { return cur; }, get curT() { return curT; }, TR, GEN, gens: { genMath, genLogic, genSpatial, genRead, genSci, genEng }, numWord, choose, startTrack, goHome, openParent, nextQ, show,
   setLevel(t, l) { S.t[t].lvl = clampL(t, l); S.t[t].streak = 0; S.t[t].wrong = 0; save(); } };
 })();
