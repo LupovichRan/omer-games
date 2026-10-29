@@ -67,6 +67,32 @@
   #again { white-space: nowrap; position: fixed; top: 45%; left: 50%; transform: translateX(-50%); z-index: 18; display: none; }
   #again.on { display: block; }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; width: 100%; height: 100%; }
+  body { font-family: "OJ Rubik", "Arial Rounded MT Bold", Arial, sans-serif; }
+  button { font-family: inherit; }
+  #menuPika { display: flex; justify-content: center; width: auto !important; height: auto !important; animation: ojBob 2.4s ease-in-out infinite; }
+  @keyframes ojBob { 50% { transform: translateY(-8px); } }
+  #guidePika { width: 110px; height: 110px; display: flex; align-items: flex-end; justify-content: center; }
+  .tile { background-image: linear-gradient(160deg, rgba(255,255,255,.35), rgba(0,0,0,.08)) !important; transition: transform .15s; }
+  .tile .tstars { position: absolute; bottom: 6px; left: 0; right: 0; font-size: clamp(14px, 3vw, 20px); letter-spacing: -2px; text-shadow: none; }
+  .tile.done::after { content: none; }
+  .t4 { background-color: #ab47bc; } .t1 { background-color: #29b6f6; } .t2 { background-color: #66bb6a; } .t3 { background-color: #ef5350; }
+  .tiles { max-width: 900px; }
+  @media (max-width: 600px) { .tile { width: 40vw; height: 22vh; max-height: 160px; } }
+  #menu { background: radial-gradient(circle at 50% 30%, #fff59d, #ffcb05 60%, #f5a300); }
+  #menu::before { content: "🧪 🔭 🌱 💡 🧲 🌈"; position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 28px; opacity: .35; letter-spacing: 10px; }
+  .menuBtns { display: flex; gap: 10px; }
+  /* sort */
+  #sort { background: linear-gradient(#e1f5fe 0 40%, #fff8e1 100%); }
+  #sortQ { position: absolute; top: 84px; left: 0; right: 0; display: flex; justify-content: center; }
+  #sortItem { font-size: clamp(80px, 16vh, 130px); line-height: 1; background: #fff; border-radius: 34px; padding: 10px 26px; border: 6px solid #ce93d8; box-shadow: 0 8px 0 #ab47bc; animation: ojBob 1.6s ease-in-out infinite; touch-action: none; cursor: grab; }
+  #sortLeft { position: absolute; top: calc(84px + clamp(120px, 20vh, 170px)); left: 0; right: 0; text-align: center; font-size: 26px; letter-spacing: 2px; }
+  #bins { position: absolute; left: 8px; right: 8px; bottom: 130px; display: flex; gap: 10px; justify-content: center; }
+  .bin { flex: 1; max-width: 260px; min-height: clamp(150px, 26vh, 230px); border-radius: 30px; border: 6px solid #fff; box-shadow: 0 8px 0 rgba(0,0,0,.2); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; color: #fff; font-size: clamp(22px, 5vw, 30px); font-weight: 800; text-shadow: 0 2px 2px rgba(0,0,0,.35); position: relative; overflow: hidden; }
+  .bin b { font-size: clamp(46px, 10vw, 70px); line-height: 1.1; }
+  .bin .got { display: flex; flex-wrap: wrap; justify-content: center; font-size: 26px; gap: 2px; padding: 4px; text-shadow: none; }
+  .bin.sea { background: linear-gradient(#4fc3f7, #0277bd); } .bin.land { background: linear-gradient(#aed581, #558b2f); } .bin.sky { background: linear-gradient(#b3e5fc, #7986cb); }
+  .bin.hot { outline: 6px dashed #ffeb3b; }
+  .fly { position: fixed; z-index: 25; font-size: 80px; transition: all .45s cubic-bezier(.5,-0.3,.6,1); pointer-events: none; transform: translate(-50%,-50%); }
 </style>
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -95,12 +121,14 @@
 <div class="screen on" id="menu">
   <div class="inner">
     <h1>המעבדה של פיקאצ'ו 🔬</h1>
-    <canvas id="menuPika" width="200" height="200"></canvas>
+    <div id="menuPika"></div>
     <div class="tiles">
       <button class="tile t1" data-go="sink">💧<span>צף או שוקע?</span></button>
       <button class="tile t2" data-go="ramp">⚽<span>מגלשה</span></button>
       <button class="tile t3" data-go="mag">🧲<span>מגנט</span></button>
+      <button class="tile t4" data-go="sort">🐠<span>איפה גרים?</span></button>
     </div>
+    <div class="menuBtns"><button class="round" id="albumBtn" aria-label="אלבום">📒</button><button class="round" id="helpBtn" aria-label="הסבר">❓</button></div>
     <div data-pwa-slot></div>
   </div>
 </div>
@@ -130,8 +158,18 @@
   <div id="magnet">🧲</div>
 </div>
 
+<div class="screen" id="sort">
+  <div id="sortQ"><div id="sortItem"></div></div>
+  <div id="sortLeft"></div>
+  <div id="bins">
+    <button class="bin sky" data-h="sky"><b>☁️</b>בשמיים<div class="got"></div></button>
+    <button class="bin land" data-h="land"><b>🌳</b>ביבשה<div class="got"></div></button>
+    <button class="bin sea" data-h="sea"><b>🌊</b>בים<div class="got"></div></button>
+  </div>
+</div>
+
 <button class="big yellow" id="again">🔄 עוד פעם!</button>
-<div id="guide"><div id="bubble"></div><canvas id="guidePika" width="110" height="110"></canvas></div>
+<div id="guide"><div id="bubble"></div><div id="guidePika"></div></div>
 <canvas id="confetti"></canvas>
 
 <script>
@@ -141,7 +179,7 @@
   let actx = null, muted = false;
   function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (actx && actx.state === 'suspended') actx.resume(); return actx; }
   function tone(f, d, type = 'sine', v = 0.2, delay = 0, to = null) {
-    if (muted) return; const a = ac(); if (!a) return; const t = a.currentTime + delay;
+    if (muted || !OJ.sfxOn) return; const a = ac(); if (!a) return; const t = a.currentTime + delay;
     const o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
     o.connect(g).connect(a.destination); o.start(t); o.stop(t + d + 0.05);
@@ -167,12 +205,13 @@
     lastSay = text;
     const b = $('bubble'); b.textContent = text; b.classList.add('show'); guideHappy = 2.5;
     clearTimeout(bubbleT); bubbleT = setTimeout(() => b.classList.remove('show'), 7000);
-    if (!muted && heVoice && speak) {
+    if (!muted && OJ.sfxOn && heVoice && speak) {
       try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(speak.replace(/[^\u0590-\u05FF\s,.!?'"-]/g, '')); u.voice = heVoice; u.lang = heVoice.lang; u.rate = 0.9; u.pitch = 1.2; speechSynthesis.speak(u); } catch (e) {}
     }
   }
   $('sayBtn').onclick = () => { if (lastSay) say(lastSay); };
-  $('muteBtn').onclick = () => { muted = !muted; $('muteBtn').textContent = muted ? '🔇' : '🔊'; if (muted && window.speechSynthesis) speechSynthesis.cancel(); };
+  const paintMute = () => { $('muteBtn').textContent = OJ.sfxOn ? '🔊' : '🔇'; }; paintMute();
+  $('muteBtn').onclick = () => { OJ.sfxOn = !OJ.sfxOn; paintMute(); if (!OJ.sfxOn && window.speechSynthesis) speechSynthesis.cancel(); };
 
   // ---------- stars ----------
   let stars = 0; const addStar = (n = 1) => { stars += n; $('starCount').textContent = stars; };
@@ -247,12 +286,13 @@
 
 
   let guideHappy = 0, T = 0;
-  const mp = $('menuPika').getContext('2d'), gp = $('guidePika').getContext('2d');
+  $('menuPika').innerHTML = OJ.pika('happy', Math.min(170, innerHeight * .2));
+  let gExpr = '';
+  function face(expr) { if (expr === gExpr) return; gExpr = expr; $('guidePika').innerHTML = OJ.pika(expr, 104); }
+  let faceT = null; function mood(expr, ms = 2500) { face(expr); clearTimeout(faceT); faceT = setTimeout(() => face('happy'), ms); }
+  face('happy');
   function pikaLoop(ts) {
     T = ts / 1000;
-    if ($('menu').classList.contains('on')) { mp.clearRect(0, 0, 200, 200); drawMouse(mp, 108, 128 + Math.sin(T * 3) * 5, 115, { happy: 1, t: T }); }
-    gp.clearRect(0, 0, 110, 110); guideHappy -= 1 / 60;
-    drawMouse(gp, 58, 72 + (guideHappy > 0 ? -Math.abs(Math.sin(T * 8)) * 6 : 0), 62, { happy: guideHappy > 0 ? 1 : 0, t: T, facing: -1 });
     drawConfetti();
     requestAnimationFrame(pikaLoop);
   }
@@ -261,8 +301,16 @@
   const cc = $('confetti'), cx = cc.getContext('2d'); let conf = [];
   function sizeConf() { cc.width = innerWidth; cc.height = innerHeight; }
   sizeConf(); addEventListener('resize', sizeConf);
-  function party(text, speak) {
-    sfx.party(); say(text, speak);
+  const NAMES = { sink: 'צף או שוקע', ramp: 'מגלשה', mag: 'מגנט', sort: 'איפה גרים' };
+  function paintTiles() {
+    document.querySelectorAll('.tile[data-go]').forEach(t => { const n = OJ.getStars('science', t.dataset.go); let s = t.querySelector('.tstars'); if (!s) { s = document.createElement('div'); s.className = 'tstars'; t.appendChild(s); } s.textContent = n ? '⭐'.repeat(n) + '☆'.repeat(3 - n) : '☆☆☆'; });
+  }
+  paintTiles();
+  function party(text, speak, st = 3) {
+    $('bubble').classList.remove('show'); mood('cheer', 4000);
+    OJ.setStars('science', current, st); paintTiles(); const exp = current;
+    setTimeout(() => OJ.celebrate({ title: 'ניסוי הצליח! 🔬', sub: text, speak: speak || text, stars: st, sticker: true, game: 'science',
+      button: '🏠 למעבדה', onDone: () => go('menu'), again: { label: '🔄 עוד פעם', fn: () => go(exp) } }), 400);
     const cols = ['#ff5252', '#ffeb3b', '#69f0ae', '#40c4ff', '#e040fb', '#ff9800'];
     for (let i = 0; i < 120; i++) conf.push({ x: Math.random() * innerWidth, y: -20 - Math.random() * 200, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, c: cols[i % 6], r: Math.random() * 6, life: 4 });
   }
@@ -278,9 +326,18 @@
     sfx.tap(); document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === name)); current = name;
     $('again').classList.remove('on'); $('bubble').classList.remove('show');
     if (window.speechSynthesis) speechSynthesis.cancel();
-    if (name === 'sink') Sink.start(); if (name === 'ramp') Ramp.start(); if (name === 'mag') Mag.start();
+    if (name === 'sink') Sink.start(); if (name === 'ramp') Ramp.start(); if (name === 'mag') Mag.start(); if (name === 'sort') Sort.start();
+    if (name === 'menu') paintTiles();
   }
-  document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { ac(); go(b.dataset.go); });
+  const INTRO = [
+    { pic: '🔬', text: 'ברוך הבא למעבדה של פיקאצ׳ו! כאן עושים ניסויים אמיתיים.' },
+    { pic: '💧 ⚽ 🧲 🐠', text: 'בוחרים ניסוי: מים, מגלשה, מגנט, או איפה בעלי חיים גרים.' },
+    { pic: '🤔 ➜ 👀', text: 'קודם מנחשים, ואז בודקים מה קורה באמת!', expr: 'think' },
+    { pic: '⭐⭐⭐', text: 'על כל ניסוי מקבלים כוכבים ומדבקה לאלבום.', expr: 'cheer' }
+  ];
+  document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { ac(); OJ.intro('science', INTRO).then(() => go(b.dataset.go)); });
+  $('albumBtn').onclick = () => OJ.album();
+  $('helpBtn').onclick = () => OJ.intro('science', INTRO, { force: true });
   $('homeBtn').onclick = () => go('menu');
   $('again').onclick = () => go(current);
   const markDone = id => document.querySelector(`[data-go="${id}"]`).classList.add('done');
@@ -295,13 +352,21 @@
       { e: '🍃', f: true,  why: 'העלה צף! הוא דק וקל מאוד.' },
       { e: '🪙', f: false, why: 'המטבע שוקע! מתכת שוקעת כי היא כבדה.' },
       { e: '⚽', f: true,  why: 'הכדור צף! הוא מלא באוויר.' },
-      { e: '🔩', f: false, why: 'הבורג שוקע! הוא עשוי ממתכת כבדה.' }
+      { e: '🔩', f: false, why: 'הבורג שוקע! הוא עשוי ממתכת כבדה.' },
+      { e: '🪵', f: true,  why: 'העץ צף! עץ קל יותר מהמים.' },
+      { e: '🎈', f: true,  why: 'הבלון צף! הוא מלא באוויר.' },
+      { e: '🥄', f: false, why: 'הכפית שוקעת! היא עשויה ממתכת.' },
+      { e: '🧽', f: true,  why: 'הספוג צף! יש בו הרבה חורים עם אוויר.' },
+      { e: '💍', f: false, why: 'הטבעת שוקעת! היא קטנה אבל כבדה.' },
+      { e: '🏐', f: true,  why: 'הכדור צף! הוא מלא באוויר.' }
     ];
     let left = 0, cur = null, busy = false, right = 0;
     function start() {
-      const tray = $('tray'), tank = $('tank'); tray.innerHTML = ''; tank.innerHTML = ''; left = OBJS.length; right = 0; cur = null; busy = false;
+      const tray = $('tray'), tank = $('tank'); tray.innerHTML = ''; tank.innerHTML = ''; right = 0; cur = null; busy = false;
       $('held').style.display = 'none'; $('predict').classList.remove('on');
-      OBJS.slice().sort(() => Math.random() - .5).forEach(o => {
+      const sh = OBJS.slice().sort(() => Math.random() - .5);
+      const pick = sh.filter(o => o.f).slice(0, 4).concat(sh.filter(o => !o.f).slice(0, 4)).sort(() => Math.random() - .5); left = pick.length;
+      pick.forEach(o => {
         const b = document.createElement('button'); b.className = 'obj'; b.textContent = o.e;
         b.onclick = () => { if (busy || cur) return; sfx.tap(); cur = { o, b }; b.classList.add('used'); const h = $('held'); h.textContent = o.e; h.style.display = 'block'; $('predict').classList.add('on'); say('מה יקרה? צף או שוקע?'); };
         tray.appendChild(b);
@@ -328,9 +393,9 @@
       function finish() {
         if (o.f) el.style.animation = 'wob 1.4s infinite alternate';
         const ok = fl === o.f;
-        if (ok) { sfx.yes(); addStar(); right++; say('נכון! ⭐ ' + o.why, 'נכון! ' + o.why); } else { sfx.oops(); say('לא נורא! ' + o.why); }
+        if (ok) { OJ.sfx('good'); addStar(); right++; mood('cheer'); OJ.sparkle(el, { n: 12 }); say('נכון! ⭐ ' + o.why, 'נכון! ' + o.why); } else { OJ.sfx('bad'); mood('oops'); say('לא נורא! ' + o.why); }
         left--; cur = null; busy = false;
-        if (left === 0) setTimeout(() => { markDone('sink'); party('כל הכבוד! ' + right + ' ⭐ — דברים קלים צפים, דברים כבדים שוקעים!', 'כל הכבוד! דברים קלים צפים, ודברים כבדים שוקעים!'); $('again').classList.add('on'); }, 2600);
+        if (left === 0) setTimeout(() => { markDone('sink'); party('דברים קלים ומלאי אוויר צפים, דברים כבדים שוקעים!', 'כל הכבוד! דברים קלים צפים, ודברים כבדים שוקעים!', right >= 7 ? 3 : right >= 5 ? 2 : 1); }, 2600);
       }
     }
     function bubbles(tank, x, y, n = 6) { for (let i = 0; i < n; i++) { const b = document.createElement('div'); b.className = 'bubbleUp'; b.style.left = `calc(${x}% + ${(Math.random() - .5) * 40}px)`; b.style.top = (y + Math.random() * 20) + 'px'; tank.appendChild(b); setTimeout(() => b.remove(), 1300); } }
@@ -369,10 +434,10 @@
       raf = requestAnimationFrame(loop);
     }
     function stopped(g) {
-      flags.push({ x: ball.x, a: ang }); sfx.yes(); addStar();
+      flags.push({ x: ball.x, a: ang }); OJ.sfx('good'); addStar(); mood('wow');
       const first = !tried[ang]; tried[ang] = true;
       const txt = { 12: 'מגלשה נמוכה: הכדור איטי ועוצר קרוב.', 25: 'מגלשה באמצע: הכדור מגיע די רחוק!', 40: 'מגלשה גבוהה: הכדור הכי מהיר ומגיע הכי רחוק!' }[ang];
-      if (Object.keys(tried).length === 3 && first) { markDone('ramp'); setTimeout(() => { party('כל הכבוד! ככל שהמגלשה גבוהה יותר, הכדור מהיר יותר ומגיע רחוק יותר!'); $('again').classList.add('on'); }, 300); }
+      if (Object.keys(tried).length === 3 && first) { markDone('ramp'); setTimeout(() => { party('ככל שהמגלשה גבוהה יותר, הכדור מהיר יותר ומגיע רחוק יותר!', 'כל הכבוד! ככל שהמגלשה גבוהה יותר, הכדור מהיר יותר ומגיע רחוק יותר!'); }, 300); }
       else say(txt + (Object.keys(tried).length < 3 ? ' 👆 נסה גובה אחר!' : ''), txt + (Object.keys(tried).length < 3 ? ' נסה גובה אחר!' : ''));
     }
     function draw(g) {
@@ -398,7 +463,8 @@
   const Mag = (() => {
     const ITEMS = [
       { e: '📎', m: true, n: 'האטב' }, { e: '🔑', m: true, n: 'המפתח' }, { e: '🔩', m: true, n: 'הבורג' }, { e: '🥄', m: true, n: 'הכפית' },
-      { e: '🧸', m: false, n: 'הדובי' }, { e: '🍌', m: false, n: 'הבננה' }, { e: '✏️', m: false, n: 'העיפרון' }, { e: '🧦', m: false, n: 'הגרב' }, { e: '🎈', m: false, n: 'הבלון' }
+      { e: '✂️', m: true, n: 'המספריים' },
+      { e: '🧸', m: false, n: 'הדובי' }, { e: '🧩', m: false, n: 'הפאזל' }, { e: '🍌', m: false, n: 'הבננה' }, { e: '✏️', m: false, n: 'העיפרון' }, { e: '🧦', m: false, n: 'הגרב' }, { e: '🎈', m: false, n: 'הבלון' }
     ];
     let things = [], mx = 0, my = 0, raf = null, stuck = 0, done = false, lastNo = 0;
     const st = $('mag'), mg = $('magnet');
@@ -427,11 +493,11 @@
         if (t.stuck) { t.x = tx + t.ox; t.y = ty + t.oy; }
         else if (t.m && d < 170) {
           const k = Math.min(0.35, 18 / Math.max(d, 1)); t.x += (tx - t.x) * k; t.y += (ty - t.y) * k;
-          if (d < 45) { t.stuck = true; stuck++; const n = stuck; t.ox = (n % 2 ? -1 : 1) * Math.ceil(n / 2) * 18; t.oy = 18 + (n % 3) * 10; sfx.click(); addStar(); say(t.n + ' נדבק! ⭐ הוא עשוי ממתכת.', t.n + ' נדבק! הוא עשוי ממתכת.');
-            if (stuck === ITEMS.filter(i => i.m).length && !done) { done = true; markDone('mag'); setTimeout(() => { party('כל הכבוד! המגנט מושך רק דברים ממתכת! 🧲'); $('again').classList.add('on'); }, 900); } }
+          if (d < 45) { t.stuck = true; stuck++; const n = stuck; t.ox = (n % 2 ? -1 : 1) * Math.ceil(n / 2) * 18; t.oy = 18 + (n % 3) * 10; sfx.click(); addStar(); mood('cheer'); OJ.sparkle({ x: t.x, y: t.y }, { n: 8 }); say(t.n + ' נדבק! ⭐ הוא עשוי ממתכת.', t.n + ' נדבק! הוא עשוי ממתכת.');
+            if (stuck === ITEMS.filter(i => i.m).length && !done) { done = true; markDone('mag'); setTimeout(() => { party('המגנט מושך רק דברים ממתכת! 🧲', 'כל הכבוד! המגנט מושך רק דברים ממתכת!'); }, 900); } }
         } else if (!t.m && d < 75 && now - t.said > 3000 && now - lastNo > 1500) {
           t.said = now; lastNo = now; sfx.boing(); t.el.classList.remove('shake'); void t.el.offsetWidth; t.el.classList.add('shake');
-          say(t.n + ' לא נדבק, הוא לא ממתכת.');
+          mood('think'); say(t.n + ' לא נדבק, הוא לא ממתכת.');
         }
         t.el.style.left = t.x + 'px'; t.el.style.top = t.y + 'px';
       });
@@ -440,8 +506,60 @@
     return { start };
   })();
 
+  // ================= WHERE DO THEY LIVE (sorting) =================
+  const Sort = (() => {
+    const ALL = [
+      { e: '🐠', h: 'sea', n: 'הדג', why: 'הדג גר בים! הוא נושם במים.' }, { e: '🐙', h: 'sea', n: 'התמנון', why: 'התמנון גר בים! יש לו שמונה זרועות.' },
+      { e: '🐬', h: 'sea', n: 'הדולפין', why: 'הדולפין גר בים! הוא שוחה מהר מאוד.' }, { e: '🦀', h: 'sea', n: 'הסרטן', why: 'הסרטן גר בים ובחוף!' },
+      { e: '🐳', h: 'sea', n: 'הלוויתן', why: 'הלוויתן גר בים! הוא הכי גדול.' }, { e: '🐢', h: 'sea', n: 'הצב', why: 'צב הים שוחה בים!' },
+      { e: '🐶', h: 'land', n: 'הכלב', why: 'הכלב גר ביבשה! הוא הולך על ארבע רגליים.' }, { e: '🐘', h: 'land', n: 'הפיל', why: 'הפיל גר ביבשה! הוא כבד מאוד.' },
+      { e: '🦁', h: 'land', n: 'האריה', why: 'האריה גר ביבשה!' }, { e: '🐰', h: 'land', n: 'הארנב', why: 'הארנב גר ביבשה! הוא קופץ.' },
+      { e: '🐄', h: 'land', n: 'הפרה', why: 'הפרה גרה ביבשה, בשדה.' }, { e: '🐿️', h: 'land', n: 'הסנאי', why: 'הסנאי גר ביבשה, על העצים.' },
+      { e: '🐦', h: 'sky', n: 'הציפור', why: 'הציפור עפה בשמיים! יש לה כנפיים.' }, { e: '🦋', h: 'sky', n: 'הפרפר', why: 'הפרפר עף בשמיים!' },
+      { e: '🦅', h: 'sky', n: 'הנשר', why: 'הנשר עף גבוה בשמיים!' }, { e: '🐝', h: 'sky', n: 'הדבורה', why: 'הדבורה עפה מפרח לפרח!' },
+      { e: '🦉', h: 'sky', n: 'הינשוף', why: 'הינשוף עף בלילה!' }, { e: '🦜', h: 'sky', n: 'התוכי', why: 'התוכי עף ויכול לדבר!' }
+    ];
+    let q = [], i = 0, miss = 0, busy = false, total = 9;
+    const item = $('sortItem');
+    function start() {
+      const sh = ALL.slice().sort(() => Math.random() - .5);
+      q = ['sea', 'land', 'sky'].flatMap(h => sh.filter(o => o.h === h).slice(0, 3)).sort(() => Math.random() - .5);
+      i = 0; miss = 0; busy = false; total = q.length;
+      document.querySelectorAll('.bin .got').forEach(g => g.innerHTML = '');
+      show(); say('איפה הוא גר? בשמיים, ביבשה או בים? לחץ על הבית הנכון!', 'איפה הוא גר? בשמיים, ביבשה, או בים? לחץ על הבית הנכון!');
+    }
+    function show() {
+      const o = q[i]; item.textContent = o.e; item.style.visibility = 'visible'; OJ.enter && OJ.enter(item);
+      $('sortLeft').textContent = '🔵'.repeat(total - i - 1) ;
+    }
+    function drop(h) {
+      if (busy || i >= q.length) return; const o = q[i], bin = document.querySelector(`.bin[data-h="${h}"]`);
+      if (o.h !== h) { miss++; OJ.sfx('bad'); OJ.shake(bin); mood('oops'); say('לא שם... ' + o.n + ' גר במקום אחר. נסה שוב!'); return; }
+      busy = true; OJ.sfx('good'); addStar(); mood('cheer');
+      const r = item.getBoundingClientRect(), br = bin.getBoundingClientRect();
+      const f = document.createElement('div'); f.className = 'fly'; f.textContent = o.e; f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + r.height / 2) + 'px'; document.body.appendChild(f);
+      item.style.visibility = 'hidden';
+      requestAnimationFrame(() => requestAnimationFrame(() => { f.style.left = (br.left + br.width / 2) + 'px'; f.style.top = (br.top + br.height * .7) + 'px'; f.style.fontSize = '30px'; }));
+      say('נכון! ' + o.why);
+      setTimeout(() => { f.remove(); const s = document.createElement('span'); s.textContent = o.e; bin.querySelector('.got').appendChild(s); OJ.sparkle(bin, { n: 10 }); OJ.bounce(bin);
+        i++; busy = false;
+        if (i >= q.length) { $('sortLeft').textContent = ''; markDone('sort'); setTimeout(() => party('לדגים יש סנפירים לים, לציפורים כנפיים לשמיים, ולחיות היבשה רגליים!', 'כל הכבוד! לדגים יש סנפירים, לציפורים יש כנפיים, ולחיות היבשה יש רגליים!', miss === 0 ? 3 : miss <= 2 ? 2 : 1), 900); }
+        else show(); }, 500);
+    }
+    document.querySelectorAll('.bin').forEach(b => b.onclick = () => { ac(); drop(b.dataset.h); });
+    // drag the animal onto a home
+    let drag = null;
+    item.addEventListener('pointerdown', e => { if (busy) return; ac(); drag = { x: e.clientX, y: e.clientY }; item.setPointerCapture(e.pointerId); item.style.animation = 'none'; });
+    item.addEventListener('pointermove', e => { if (!drag) return; item.style.transform = `translate(${e.clientX - drag.x}px, ${e.clientY - drag.y}px) scale(1.1)`;
+      const t = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('bin')); document.querySelectorAll('.bin').forEach(b => b.classList.toggle('hot', b === t)); });
+    item.addEventListener('pointerup', e => { if (!drag) return; drag = null; item.style.transform = ''; item.style.animation = '';
+      document.querySelectorAll('.bin').forEach(b => b.classList.remove('hot'));
+      const t = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('bin')); if (t) drop(t.dataset.h); });
+    return { start, drop, get cur() { return q[i]; } };
+  })();
+
   requestAnimationFrame(pikaLoop);
-  window.__sci = { go, get stars() { return stars; }, get voice() { return heVoice && heVoice.name; } };
+  window.__sci = { go, Sort, get stars() { return stars; }, get voice() { return heVoice && heVoice.name; } };
 })();
 </script>
 </body>
