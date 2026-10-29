@@ -99,6 +99,16 @@
   .toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 11; }
   #pika { width: 70px; height: 70px; flex: none; }
+  body { font-family: "OJ Rubik", "Arial Rounded MT Bold", Arial, sans-serif; }
+  button { font-family: inherit; }
+  #hero { width: auto !important; height: auto !important; display: flex; justify-content: center; animation: gBob 2.4s ease-in-out infinite; }
+  @keyframes gBob { 50% { transform: translateY(-7px); } }
+  #pika { display: flex; align-items: flex-end; justify-content: center; }
+  .gbtns { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+  .tile { position: relative; overflow: hidden; background-image: radial-gradient(circle at 85% 10%, rgba(255,255,255,.6), transparent 45%); }
+  .tile .gst { font-size: 17px; letter-spacing: -1px; }
+  .qcard.ok { animation: gOk .5s; }
+  @keyframes gOk { 40% { transform: scale(1.02); box-shadow: 0 0 0 8px #a5d6a7; } }
   @media (max-height: 720px) { #hero { width: 110px; height: 110px; } .big { font-size: 27px; padding: 9px 16px; } }
 </style>
 <!-- PWA -->
@@ -120,11 +130,12 @@
   <div class="screen on" id="sStart">
     <div class="top"><button class="round" id="homeBtn" aria-label="תפריט">🏠</button><div class="pill" id="starsPill">⭐ 0</div></div>
     <div class="panel">
-      <canvas id="hero" width="360" height="360"></canvas>
+      <div id="hero"></div>
       <h1 id="title">אתגר החשיבה של פיקאצ'ו</h1>
       <div class="sub">🧩 🔢 🔄 🧠</div>
       <button class="big b-green" id="practiceBtn">🏋️ אימון</button>
       <button class="big b-orange" id="testBtn">⏱️ מבחן תרגול</button>
+      <div class="gbtns"><button class="round" id="albumBtn" aria-label="אלבום">📒</button><button class="round" id="helpBtn" aria-label="הסבר">❓</button></div>
       <div data-pwa-slot></div>
     </div>
   </div>
@@ -143,7 +154,7 @@
     <div class="timer" id="timer" style="display:none"><div class="fill" id="tfill"></div><div class="runner" id="trun">⚡</div></div>
     <div class="qcard" id="qcard">
       <div class="chap" id="chap"></div>
-      <div class="qhead"><canvas id="pika" width="140" height="140"></canvas><div class="prompt" id="prompt"></div></div>
+      <div class="qhead"><div id="pika"></div><div class="prompt" id="prompt"></div></div>
       <div class="stem" id="stem"></div>
       <div class="opts" id="opts"></div>
       <div class="fb" id="fb"></div>
@@ -1232,10 +1243,10 @@
     o.type = type; o.frequency.setValueAtTime(f, t0); g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + d);
     o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + d + 0.05);
   }
-  const yesS = () => [660, 880, 1100].forEach((f, i) => tone(f, 0.18, 'sine', 0.2, i * 0.09));
-  const hmS = () => { tone(330, 0.15, 'sine', 0.12); tone(300, 0.2, 'sine', 0.12, 0.13); };
-  const tapS = () => tone(520, 0.1, 'triangle', 0.14);
-  const upS = () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.2, 'triangle', 0.2, i * 0.12));
+  const yesS = () => OJ.sfx('good');
+  const hmS = () => OJ.sfx('bad');
+  const tapS = () => OJ.sfx('tap');
+  const upS = () => OJ.sfx('levelup');
   function say(txt, force) {
     if ((!S.voice && !force) || !window.speechSynthesis || !txt) return;
     try { const u = new SpeechSynthesisUtterance(txt); u.lang = 'he-IL'; u.rate = 0.92; u.pitch = 1.25; const v = speechSynthesis.getVoices().find(v => /^he/i.test(v.lang)); if (v) u.voice = v; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
@@ -1254,8 +1265,10 @@
     parts = parts.filter(p => p.life > 0 && p.y < cf.height + 30);
     if (parts.length) requestAnimationFrame(step); else { anim = false; cx.clearRect(0, 0, cf.width, cf.height); }
   }
-  function drawHero(happy) { const c = el('hero').getContext('2d'); c.clearRect(0, 0, 360, 360); drawMouse(c, 190, 220, 220, { happy }); }
-  function drawPika(mood) { const c = el('pika').getContext('2d'); c.clearRect(0, 0, 140, 140); drawMouse(c, 74, 88, 104, { happy: mood === 1 ? 1 : 0, dizzy: mood === -1 ? 1 : 0 }); }
+  function drawHero() { el('hero').innerHTML = OJ.pika('happy', innerHeight < 720 ? 110 : 150); }
+  let pMood = null;
+  function drawPika(mood) { if (mood === pMood) return; pMood = mood; el('pika').innerHTML = OJ.pika(mood === 1 ? 'cheer' : mood === -1 ? 'oops' : 'think', 70); }
+  const secStars = id => { const l = S.sec[id].lvl; return l >= MAXL ? 3 : l >= Math.ceil(MAXL * 2 / 3) ? 2 : l > 1 ? 1 : 0; };
   let toastT = 0;
   function toast(t) { const d = el('toast'); d.innerHTML = t; d.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => d.classList.remove('on'), 1700); }
   function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); scrollTo(0, 0); }
@@ -1263,9 +1276,9 @@
   // ---- tiles ----
   const dots = l => '●'.repeat(l) + '○'.repeat(MAXL - l);
   function paintTiles() {
-    el('tiles').innerHTML = SECS.map((s, i) => `<button class="tile t${i}" data-s="${s.id}"><div class="em">${s.em}</div><div class="nm">${s.nm}</div><div class="lv">רמה ${S.sec[s.id].lvl} <span class="lvdots">${dots(S.sec[s.id].lvl)}</span></div></button>`).join('') +
+    el('tiles').innerHTML = SECS.map((s, i) => `<button class="tile t${i}" data-s="${s.id}"><div class="em">${s.em}</div><div class="nm">${s.nm}</div><div class="lv">רמה ${S.sec[s.id].lvl} <span class="lvdots">${dots(S.sec[s.id].lvl)}</span></div><div class="gst">${'⭐'.repeat(secStars(s.id))}${'☆'.repeat(3 - secStars(s.id))}</div></button>`).join('') +
       `<button class="tile t6" data-s="mix"><div class="em">🎲</div><div class="nm">ערבוב</div><div class="lv">מכל הנושאים</div></button>`;
-    el('tiles').querySelectorAll('.tile').forEach(b => b.onclick = () => { tapS(); startPractice(b.dataset.s); });
+    el('tiles').querySelectorAll('.tile').forEach(b => b.onclick = () => { tapS(); OJ.intro('gifted', INTRO).then(() => startPractice(b.dataset.s)); });
   }
   // ---- play ----
   const LAB = ['א', 'ב', 'ג', 'ד', 'ה'];
@@ -1304,12 +1317,13 @@
     const first = tries === 0; tries++;
     if (first) { st.n++; st.t += Math.min(600, (performance.now() - tStart) / 1000); }
     if (ok) {
-      answered = true; btn.classList.add('right'); yesS(); burst(btn); drawPika(1);
+      answered = true; btn.classList.add('right'); yesS(); burst(btn); drawPika(1); OJ.sparkle(btn, { n: 12 }); OJ.bounce(el('scorePill')); el('qcard').classList.remove('ok'); void el('qcard').offsetWidth; el('qcard').classList.add('ok');
       el('opts').querySelectorAll('.opt').forEach((b, j) => { if (j !== i) b.classList.add('faded'); });
       let lvlMsg = '';
       if (first) {
         st.ok++; S.stars++; st.miss = 0; st.streak++;
-        if (st.streak >= UP) { st.streak = 0; if (st.lvl < MAXL) { st.lvl++; lvlMsg = `<div>⬆️ עלית לרמה ${st.lvl}!</div>`; setTimeout(() => { upS(); toast('⬆️ רמה ' + st.lvl + '!'); confetti(60); }, 350); } }
+        if (st.streak >= UP) { st.streak = 0; if (st.lvl < MAXL) { st.lvl++; lvlMsg = `<div>⬆️ עלית לרמה ${st.lvl}!</div>`; const L = st.lvl, sid = q.sec; OJ.setStars('gifted', sid, Math.max(1, secStars(sid)));
+          setTimeout(() => { hush(); OJ.celebrate({ title: `עלית לרמה ${L}! ⬆️`, sub: SEC[sid].em + ' ' + SEC[sid].nm + ' · ' + L + ' / ' + MAXL, stars: 3, sticker: true, game: 'gifted', speak: `כל הכבוד! עלית לרמה ${L}!`, button: '▶ ממשיכים', onDone: () => { hush(); nextPractice(); } }); }, 1600); } }
       } else st.streak = 0;
       save();
       feedback(true, `<div class="ttl">${pick(['✅ נכון!', '🎉 מצוין!', '⚡ יופי!', '🌟 כל הכבוד!'])}</div><div>${q.explain || ''}</div>${lvlMsg}`);
@@ -1317,7 +1331,7 @@
       el('hintBtn').style.display = 'none'; el('nextBtn').style.display = '';
       el('scorePill').textContent = '⭐ ' + S.stars;
     } else {
-      btn.classList.add('wrong'); hmS(); drawPika(-1);
+      btn.classList.add('wrong'); hmS(); drawPika(-1); OJ.shake(btn);
       if (first) { st.streak = 0; st.miss++; if (st.miss >= DOWN) { st.miss = 0; if (st.lvl > 1) { st.lvl--; } } save(); }
       if (tries >= 2) {
         answered = true;
@@ -1363,7 +1377,9 @@
     S.stars += ok; S.tests.unshift({ d: new Date().toISOString(), ok, n: R.length, time: Math.round(total), secs }); S.tests = S.tests.slice(0, 10); save();
     el('sumLine').innerHTML = `ענית נכון על <b>${ok}</b> מתוך <b>${R.length}</b> שאלות · ⏱️ ${Math.floor(total / 60)}:${String(Math.round(total % 60)).padStart(2, '0')} דקות`;
     el('sumTable').innerHTML = '<tr><th>נושא</th><th>נכון</th><th>זמן ממוצע</th></tr>' + PLAN.map(([sid]) => { const s = secs[sid]; return `<tr><td>${SEC[sid].em} ${SEC[sid].nm}</td><td>${'⭐'.repeat(s.ok)}${'☆'.repeat(s.n - s.ok)} ${s.ok}/${s.n}</td><td>${s.n ? Math.round(s.t / s.n) : 0} שניות</td></tr>`; }).join('');
-    show('sSum'); confetti(120); upS(); say(`כל הכבוד! ענית נכון על ${ok} מתוך ${R.length} שאלות.`);
+    show('sSum'); confetti(120); say(`כל הכבוד! ענית נכון על ${ok} מתוך ${R.length} שאלות.`);
+    const ts = ok >= R.length * .8 ? 3 : ok >= R.length * .5 ? 2 : 1; OJ.setStars('gifted', 'test', Math.max(ts, OJ.getStars('gifted', 'test')));
+    setTimeout(() => OJ.celebrate({ title: 'סיימת את המבחן! 🏁', sub: `${ok} / ${R.length}`, stars: ts, sticker: true, game: 'gifted', speak: false, button: '📊 התוצאות' }), 700);
     test.done = true;
   }
   el('againBtn').onclick = () => { tapS(); startTest(); };
@@ -1371,10 +1387,18 @@
   // ---- start / nav ----
   function goStart() { mode = null; cur = null; test = null; hush(); clearInterval(timerI); paintStars(); drawHero(1); show('sStart'); }
   el('practiceBtn').onclick = () => { tapS(); paintTiles(); show('sSections'); say('במה נתאמן? מטריצות, סדרות, אנלוגיות, מרחבי, כמותי, או מילולי.'); };
-  el('testBtn').onclick = () => { tapS(); startTest(); };
+  el('testBtn').onclick = () => { tapS(); OJ.intro('gifted', INTRO).then(startTest); };
   el('backStart').onclick = () => { tapS(); goStart(); };
   el('sayPick').onclick = () => say('במה נתאמן? מטריצות, סדרות, אנלוגיות, מרחבי, כמותי, או מילולי.', true);
   el('homeBtn').onclick = () => { location.href = '../index.html'; };
+  const INTRO = [
+    { pic: '🧩 🔢 🔄', text: 'זה האתגר של פיקאצ׳ו: חידות חשיבה של אלופים!' },
+    { pic: '🏋️', text: 'באימון בוחרים נושא. כל תשובה נכונה מקרבת לרמה הבאה.' },
+    { pic: '💡', text: 'תקוע? לוחצים על רמז. טעות? מנסים שוב, לא נורא בכלל!', expr: 'think' },
+    { pic: '⏱️', text: 'במבחן התרגול יש חמש עשרה שאלות. עונים הכי טוב שאפשר, בלי לחץ.', expr: 'cheer' }
+  ];
+  el('albumBtn').onclick = () => OJ.album();
+  el('helpBtn').onclick = () => OJ.intro('gifted', INTRO, { force: true });
   // ---- parents (long-press the title, or #parents) ----
   function paintParent() {
     el('parentTable').innerHTML = '<tr><th>נושא</th><th>רמה</th><th>דיוק</th><th>זמן ממוצע</th><th>שאלות</th></tr>' + SECS.map(s => { const st = S.sec[s.id]; return `<tr><td>${s.em} ${s.nm}</td><td><span class="lvsel"><button data-s="${s.id}" data-d="1">+</button><b>${st.lvl}</b><button data-s="${s.id}" data-d="-1">−</button></span></td><td>${st.n ? Math.round(100 * st.ok / st.n) + '%' : '—'}</td><td>${st.n ? Math.round(st.t / st.n) + ' ש׳' : '—'}</td><td>${st.n}</td></tr>`; }).join('');
