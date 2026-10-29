@@ -5,20 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>המשחקים של עומר 🎮</title>
 <style>
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin: 0; min-height: 100vh; font-family: "Arial Rounded MT Bold", "Varela Round", Arial, sans-serif; background: radial-gradient(circle at 50% 0, #fff59d, #ffcb05 45%, #ff9800); display: flex; flex-direction: column; align-items: center; padding: 24px 12px 40px; }
-  h1 { font-size: clamp(36px, 9vw, 72px); color: #3b4cca; text-shadow: 3px 3px 0 #fff, 6px 6px 0 rgba(0,0,0,.15); margin: 10px 0 24px; text-align: center; }
-  .games { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 90vw), 1fr)); gap: 22px; width: 100%; max-width: 900px; }
-  a.game { text-decoration: none; border-radius: 34px; border: 7px solid #fff; padding: 22px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; box-shadow: 0 10px 0 rgba(0,0,0,.25); transition: transform .15s; }
-  a.game:hover { transform: translateY(-4px) rotate(-1deg); }
-  a.game:active { transform: translateY(6px); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
-  .icon { font-size: 90px; line-height: 1; animation: bob 1.4s infinite alternate ease-in-out; }
-  .name { font-size: 34px; font-weight: bold; text-shadow: 0 3px 3px rgba(0,0,0,.35); text-align: center; }
-  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-  .c1 { background: linear-gradient(135deg, #ff5252, #ff9100); }
-  .c2 { background: linear-gradient(135deg, #29b6f6, #3949ab); }
-  .c3 { background: linear-gradient(135deg, #66bb6a, #00897b); }
-  .c4 { background: linear-gradient(135deg, #ab47bc, #ec407a); }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:"Arial Rounded MT Bold","Varela Round",Arial,sans-serif;background:linear-gradient(#ffe082,#ffcb05 40%,#c77d3a 40%,#a0612a);display:flex;flex-direction:column;align-items:center;padding:12px 8px 20px;user-select:none}
+h1{font-size:clamp(26px,6vw,52px);color:#3b4cca;text-shadow:3px 3px 0 #fff;margin:4px 0 6px;text-align:center}
+.store{position:relative;width:100%;max-width:980px;flex:1;display:flex;align-items:center;min-height:0}
+.view{overflow:hidden;flex:1;height:100%;touch-action:pan-y}
+.track{display:flex;height:100%;transition:transform .45s cubic-bezier(.3,.8,.3,1)}
+.shelf{flex:0 0 100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 6px}
+.sign{background:#fff;border:5px solid #6d3d14;border-radius:22px;padding:6px 22px;font-size:clamp(24px,6vw,40px);font-weight:bold;color:#6d3d14;margin-bottom:14px;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.25)}
+.wood{width:100%;max-width:820px;background:linear-gradient(#8d5524,#6d3d14);border:8px solid #4e2a0c;border-radius:20px;padding:18px 12px 0;display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
+.wood:after{content:"";flex-basis:100%;height:22px;margin:0 -12px;background:linear-gradient(#c68642,#8d5524);border-top:4px solid #e0a060}
+a.box{text-decoration:none;-webkit-user-drag:none;width:clamp(130px,38vw,210px);border-radius:18px;border:5px solid #fff;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;box-shadow:0 8px 0 rgba(0,0,0,.35);transition:transform .15s}
+a.box:active{transform:translateY(5px)}
+.icon{font-size:clamp(54px,14vw,84px);line-height:1}
+.name{font-size:clamp(18px,4.6vw,26px);font-weight:bold;text-align:center;text-shadow:0 2px 3px rgba(0,0,0,.4)}
+.arrow{flex:0 0 auto;width:clamp(52px,13vw,84px);height:clamp(52px,13vw,84px);border-radius:50%;border:5px solid #fff;background:#3b4cca;color:#fff;font-size:clamp(26px,7vw,44px);cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.3);z-index:2}
+.arrow:disabled{opacity:.3}
+.dots{display:flex;gap:12px;margin-top:10px;direction:ltr}
+.dot{font-size:30px;padding:4px 10px;border-radius:16px;background:rgba(255,255,255,.4);border:3px solid transparent;cursor:pointer}
+.dot.on{background:#fff;border-color:#3b4cca;transform:scale(1.15)}
+@media (max-width:600px){.arrow{position:absolute;top:calc(50% - 160px)}#goLeft{left:2px}#goRight{right:2px}.sign{max-width:calc(100% - 120px);font-size:22px;padding:6px 10px}}
 </style>
 <!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -34,16 +41,59 @@
 <!-- /PWA -->
 </head>
 <body>
-  <h1>🎮 המשחקים של עומר 🎮</h1>
-  <div data-pwa-slot style="margin:-12px 0 18px"></div>
-  <div class="games">
-    <!-- GAMES: add a new <a class="game"> block for each new game (newest first is fine) -->
-    <a class="game c2" href="garden/index.html"><div class="icon">🌸</div><div class="name">הגינה של פיקאצ'ו</div></a>
-    <a class="game c1" href="brain/index.html"><div class="icon">🧠</div><div class="name">חדר כושר למוח</div></a>
-    <a class="game c4" href="gifted/index.html"><div class="icon">🎓</div><div class="name">אתגר החשיבה של פיקאצ'ו</div></a>
-    <a class="game c3" href="memory/index.html"><div class="icon">🃏</div><div class="name">הזיכרון של פיקאצ'ו</div></a>
-    <a class="game c1" href="pikachu/index.html"><div class="icon">⚡</div><div class="name">פיקאצ'ו תופס כדורים</div></a>
-    <a class="game c2" href="science/index.html"><div class="icon">🔬</div><div class="name">המעבדה של פיקאצ'ו</div></a>
-  </div>
+<h1>🏪 חנות המשחקים של עומר</h1>
+<div data-pwa-slot style="margin:0 0 4px"></div>
+<div class="store" dir="ltr">
+  <button class="arrow" id="goLeft" aria-label="מדף משמאל">◀</button>
+  <div class="view" id="view"><div class="track" id="track"></div></div>
+  <button class="arrow" id="goRight" aria-label="מדף מימין">▶</button>
+</div>
+<div class="dots" id="dots"></div>
+<script>
+/* SHELVES: ordered visually left -> right. The middle one is the front shelf shown first.
+   To add a game: put {href, emoji, name, color} into a shelf's games (max ~4 per shelf),
+   or add a new shelf object. */
+const SHELVES = [
+  {icon:'🧠', title:'חשיבה וחשבון', games:[
+    {href:'brain/index.html', emoji:'🧠', name:'חדר כושר למוח', color:'#ff5252,#ff9100'},
+    {href:'gifted/index.html', emoji:'🎓', name:'אתגר החשיבה', color:'#ab47bc,#ec407a'},
+  ]},
+  {icon:'⚡', title:"פיקאצ'ו וחברים", games:[
+    {href:'pikachu/index.html', emoji:'⚡', name:"פיקאצ'ו תופס כדורים", color:'#ff5252,#ff9100'},
+    {href:'garden/index.html', emoji:'🌸', name:"הגינה של פיקאצ'ו", color:'#29b6f6,#3949ab'},
+    {href:'memory/index.html', emoji:'🃏', name:"משחק הזיכרון", color:'#66bb6a,#00897b'},
+  ]},
+  {icon:'🔬', title:'מדע', games:[
+    {href:'science/index.html', emoji:'🔬', name:"המעבדה של פיקאצ'ו", color:'#29b6f6,#3949ab'},
+  ]},
+];
+const track=document.getElementById('track'),dots=document.getElementById('dots');
+function say(t){try{if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='he-IL';u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+SHELVES.forEach((s,i)=>{
+  const el=document.createElement('section');el.className='shelf';el.dir='rtl';
+  el.innerHTML='<div class="sign">'+s.icon+' '+s.title+'</div><div class="wood">'+s.games.map(g=>
+    '<a class="box" draggable="false" href="'+g.href+'" style="background:linear-gradient(135deg,'+g.color+')"><div class="icon">'+g.emoji+'</div><div class="name">'+g.name+'</div></a>').join('')+'</div>';
+  el.querySelector('.sign').onclick=()=>say('מדף '+s.title);
+  track.appendChild(el);
+  const d=document.createElement('span');d.className='dot';d.textContent=s.icon;d.onclick=()=>go(i);dots.appendChild(d);
+});
+// Say game name, then open (short delay so speech starts)
+track.addEventListener('click',e=>{const a=e.target.closest('a.box');if(!a)return;e.preventDefault();say(a.querySelector('.name').textContent);setTimeout(()=>location.href=a.getAttribute('href'),700)});
+let cur=+(sessionStorage.getItem('shelf')??Math.floor(SHELVES.length/2));
+if(!(cur>=0&&cur<SHELVES.length))cur=Math.floor(SHELVES.length/2);
+function go(i,speak=true){cur=Math.max(0,Math.min(SHELVES.length-1,i));sessionStorage.setItem('shelf',cur);
+  track.style.transform='translateX('+(-cur*100)+'%)';
+  [...dots.children].forEach((d,j)=>d.classList.toggle('on',j===cur));
+  goLeft.disabled=cur===0;goRight.disabled=cur===SHELVES.length-1;
+  if(speak)say('מדף '+SHELVES[cur].title);}
+goLeft.onclick=()=>go(cur-1);goRight.onclick=()=>go(cur+1);
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')go(cur-1);if(e.key==='ArrowRight')go(cur+1)});
+let sx=null,sy=0;const view=document.getElementById('view');
+view.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+view.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){go(dx<0?cur+1:cur-1);view.dataset.swiped=Date.now()}});
+view.addEventListener('click',e=>{if(Date.now()-(+view.dataset.swiped||0)<300){e.preventDefault();e.stopPropagation()}},true);
+go(cur,false);
+</script>
 </body>
 </html>

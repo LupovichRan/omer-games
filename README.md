@@ -55,3 +55,9 @@ One shared script loaded by the menu and **every** game (same origin → one sha
 Run `python3 tools/new-game-pwa.py --all` before committing – it refreshes the content-hash versions of the
 service workers so installed apps pick up the update (they also refresh pages in the background).
 To redraw a game's icons: add `--icons` (with `--emoji`/`--colors`).
+
+## Adding a game to the store shelves (root menu)
+The root `index.html` shows games on shelves (left / front / right). Edit the `SHELVES` array in its `<script>`:
+add `{href:'folder/index.html', emoji:'🎲', name:'שם קצר', color:'#hex1,#hex2'}` to a shelf's `games`
+(keep ≤4 per shelf; if full, add a new shelf object `{icon, title, games:[...]}`). Array order = visual left→right;
+the middle shelf is shown first. Then bump `VERSION` in root `sw.js` (or run `tools/new-game-pwa.py --all`).
