@@ -6,6 +6,7 @@
    - kid badge ⏳ (tap = hear remaining time), spoken + visual warnings at 5 and 1 minutes left
    - full-screen lock when time is up / outside allowed hours; only the parent PIN opens it
    - parent area: 🔒 button on the menu (or long-press the ⏳ badge 2s anywhere); 4-digit PIN, SHA-256 + salt
+   - forgot PIN: adult math check (2-digit x 2-digit) + confirm replaces ONLY the PIN (progress, limit, today's time untouched)
    NOTE: client-side only – clearing the browser's site data removes the limit. Use Screen Time / Family Link for hard enforcement. */
 (() => {
   if (window.__omerPC) return; window.__omerPC = true;
@@ -238,8 +239,9 @@
     const m = showModal(`<h2>🔒 Parents · הורים</h2><div>Enter your 4-digit PIN</div><div class="he">הקישו קוד הורים (4 ספרות)</div>
       <div style="text-align:center;margin:10px 0"><input class="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"></div>
       <div style="text-align:center"><button class="b g ok" type="button">Open</button></div><div class="msg"></div>
-      <details style="font-size:13px;color:#777;margin-top:8px"><summary>Forgot PIN?</summary>Clearing this site's data in the browser settings (Site settings → lupovichran.github.io → Clear data) resets the PIN, the limit and the games' saved progress.</details>`);
+      <div style="text-align:center;margin-top:10px"><button class="b forgot" type="button" style="font-size:14px">שכחתי קוד · Forgot PIN</button></div>`);
     const inp = m.querySelector('input'), msg = m.querySelector('.msg');
+    m.querySelector('.forgot').addEventListener('click', forgotPin);
     if (wait > 0) { msg.textContent = `Too many wrong tries. Try again in ${Math.ceil(wait / 1000)} s.`; inp.disabled = true; setTimeout(() => modal === m && openParent(), wait + 200); return; }
     const go = async () => {
       const cc = cfg(); if (cc.lockUntil > Date.now()) return openParent();
@@ -257,8 +259,41 @@
     inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 4); if (inp.value.length === 4) go(); });
     setTimeout(() => inp.focus(), 50);
   }
+  // Forgot PIN: an adult math check (2-digit x 2-digit, typed, never spoken) + confirm, then a new PIN.
+  // Only the PIN fields change – the limit, hours, today's used time and all game progress stay as they are.
+  function forgotPin() {
+    const c = cfg(), wait = c.lockUntil - Date.now();
+    if (wait > 0) { const m = showModal(`<h2>🔑 Forgot PIN · שכחתי קוד</h2><div class="msg">Too many wrong tries. Try again in ${Math.ceil(wait / 1000)} s.</div>`); setTimeout(() => modal === m && forgotPin(), wait + 200); return; }
+    const a = 13 + Math.floor(Math.random() * 37), b = 13 + Math.floor(Math.random() * 37);
+    let tries = 0;
+    const m = showModal(`<h2>🔑 Forgot PIN · שכחתי קוד</h2>
+      <div class="he">כדי לאפס רק את קוד ההורים, פתרו את התרגיל (למבוגרים). ההתקדמות של עומר במשחקים לא תימחק.</div>
+      <div style="font-size:13px;color:#666">Solve to reset only the parent PIN. Game progress, stickers, the limit and today's time stay.</div>
+      <div class="q" style="text-align:center;font-size:34px;font-weight:bold;margin:12px 0;direction:ltr">${a} × ${b} = ?</div>
+      <div style="text-align:center"><input class="ans" inputmode="numeric" maxlength="5" autocomplete="off" style="font-size:26px;width:140px;text-align:center"></div>
+      <div style="text-align:center;margin-top:8px"><button class="b g ok" type="button">המשך · Continue</button></div><div class="msg"></div>`);
+    const inp = m.querySelector('.ans'), msg = m.querySelector('.msg');
+    inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 5); });
+    const go = () => {
+      if (+inp.value === a * b && inp.value !== '') return confirmReset();
+      tries++;
+      if (tries >= 3) { const cc = cfg(); cc.lockUntil = Date.now() + 120000; saveCfg(cc); return forgotPin(); }
+      msg.textContent = `Not right (${3 - tries} tries left) · לא נכון`; inp.value = ''; inp.focus();
+    };
+    m.querySelector('.ok').addEventListener('click', go);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    setTimeout(() => inp.focus(), 50);
+  }
+  function confirmReset() {
+    const m = showModal(`<h2>🔑 Reset PIN? · לאפס קוד?</h2>
+      <div class="he">יימחק רק קוד ההורים. המשחקים, המדבקות, ההגבלה היומית והזמן שכבר שוחק היום נשארים.</div>
+      <div style="font-size:13px;color:#666">Only the PIN is replaced. Nothing else changes and no extra time is added.</div>
+      <div style="text-align:center;margin-top:12px"><button class="b g yes" type="button">כן, קוד חדש · Yes, new PIN</button><button class="b no" type="button">ביטול · Cancel</button></div>`);
+    m.querySelector('.yes').addEventListener('click', () => setupPin('reset'));
+    m.querySelector('.no').addEventListener('click', closeModal);
+  }
   function setupPin(change) {
-    const m = showModal(`<h2>🔒 ${change ? 'Change' : 'Create a'} parent PIN</h2><div class="he">${change ? 'שינוי קוד הורים' : 'יצירת קוד הורים – 4 ספרות'}</div>
+    const m = showModal(`<h2>🔒 ${change === 'reset' ? 'New' : change ? 'Change' : 'Create a'} parent PIN</h2><div class="he">${change === 'reset' ? 'קוד הורים חדש – 4 ספרות' : change ? 'שינוי קוד הורים' : 'יצירת קוד הורים – 4 ספרות'}</div>
       <div style="margin-top:8px">Daily play limit is <b>on</b> (${cfg().limit} min). Choose a 4-digit PIN that only parents know.</div>
       <div style="text-align:center;margin:10px 0">New PIN<br><input class="pin p1" inputmode="numeric" maxlength="4" autocomplete="off"><br>Repeat<br><input class="pin p2" inputmode="numeric" maxlength="4" autocomplete="off"></div>
       <div style="text-align:center"><button class="b g ok" type="button">Save PIN</button></div><div class="msg"></div>`);
